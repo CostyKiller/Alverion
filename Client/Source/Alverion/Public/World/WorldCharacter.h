@@ -44,6 +44,7 @@ private:
 	void rise();
 	void toggleAutoRun();
 	void toggleRearView();
+	void toggleFirstPerson();
 
 	/** Whether a key, button or click other than the auto run key or the wheel went down this frame. */
 	bool pressedOtherThanAutoRun(const APlayerController& controller) const;
@@ -114,6 +115,12 @@ private:
 
 	/** Set and cleared by the rear view key: the camera looks behind, and movement keeps the way it faced before. */
 	bool _rearView = false;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _switchCameraAction;
+
+	/** Set and cleared by the switch camera key: the camera sits at the eyes, the worn body is hidden and turns with the camera. */
+	bool _firstPerson = false;
 
 	/** Set by any movement key this frame, read and cleared by Tick: four keys can be held at once, so no single release means stopped. */
 	bool _movedThisFrame = false;

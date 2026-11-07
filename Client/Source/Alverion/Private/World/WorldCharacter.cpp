@@ -27,6 +27,10 @@ namespace
 	constexpr float capsuleHalfHeightCm = 90.0f;
 	constexpr float cameraDistanceCm = 450.0f;
 
+	// Where the camera arm starts above the capsule's middle: over the shoulders from behind, at the eyes in first person.
+	constexpr float thirdPersonArmHeightCm = 60.0f;
+	constexpr float firstPersonArmHeightCm = 75.0f;
+
 	// The mouse wheel's reach, from over the shoulder to a wide view, how far one notch moves the camera and how quickly it glides there.
 	constexpr float cameraNearestCm = 150.0f;
 	constexpr float cameraFarthestCm = 1500.0f;
@@ -58,6 +62,7 @@ namespace
 	const TCHAR* const jumpPath = TEXT("/Game/Input/Actions/IA_Jump.IA_Jump");
 	const TCHAR* const autoRunPath = TEXT("/Game/Input/Actions/IA_AutoRun.IA_AutoRun");
 	const TCHAR* const backViewPath = TEXT("/Game/Input/Actions/IA_BackView.IA_BackView");
+	const TCHAR* const switchCameraPath = TEXT("/Game/Input/Actions/IA_SwitchCamera.IA_SwitchCamera");
 
 	UServerConnectionSubsystem* connectionOf(const AActor& actor)
 	{
@@ -86,7 +91,7 @@ AWorldCharacter::AWorldCharacter()
 	_arm->SetupAttachment(RootComponent);
 	_arm->TargetArmLength = cameraDistanceCm;
 	_cameraDistanceCm = cameraDistanceCm;
-	_arm->SetRelativeLocation(FVector(0.0f, 0.0f, 60.0f));
+	_arm->SetRelativeLocation(FVector(0.0f, 0.0f, thirdPersonArmHeightCm));
 	_arm->bUsePawnControlRotation = true;
 
 	_camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -145,6 +150,7 @@ void AWorldCharacter::wear(const Network::FAppearance& appearance)
 
 		character->_metaHuman = body;
 		character->_body->SetVisibility(false);
+		body->SetActorHiddenInGame(character->_firstPerson);
 	});
 }
 
@@ -161,6 +167,7 @@ void AWorldCharacter::PawnClientRestart()
 		_jumpAction = LoadObject<UInputAction>(nullptr, jumpPath);
 		_autoRunAction = LoadObject<UInputAction>(nullptr, autoRunPath);
 		_backViewAction = LoadObject<UInputAction>(nullptr, backViewPath);
+		_switchCameraAction = LoadObject<UInputAction>(nullptr, switchCameraPath);
 
 		_lookAction = NewObject<UInputAction>(this);
 		_lookAction->ValueType = EInputActionValueType::Axis2D;
@@ -236,6 +243,11 @@ void AWorldCharacter::SetupPlayerInputComponent(UInputComponent* input)
 		enhanced->BindAction(_backViewAction, ETriggerEvent::Started, this, &AWorldCharacter::toggleRearView);
 	}
 
+	if (_switchCameraAction != nullptr)
+	{
+		enhanced->BindAction(_switchCameraAction, ETriggerEvent::Started, this, &AWorldCharacter::toggleFirstPerson);
+	}
+
 	if (_lookAction != nullptr)
 	{
 		enhanced->BindAction(_lookAction, ETriggerEvent::Triggered, this, &AWorldCharacter::look);
@@ -307,6 +319,23 @@ void AWorldCharacter::toggleRearView()
 	FRotator rotation = Controller->GetControlRotation();
 	rotation.Yaw += 180.0f;
 	Controller->SetControlRotation(rotation);
+}
+
+void AWorldCharacter::toggleFirstPerson()
+{
+	_firstPerson = !_firstPerson;
+
+	// From the eyes the body turns with the camera, as somebody looking about does; from behind it faces where it runs.
+	bUseControllerRotationYaw = _firstPerson;
+	GetCharacterMovement()->bOrientRotationToMovement = !_firstPerson;
+
+	// The arm length glides in Tick; the height and the hidden body change at once, so the camera never sits inside the head.
+	_arm->SetRelativeLocation(FVector(0.0f, 0.0f, _firstPerson ? firstPersonArmHeightCm : thirdPersonArmHeightCm));
+	_body->SetHiddenInGame(_firstPerson);
+	if (_metaHuman != nullptr)
+	{
+		_metaHuman->SetActorHiddenInGame(_firstPerson);
+	}
 }
 
 bool AWorldCharacter::pressedOtherThanAutoRun(const APlayerController& controller) const
@@ -383,7 +412,7 @@ void AWorldCharacter::Tick(float deltaSeconds)
 		_camera->SetFieldOfView(settings->getFieldOfView());
 	}
 
-	_arm->TargetArmLength = FMath::FInterpTo(_arm->TargetArmLength, _cameraDistanceCm, deltaSeconds, cameraZoomRate);
+	_arm->TargetArmLength = FMath::FInterpTo(_arm->TargetArmLength, _firstPerson ? 0.0f : _cameraDistanceCm, deltaSeconds, cameraZoomRate);
 
 	if (_onGround)
 	{

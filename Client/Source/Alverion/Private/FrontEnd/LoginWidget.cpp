@@ -90,6 +90,7 @@ namespace
 	// The asset set no size on the credential labels, which lands on the engine default.
 	constexpr int32 credentialFontSize = 15;
 	constexpr float credentialLabelWidth = 110.0f;
+	constexpr FLinearColor credentialLabelRim = FLinearColor(0.4f, 0.4f, 0.42f, 1.0f);
 
 	// Light ink over a dark translucent fill, so the fields sit in the same family as the buttons.
 	// The stock light grey boxes read as placeholders against the styled frame around them.
@@ -156,7 +157,12 @@ namespace
 		UHorizontalBox* row = tree.ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
 
 		UTextBlock* label = tree.ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(labelName));
-		label->SetFont(UIStyle::font(credentialFontSize));
+
+		// A mid grey rim, since these stand on the bright sky rather than on a panel: a light one blurs the letters, a black one is too heavy.
+		FSlateFontInfo labelFont = UIStyle::font(credentialFontSize);
+		labelFont.OutlineSettings.OutlineSize = 1;
+		labelFont.OutlineSettings.OutlineColor = credentialLabelRim;
+		label->SetFont(labelFont);
 		label->SetColorAndOpacity(FSlateColor(UIStyle::labelColor));
 		label->SetMinDesiredWidth(credentialLabelWidth);
 		label->SetJustification(ETextJustify::Right);

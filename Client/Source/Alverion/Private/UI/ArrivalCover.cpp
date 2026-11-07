@@ -6,11 +6,11 @@
 namespace
 {
 	// Black while the arrived scene settles, then the fade.
-	constexpr float coverHoldSeconds = 1.0f;
-	constexpr float coverFadeSeconds = 1.0f;
+	constexpr float arrivalHoldSeconds = 1.0f;
+	constexpr float arrivalFadeSeconds = 1.0f;
 
 	// The first frames after a load can each take far longer than this, and counted whole they would spend the hold before anything was drawn.
-	constexpr float coverLongestStepSeconds = 0.1f;
+	constexpr float arrivalLongestStepSeconds = 0.1f;
 }
 
 TSharedRef<SWidget> UArrivalCover::RebuildWidget()
@@ -32,9 +32,9 @@ void UArrivalCover::NativeTick(const FGeometry& geometry, float deltaSeconds)
 {
 	Super::NativeTick(geometry, deltaSeconds);
 
-	_elapsed += FMath::Min(deltaSeconds, coverLongestStepSeconds);
+	_elapsed += FMath::Min(deltaSeconds, arrivalLongestStepSeconds);
 
-	const float alpha = 1.0f - FMath::Clamp((_elapsed - coverHoldSeconds) / coverFadeSeconds, 0.0f, 1.0f);
+	const float alpha = 1.0f - FMath::Clamp((_elapsed - arrivalHoldSeconds) / arrivalFadeSeconds, 0.0f, 1.0f);
 	if (_black != nullptr)
 	{
 		_black->SetColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, alpha));

@@ -126,22 +126,22 @@ void UGameMenuWidget::NativeConstruct()
 
 	if (closeButton != nullptr)
 	{
-		closeButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleCloseClicked);
+		closeButton->OnClicked.AddUniqueDynamic(this, &UGameMenuWidget::handleCloseClicked);
 	}
 
 	if (optionsButton != nullptr)
 	{
-		optionsButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleOptionsClicked);
+		optionsButton->OnClicked.AddUniqueDynamic(this, &UGameMenuWidget::handleOptionsClicked);
 	}
 
 	if (charactersButton != nullptr)
 	{
-		charactersButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleCharactersClicked);
+		charactersButton->OnClicked.AddUniqueDynamic(this, &UGameMenuWidget::handleCharactersClicked);
 	}
 
 	if (quitButton != nullptr)
 	{
-		quitButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleQuitClicked);
+		quitButton->OnClicked.AddUniqueDynamic(this, &UGameMenuWidget::handleQuitClicked);
 	}
 
 	LocalizedText::applyToTree(WidgetTree, gameMenuTextKeys);
@@ -155,6 +155,23 @@ UWidget* UGameMenuWidget::NativeGetDesiredFocusTarget() const
 	}
 
 	return Super::NativeGetDesiredFocusTarget();
+}
+
+FReply UGameMenuWidget::NativeOnKeyDown(const FGeometry& geometry, const FKeyEvent& keyEvent)
+{
+	if (keyEvent.GetKey() == EKeys::Escape)
+	{
+		UGameInstance* gameInstance = GetGameInstance();
+		UUISubsystem* ui = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+		if ((ui == nullptr) || ui->acceptEscape(keyEvent.IsRepeat()))
+		{
+			handleCloseClicked();
+		}
+
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnKeyDown(geometry, keyEvent);
 }
 
 void UGameMenuWidget::playClickSound() const

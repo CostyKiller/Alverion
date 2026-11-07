@@ -691,87 +691,87 @@ void UOptionsWidget::NativeConstruct()
 
 	if (displayTabButton != nullptr)
 	{
-		displayTabButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleDisplayTabClicked);
+		displayTabButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleDisplayTabClicked);
 	}
 
 	if (audioTabButton != nullptr)
 	{
-		audioTabButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleAudioTabClicked);
+		audioTabButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleAudioTabClicked);
 	}
 
 	if (inputTabButton != nullptr)
 	{
-		inputTabButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleInputTabClicked);
+		inputTabButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleInputTabClicked);
 	}
 
 	if (gameplayTabButton != nullptr)
 	{
-		gameplayTabButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleGameplayTabClicked);
+		gameplayTabButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleGameplayTabClicked);
 	}
 
 	if (interfaceTabButton != nullptr)
 	{
-		interfaceTabButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleInterfaceTabClicked);
+		interfaceTabButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleInterfaceTabClicked);
 	}
 
 	if (applyButton != nullptr)
 	{
-		applyButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleApplyClicked);
+		applyButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleApplyClicked);
 	}
 
 	if (revertButton != nullptr)
 	{
-		revertButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleRevertClicked);
+		revertButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleRevertClicked);
 	}
 
 	if (defaultsButton != nullptr)
 	{
-		defaultsButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleDefaultsClicked);
+		defaultsButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleDefaultsClicked);
 	}
 
 	if (backButton != nullptr)
 	{
-		backButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleBackClicked);
+		backButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleBackClicked);
 	}
 
 	if (keepChangesButton != nullptr)
 	{
-		keepChangesButton->OnClicked.AddDynamic(this, &UOptionsWidget::handleKeepChangesClicked);
+		keepChangesButton->OnClicked.AddUniqueDynamic(this, &UOptionsWidget::handleKeepChangesClicked);
 	}
 
 	if (fovSlider != nullptr)
 	{
-		fovSlider->OnValueChanged.AddDynamic(this, &UOptionsWidget::handleFovChanged);
+		fovSlider->OnValueChanged.AddUniqueDynamic(this, &UOptionsWidget::handleFovChanged);
 	}
 
 	if (mouseSensitivitySlider != nullptr)
 	{
-		mouseSensitivitySlider->OnValueChanged.AddDynamic(this, &UOptionsWidget::handleMouseSensitivityChanged);
+		mouseSensitivitySlider->OnValueChanged.AddUniqueDynamic(this, &UOptionsWidget::handleMouseSensitivityChanged);
 	}
 
 	if (screenPercentageSlider != nullptr)
 	{
-		screenPercentageSlider->OnValueChanged.AddDynamic(this, &UOptionsWidget::handleScreenPercentageChanged);
+		screenPercentageSlider->OnValueChanged.AddUniqueDynamic(this, &UOptionsWidget::handleScreenPercentageChanged);
 	}
 
 	if (hudScaleSlider != nullptr)
 	{
-		hudScaleSlider->OnValueChanged.AddDynamic(this, &UOptionsWidget::handleHudScaleChanged);
+		hudScaleSlider->OnValueChanged.AddUniqueDynamic(this, &UOptionsWidget::handleHudScaleChanged);
 	}
 
 	if (masterVolumeSlider != nullptr)
 	{
-		masterVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionsWidget::handleMasterVolumeChanged);
+		masterVolumeSlider->OnValueChanged.AddUniqueDynamic(this, &UOptionsWidget::handleMasterVolumeChanged);
 	}
 
 	if (musicVolumeSlider != nullptr)
 	{
-		musicVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionsWidget::handleMusicVolumeChanged);
+		musicVolumeSlider->OnValueChanged.AddUniqueDynamic(this, &UOptionsWidget::handleMusicVolumeChanged);
 	}
 
 	if (sfxVolumeSlider != nullptr)
 	{
-		sfxVolumeSlider->OnValueChanged.AddDynamic(this, &UOptionsWidget::handleSfxVolumeChanged);
+		sfxVolumeSlider->OnValueChanged.AddUniqueDynamic(this, &UOptionsWidget::handleSfxVolumeChanged);
 	}
 
 	// Applying a language switches the running culture under a screen that is still open,
@@ -839,6 +839,19 @@ FReply UOptionsWidget::NativeOnKeyDown(const FGeometry& geometry, const FKeyEven
 {
 	if (applyPendingRebind(keyEvent.GetKey()))
 	{
+		return FReply::Handled();
+	}
+
+	// Escape leaves the way Back does, in the front end as well as over the world. A rebind in progress took it above.
+	if (keyEvent.GetKey() == EKeys::Escape)
+	{
+		UGameInstance* gameInstance = GetGameInstance();
+		UUISubsystem* ui = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+		if ((ui == nullptr) || ui->acceptEscape(keyEvent.IsRepeat()))
+		{
+			handleBackClicked();
+		}
+
 		return FReply::Handled();
 	}
 

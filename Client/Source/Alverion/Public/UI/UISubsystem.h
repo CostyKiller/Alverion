@@ -88,7 +88,13 @@ public:
 	// The server answers a creation before it sends the list, so the new character's id is not known at that moment.
 	FString createdName;
 
+	// Whether an Escape press may close or open a screen: never a held key's repeat, and only after Escape has rested 300 milliseconds.
+	// A burst of presses then closes one screen rather than running through all of them and opening the menu again.
+	bool acceptEscape(bool isRepeat);
+
 private:
+	double _lastEscapeSeconds = 0.0;
+
 	UPROPERTY()
 	TMap<EUILayer, TObjectPtr<UCommonActivatableWidgetStack>> _layers;
 

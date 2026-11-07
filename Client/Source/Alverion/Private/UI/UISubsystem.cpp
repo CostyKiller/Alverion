@@ -3,6 +3,26 @@
 #include "CommonActivatableWidget.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
 
+namespace
+{
+	// How long Escape must rest before a press counts.
+	constexpr double escapeCooldownSeconds = 0.3;
+}
+
+bool UUISubsystem::acceptEscape(bool isRepeat)
+{
+	if (isRepeat)
+	{
+		return false;
+	}
+
+	// Measured from the last press, taken or not, so mashing counts once and nothing more until the key rests.
+	const double now = FPlatformTime::Seconds();
+	const bool rested = ((now - _lastEscapeSeconds) >= escapeCooldownSeconds);
+	_lastEscapeSeconds = now;
+	return rested;
+}
+
 void UUISubsystem::registerLayer(EUILayer layer, UCommonActivatableWidgetStack* stack)
 {
 	if (stack == nullptr)

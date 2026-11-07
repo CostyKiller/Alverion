@@ -43,7 +43,7 @@ void AClientPlayerController::toggleGameMenu()
 	UGameInstance* gameInstance = GetGameInstance();
 	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
 	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
-	if (layer == nullptr)
+	if ((layer == nullptr) || !subsystem->acceptEscape(false))
 	{
 		return;
 	}

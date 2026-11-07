@@ -283,29 +283,29 @@ void ULoginWidget::NativeConstruct()
 
 	if (loginButton != nullptr)
 	{
-		loginButton->OnClicked.AddDynamic(this, &ULoginWidget::handleLoginClicked);
+		loginButton->OnClicked.AddUniqueDynamic(this, &ULoginWidget::handleLoginClicked);
 	}
 
 	if (optionsButton != nullptr)
 	{
-		optionsButton->OnClicked.AddDynamic(this, &ULoginWidget::handleOptionsClicked);
+		optionsButton->OnClicked.AddUniqueDynamic(this, &ULoginWidget::handleOptionsClicked);
 	}
 
 	if (quitButton != nullptr)
 	{
-		quitButton->OnClicked.AddDynamic(this, &ULoginWidget::handleQuitClicked);
+		quitButton->OnClicked.AddUniqueDynamic(this, &ULoginWidget::handleQuitClicked);
 	}
 
 	// Enter in either field submits, which is what every login screen has taught players to expect.
 	if (accountTextBox != nullptr)
 	{
-		accountTextBox->OnTextCommitted.AddDynamic(this, &ULoginWidget::handleCredentialCommitted);
+		accountTextBox->OnTextCommitted.AddUniqueDynamic(this, &ULoginWidget::handleCredentialCommitted);
 	}
 
 	if (passwordTextBox != nullptr)
 	{
 		passwordTextBox->SetIsPassword(true);
-		passwordTextBox->OnTextCommitted.AddDynamic(this, &ULoginWidget::handleCredentialCommitted);
+		passwordTextBox->OnTextCommitted.AddUniqueDynamic(this, &ULoginWidget::handleCredentialCommitted);
 	}
 
 	if (statusText != nullptr)

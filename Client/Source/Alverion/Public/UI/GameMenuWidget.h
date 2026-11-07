@@ -25,6 +25,9 @@ public:
 protected:
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 
+	/** Escape closes the menu here: CommonUI holds the game's keys back while a menu is up, so the menu key never reaches the controller. */
+	virtual FReply NativeOnKeyDown(const FGeometry& geometry, const FKeyEvent& keyEvent) override;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Game Menu")
 	TObjectPtr<USoundBase> clickSound;
 

@@ -9,6 +9,8 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
+#include "Engine/GameInstance.h"
+#include "UI/UISubsystem.h"
 
 #include "UI/LocalizedText.h"
 #include "UI/UIStyle.h"
@@ -150,7 +152,13 @@ FReply UConfirmDialog::NativeOnKeyDown(const FGeometry& geometry, const FKeyEven
 {
 	if (keyEvent.GetKey() == EKeys::Escape)
 	{
-		DeactivateWidget();
+		UGameInstance* gameInstance = GetGameInstance();
+		UUISubsystem* ui = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+		if ((ui == nullptr) || ui->acceptEscape(keyEvent.IsRepeat()))
+		{
+			DeactivateWidget();
+		}
+
 		return FReply::Handled();
 	}
 

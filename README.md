@@ -28,13 +28,13 @@ Unreal Engine 5 client for L2J Mobius.
 
 Development builds also accept `-autologin=account,password,character`.
 
-Run it from the editor executable with `-game`, or package it:
+The menus run straight from the editor, but the world runs only in a packaged build: its terrain plugin needs an editor library to read the map, and that library cannot run inside a game.
 
 ```
 RunUAT BuildCookRun -project=Client/Alverion.uproject -platform=Win64 -clientconfig=Development -build -cook -stage -pak -archive -archivedirectory=Client/Saved/Packaged
 ```
 
-Play in Editor shows no ground on `L_Continent`, because the editor previews the terrain instead of streaming its compiled sections. After changing the terrain, compile those sections again:
+After changing the terrain, compile its sections again before packaging:
 
 ```
 UnrealEditor-Cmd Client/Alverion.uproject /Game/Maps/L_Continent -run=WorldPartitionBuilderCommandlet -Builder=WorldPartitionMeshPartitionBuilder -SCCProvider=None

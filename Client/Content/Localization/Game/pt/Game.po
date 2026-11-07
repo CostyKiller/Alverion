@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Game\n"
-"POT-Creation-Date: 2026-11-07 10:46\n"
-"PO-Revision-Date: 2026-11-07 10:46\n"
+"POT-Creation-Date: 2026-11-07 11:09\n"
+"PO-Revision-Date: 2026-11-07 11:09\n"
 "Language-Team: \n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
@@ -411,6 +411,13 @@ msgstr "Sair"
 msgctxt "ST_Game,menu.exit_confirm"
 msgid "Exit game?"
 msgstr "Sair do jogo?"
+
+#. Key:	menu.loading
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.loading"
+msgid "Loading..."
+msgstr "Carregando..."
 
 #. Key:	menu.no
 #. SourceLocation:	Localization/StringTables/ST_Game.csv

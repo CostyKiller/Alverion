@@ -7,14 +7,6 @@
 #include "Components/TextBlock.h"
 #include "UIStyle.h"
 
-namespace
-{
-	// The studio mark is text until there is a logo to show: centred where the full screen logo picture sat, at a size that fills the same middle of the screen.
-	const TCHAR* const studioName = TEXT("Mobius Development");
-	constexpr int32 studioFontSize = 96;
-	constexpr int32 studioLetterSpacing = 120;
-}
-
 TSharedRef<SWidget> UIntroWidget::RebuildWidget()
 {
 	if ((WidgetTree != nullptr) && (WidgetTree->RootWidget == nullptr))
@@ -24,7 +16,7 @@ TSharedRef<SWidget> UIntroWidget::RebuildWidget()
 
 		// The logo picture filled the screen and hid the scene behind it, so a dark card stands in for it.
 		FSlateBrush cardBrush;
-		cardBrush.TintColor = FSlateColor(FLinearColor(0.02f, 0.02f, 0.025f, 1.0f));
+		cardBrush.TintColor = FSlateColor(UIStyle::cardColor);
 		UImage* card = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
 		card->SetBrush(cardBrush);
 		UOverlaySlot* cardSlot = root->AddChildToOverlay(card);
@@ -32,12 +24,12 @@ TSharedRef<SWidget> UIntroWidget::RebuildWidget()
 		cardSlot->SetVerticalAlignment(VAlign_Fill);
 
 		UTextBlock* studio = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-		studio->SetText(FText::FromString(studioName));
+		studio->SetText(FText::FromString(UIStyle::studioName));
 		studio->SetJustification(ETextJustify::Center);
 
 		// Spaced out, which is the whole look of the mark and is not something a font size gives.
-		FSlateFontInfo font = UIStyle::font(studioFontSize);
-		font.LetterSpacing = studioLetterSpacing;
+		FSlateFontInfo font = UIStyle::font(UIStyle::studioFontSize);
+		font.LetterSpacing = UIStyle::studioLetterSpacing;
 		studio->SetFont(font);
 
 		UOverlaySlot* studioSlot = root->AddChildToOverlay(studio);

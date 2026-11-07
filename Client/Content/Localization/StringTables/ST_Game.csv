@@ -125,3 +125,4 @@ Key,SourceString
 "server.title","Choose a server"
 "worldentry.preparing","Preparing {0}."
 "worldentry.title","Entering the world"
+"menu.loading","Loading..."

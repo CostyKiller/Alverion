@@ -2,6 +2,7 @@
 
 #include "Appearance.h"
 #include "Camera/CameraActor.h"
+#include "CardGameModes.h"
 #include "Camera/CameraComponent.h"
 #include "CharacterCreateWidget.h"
 #include "CharacterSelectWidget.h"
@@ -64,7 +65,24 @@ AFrontEndGameMode::AFrontEndGameMode()
 
 void AFrontEndGameMode::travelToWorld(UObject* worldContext)
 {
-	UGameplayStatics::OpenLevel(worldContext, FName(continentMap), true, TEXT("game=/Script/Alverion.WorldGameMode"));
+#if WITH_EDITOR
+	// The continent's terrain plugin cannot run in a game started from the editor executable: reading the map needs its editor library, and that library crashes the game when the world is torn down.
+	// So such a run stops here and says so, rather than crashing on the way in or on the way out.
+	if (!GIsEditor)
+	{
+		const TCHAR* const notice = TEXT("The world runs only in a packaged build of the game.");
+		UE_LOG(LogTemp, Warning, TEXT("%s"), notice);
+		if (GEngine != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, notice);
+		}
+
+		return;
+	}
+#endif
+
+	// By way of the loading card. The continent's world settings name its game mode.
+	ALoadingGameMode::travelTo(worldContext, continentMap);
 }
 
 void AFrontEndGameMode::BeginPlay()

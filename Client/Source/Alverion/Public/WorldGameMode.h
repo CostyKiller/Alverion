@@ -8,6 +8,7 @@
 #include "WorldGameMode.generated.h"
 
 class AProxyCharacter;
+class URootLayout;
 class UServerConnectionSubsystem;
 
 /** The continent's game mode: the player's character where the server put it, and everybody the server says is around. */
@@ -31,4 +32,7 @@ private:
 
 	UPROPERTY()
 	TMap<uint32, TObjectPtr<AProxyCharacter>> _proxies;
+
+	UPROPERTY()
+	TObjectPtr<URootLayout> _rootLayout;
 };

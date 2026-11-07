@@ -1,0 +1,897 @@
+﻿# Game Korean translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Game\n"
+"POT-Creation-Date: 2026-11-07 10:46\n"
+"PO-Revision-Date: 2026-11-07 10:46\n"
+"Language-Team: \n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. Key:	charcreate.eye_amber
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_amber"
+msgid "Amber"
+msgstr "호박색"
+
+#. Key:	charcreate.eye_black
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_black"
+msgid "Black"
+msgstr "검은색"
+
+#. Key:	charcreate.eye_blue
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_blue"
+msgid "Blue"
+msgstr "파란색"
+
+#. Key:	charcreate.eye_brown
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_brown"
+msgid "Brown"
+msgstr "갈색"
+
+#. Key:	charcreate.eye_green
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_green"
+msgid "Green"
+msgstr "초록색"
+
+#. Key:	charcreate.eye_grey
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_grey"
+msgid "Grey"
+msgstr "회색"
+
+#. Key:	charcreate.hair_auburn
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_auburn"
+msgid "Auburn"
+msgstr "적갈색"
+
+#. Key:	charcreate.hair_black
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_black"
+msgid "Black"
+msgstr "검은색"
+
+#. Key:	charcreate.hair_blonde
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_blonde"
+msgid "Blonde"
+msgstr "금발"
+
+#. Key:	charcreate.hair_brown
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_brown"
+msgid "Brown"
+msgstr "갈색"
+
+#. Key:	charcreate.hair_red
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_red"
+msgid "Red"
+msgstr "빨간색"
+
+#. Key:	charcreate.name_required
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.name_required"
+msgid "A name is required."
+msgstr "이름을 입력하세요."
+
+#. Key:	charcreate.row_beard
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_beard"
+msgid "Beard"
+msgstr "턱수염"
+
+#. Key:	charcreate.row_eyebrows
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_eyebrows"
+msgid "Eyebrows"
+msgstr "눈썹"
+
+#. Key:	charcreate.row_eyes
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_eyes"
+msgid "Eyes"
+msgstr "눈"
+
+#. Key:	charcreate.row_face
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_face"
+msgid "Face"
+msgstr "얼굴"
+
+#. Key:	charcreate.row_hair
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_hair"
+msgid "Hair"
+msgstr "머리"
+
+#. Key:	charcreate.row_hair_color
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_hair_color"
+msgid "Hair Color"
+msgstr "머리 색"
+
+#. Key:	charcreate.row_moustache
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_moustache"
+msgid "Moustache"
+msgstr "콧수염"
+
+#. Key:	charcreate.row_tone
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_tone"
+msgid "Tone"
+msgstr "피부 톤"
+
+#. Key:	charcreate.sex_female
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.sex_female"
+msgid "Female"
+msgstr "여성"
+
+#. Key:	charcreate.sex_male
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.sex_male"
+msgid "Male"
+msgstr "남성"
+
+#. Key:	charcreate.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.title"
+msgid "Create a character"
+msgstr "캐릭터 생성"
+
+#. Key:	charcreate.value_none
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.value_none"
+msgid "None"
+msgstr "없음"
+
+#. Key:	charcreate.value_type
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.value_type"
+msgid "Type {0}"
+msgstr "유형 {0}"
+
+#. Key:	charcreate.working
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.working"
+msgid "Asking the server."
+msgstr "서버에 요청하는 중입니다."
+
+#. Key:	charselect.exit_game
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.exit_game"
+msgid "Exit Game"
+msgstr "게임 종료"
+
+#. Key:	charselect.server_list
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.server_list"
+msgid "Server List"
+msgstr "서버 목록"
+
+#. Key:	charselect.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.title"
+msgid "Choose a character"
+msgstr "캐릭터 선택"
+
+#. Key:	keybind.Attack
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Attack"
+msgid "Attack"
+msgstr "공격"
+
+#. Key:	keybind.AutoRun
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.AutoRun"
+msgid "Auto Run"
+msgstr "자동 달리기"
+
+#. Key:	keybind.BackView
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.BackView"
+msgid "Back View"
+msgstr "뒤돌아보기"
+
+#. Key:	keybind.Chat
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Chat"
+msgid "Chat"
+msgstr "채팅"
+
+#. Key:	keybind.Interact
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Interact"
+msgid "Interact"
+msgstr "상호작용"
+
+#. Key:	keybind.Inventory
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Inventory"
+msgid "Inventory"
+msgstr "인벤토리"
+
+#. Key:	keybind.Jump
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Jump"
+msgid "Jump"
+msgstr "점프"
+
+#. Key:	keybind.Map
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Map"
+msgid "Map"
+msgstr "지도"
+
+#. Key:	keybind.Menu
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Menu"
+msgid "Menu"
+msgstr "메뉴"
+
+#. Key:	keybind.MoveBackward
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveBackward"
+msgid "Move Backward"
+msgstr "뒤로 이동"
+
+#. Key:	keybind.MoveForward
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveForward"
+msgid "Move Forward"
+msgstr "앞으로 이동"
+
+#. Key:	keybind.MoveLeft
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveLeft"
+msgid "Strafe Left"
+msgstr "왼쪽 이동"
+
+#. Key:	keybind.MoveRight
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveRight"
+msgid "Strafe Right"
+msgstr "오른쪽 이동"
+
+#. Key:	keybind.SwitchCamera
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.SwitchCamera"
+msgid "Switch Camera"
+msgstr "카메라 전환"
+
+#. Key:	keybind.unbound
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.unbound"
+msgid "Unbound"
+msgstr "지정 안 됨"
+
+#. Key:	login.account
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.account"
+msgid "Account"
+msgstr "계정"
+
+#. Key:	login.account_required
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.account_required"
+msgid "Enter an account name."
+msgstr "계정 이름을 입력하세요."
+
+#. Key:	login.connecting
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.connecting"
+msgid "Connecting..."
+msgstr "연결 중..."
+
+#. Key:	login.could_not_connect
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.could_not_connect"
+msgid "Could not connect."
+msgstr "연결할 수 없습니다."
+
+#. Key:	login.login
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.login"
+msgid "Login"
+msgstr "로그인"
+
+#. Key:	login.password
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.password"
+msgid "Password"
+msgstr "비밀번호"
+
+#. Key:	menu.back
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.back"
+msgid "Back"
+msgstr "뒤로"
+
+#. Key:	menu.create
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.create"
+msgid "Create"
+msgstr "만들기"
+
+#. Key:	menu.delete
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.delete"
+msgid "Delete"
+msgstr "삭제"
+
+#. Key:	menu.delete_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.delete_confirm"
+msgid "Delete \"{0}\"?\nThis cannot be undone."
+msgstr "\"{0}\"을(를) 삭제하시겠습니까?\n되돌릴 수 없습니다."
+
+#. Key:	menu.enter
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.enter"
+msgid "Enter"
+msgstr "입장"
+
+#. Key:	menu.exit
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.exit"
+msgid "Exit"
+msgstr "종료"
+
+#. Key:	menu.exit_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.exit_confirm"
+msgid "Exit game?"
+msgstr "게임을 종료하시겠습니까?"
+
+#. Key:	menu.no
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.no"
+msgid "No"
+msgstr "아니오"
+
+#. Key:	menu.options
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.options"
+msgid "Options"
+msgstr "설정"
+
+#. Key:	menu.options_title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.options_title"
+msgid "Options"
+msgstr "설정"
+
+#. Key:	menu.quit_to_menu
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.quit_to_menu"
+msgid "Quit to Menu"
+msgstr "메뉴로 돌아가기"
+
+#. Key:	menu.resume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.resume"
+msgid "Resume"
+msgstr "계속하기"
+
+#. Key:	menu.yes
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.yes"
+msgid "Yes"
+msgstr "예"
+
+#. Key:	options.apply
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.apply"
+msgid "Apply"
+msgstr "적용"
+
+#. Key:	options.back
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.back"
+msgid "Back"
+msgstr "뒤로"
+
+#. Key:	options.bucket_anti_aliasing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_anti_aliasing"
+msgid "Anti-Aliasing Quality"
+msgstr "안티앨리어싱 품질"
+
+#. Key:	options.bucket_effects
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_effects"
+msgid "Effects"
+msgstr "효과"
+
+#. Key:	options.bucket_foliage
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_foliage"
+msgid "Foliage"
+msgstr "초목"
+
+#. Key:	options.bucket_global_illumination
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_global_illumination"
+msgid "Global Illumination"
+msgstr "전역 조명"
+
+#. Key:	options.bucket_landscape
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_landscape"
+msgid "Landscape"
+msgstr "지형"
+
+#. Key:	options.bucket_post_processing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_post_processing"
+msgid "Post Processing"
+msgstr "후처리"
+
+#. Key:	options.bucket_reflection
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_reflection"
+msgid "Reflections"
+msgstr "반사"
+
+#. Key:	options.bucket_shading
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_shading"
+msgid "Shading"
+msgstr "셰이딩"
+
+#. Key:	options.bucket_shadow
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_shadow"
+msgid "Shadows"
+msgstr "그림자"
+
+#. Key:	options.bucket_texture
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_texture"
+msgid "Textures"
+msgstr "텍스처"
+
+#. Key:	options.bucket_view_distance
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_view_distance"
+msgid "View Distance"
+msgstr "시야 거리"
+
+#. Key:	options.camera_first_person
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_first_person"
+msgid "First Person"
+msgstr "1인칭"
+
+#. Key:	options.camera_mode
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_mode"
+msgid "Camera"
+msgstr "카메라"
+
+#. Key:	options.camera_third_person
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_third_person"
+msgid "Third Person"
+msgstr "3인칭"
+
+#. Key:	options.chat_filter
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.chat_filter"
+msgid "Filter Chat Language"
+msgstr "채팅 비속어 필터"
+
+#. Key:	options.damage_numbers
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.damage_numbers"
+msgid "Damage Numbers"
+msgstr "피해량 표시"
+
+#. Key:	options.defaults
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.defaults"
+msgid "Defaults"
+msgstr "기본값"
+
+#. Key:	options.fov
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.fov"
+msgid "Field of View"
+msgstr "시야각"
+
+#. Key:	options.frame_cap
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.frame_cap"
+msgid "Frame Rate Cap"
+msgstr "프레임 제한"
+
+#. Key:	options.hud_scale
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.hud_scale"
+msgid "HUD Scale"
+msgstr "HUD 크기"
+
+#. Key:	options.keep
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.keep"
+msgid "Keep"
+msgstr "유지"
+
+#. Key:	options.language
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.language"
+msgid "Language"
+msgstr "언어"
+
+#. Key:	options.lumen
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.lumen"
+msgid "Lumen Lighting"
+msgstr "Lumen 조명"
+
+#. Key:	options.master_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.master_volume"
+msgid "Master Volume"
+msgstr "전체 볼륨"
+
+#. Key:	options.music_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.music_volume"
+msgid "Music Volume"
+msgstr "음악 볼륨"
+
+#. Key:	options.nameplates
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.nameplates"
+msgid "Nameplates"
+msgstr "이름표"
+
+#. Key:	options.nanite
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.nanite"
+msgid "Nanite Geometry"
+msgstr "Nanite 지오메트리"
+
+#. Key:	options.quality
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality"
+msgid "Quality"
+msgstr "품질"
+
+#. Key:	options.quality_cinematic
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_cinematic"
+msgid "Cinematic"
+msgstr "시네마틱"
+
+#. Key:	options.quality_custom
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_custom"
+msgid "Custom"
+msgstr "사용자 지정"
+
+#. Key:	options.quality_epic
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_epic"
+msgid "Epic"
+msgstr "에픽"
+
+#. Key:	options.quality_high
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_high"
+msgid "High"
+msgstr "높음"
+
+#. Key:	options.quality_low
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_low"
+msgid "Low"
+msgstr "낮음"
+
+#. Key:	options.quality_medium
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_medium"
+msgid "Medium"
+msgstr "중간"
+
+#. Key:	options.reset_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.reset_confirm"
+msgid "Reset to defaults?"
+msgstr "기본값으로 초기화하시겠습니까?"
+
+#. Key:	options.resolution
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.resolution"
+msgid "Resolution"
+msgstr "해상도"
+
+#. Key:	options.revert
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.revert"
+msgid "Revert"
+msgstr "되돌리기"
+
+#. Key:	options.screen_percentage
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.screen_percentage"
+msgid "Render Scale"
+msgstr "렌더링 배율"
+
+#. Key:	options.sensitivity
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.sensitivity"
+msgid "Sensitivity"
+msgstr "감도"
+
+#. Key:	options.sfx_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.sfx_volume"
+msgid "SFX Volume"
+msgstr "효과음 볼륨"
+
+#. Key:	options.show_fps
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.show_fps"
+msgid "Show FPS"
+msgstr "FPS 표시"
+
+#. Key:	options.show_stats
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.show_stats"
+msgid "Show Stats"
+msgstr "통계 표시"
+
+#. Key:	options.tab_audio
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_audio"
+msgid "Audio"
+msgstr "오디오"
+
+#. Key:	options.tab_display
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_display"
+msgid "Display"
+msgstr "화면"
+
+#. Key:	options.tab_gameplay
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_gameplay"
+msgid "Gameplay"
+msgstr "게임플레이"
+
+#. Key:	options.tab_interface
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_interface"
+msgid "Interface"
+msgstr "인터페이스"
+
+#. Key:	options.tab_keybindings
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_keybindings"
+msgid "Keybindings"
+msgstr "키 설정"
+
+#. Key:	options.upscaler
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler"
+msgid "Anti-Aliasing"
+msgstr "안티앨리어싱"
+
+#. Key:	options.upscaler_fxaa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_fxaa"
+msgid "FXAA"
+msgstr "FXAA"
+
+#. Key:	options.upscaler_off
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_off"
+msgid "Off"
+msgstr "끄기"
+
+#. Key:	options.upscaler_smaa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_smaa"
+msgid "SMAA"
+msgstr "SMAA"
+
+#. Key:	options.upscaler_taa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_taa"
+msgid "TAA"
+msgstr "TAA"
+
+#. Key:	options.upscaler_tsr
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_tsr"
+msgid "TSR"
+msgstr "TSR"
+
+#. Key:	options.vsync
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.vsync"
+msgid "VSync"
+msgstr "수직 동기화"
+
+#. Key:	options.window_mode
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.window_mode"
+msgid "Window Mode"
+msgstr "창 모드"
+
+#. Key:	server.none
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.none"
+msgid "The login server listed no servers."
+msgstr "로그인 서버가 서버를 반환하지 않았습니다."
+
+#. Key:	server.status_offline
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.status_offline"
+msgid "Offline"
+msgstr "오프라인"
+
+#. Key:	server.status_online
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.status_online"
+msgid "Online"
+msgstr "온라인"
+
+#. Key:	server.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.title"
+msgid "Choose a server"
+msgstr "서버 선택"
+
+#. Key:	worldentry.preparing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,worldentry.preparing"
+msgid "Preparing {0}."
+msgstr "{0}을(를) 준비하는 중입니다."
+
+#. Key:	worldentry.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,worldentry.title"
+msgid "Entering the world"
+msgstr "월드에 진입하는 중"
+

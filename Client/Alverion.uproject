@@ -17,6 +17,10 @@
 	],
 	"Plugins": [
 		{
+			"Name": "CommonUI",
+			"Enabled": true
+		},
+		{
 			"Name": "MeshPartition",
 			"Enabled": true
 		},

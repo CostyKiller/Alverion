@@ -2,16 +2,21 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "UISubsystem.h"
 
 #include "FrontEndGameMode.generated.h"
 
-class SCharacterScreen;
-class SCreateScreen;
-class SLoginScreen;
-class SWidget;
-class UServerConnectionSubsystem;
+class ACameraActor;
+class UAudioComponent;
+class UCommonActivatableWidget;
+class UIntroWidget;
+class URootLayout;
+class USoundBase;
 
-/** Login, the character list and character creation, over a daylit empty map. Hands over to the world when a character is chosen. */
+/**
+ * The front end on L_Login: the root layout and its screens, the hand-placed camera stops they move between,
+ * the figure standing on a preview spot, and the menu theme. Hands over to the world when a character is chosen.
+ */
 UCLASS()
 class ALVERION_API AFrontEndGameMode : public AGameModeBase
 {
@@ -23,26 +28,57 @@ public:
 	/** Where the world is loaded, with the world's game mode named in the travel options. */
 	static void travelToWorld(UObject* worldContext);
 
-protected:
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type reason) override;
+	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
 
 private:
-	void show(const TSharedRef<SWidget>& screen);
+	UPROPERTY()
+	TObjectPtr<USoundBase> _menuMusic;
+
+	UPROPERTY()
+	TObjectPtr<URootLayout> _rootLayout;
+
+	UPROPERTY()
+	TObjectPtr<UIntroWidget> _introWidget;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> _musicComponent;
+
+	// The camera actors placed in the level, by the tag that says which screen each one frames.
+	UPROPERTY()
+	TMap<FName, TObjectPtr<ACameraActor>> _cameraStops;
+
+	// The marker actors an avatar can stand on, read from the level once like the camera stops.
+	UPROPERTY()
+	TMap<EAvatarSpot, TObjectPtr<AActor>> _avatarSpots;
+
+	// Whoever is standing on a spot right now. One at a time, since only one screen shows a body.
+	UPROPERTY()
+	TObjectPtr<AActor> _avatar;
+
+	void collectCameraStops();
+	void focusStop(const FName& stopTag, bool instant);
+	void watchMenuLayer();
+	void handleMenuWidgetChanged(UCommonActivatableWidget* widget);
+
+	void collectAvatarSpots();
+	void installAvatarHooks();
+	void showAvatar(EAvatarSpot spot, TConstArrayView<uint8> appearance);
+	void clearAvatar();
+	void turnAvatar(float degrees);
+	void zoomView(float degrees);
+	FRotator aimAtHead(const ACameraActor& camera) const;
+
+	// What the live stop looked like before a zoom narrowed it, so leaving the screen puts it back. Zero means nothing is zoomed.
+	float _restingFieldOfView = 0.0f;
+	FRotator _restingRotation = FRotator::ZeroRotator;
+
+	void createRootLayout();
+	void createIntro();
 	void showLogin();
-	void showCharacters();
-	void showCreate();
+	void startMenuMusic();
+	void applyMusicVolume();
 
-	void login(const FString& host, const FString& account, const FString& password);
-	void bindFlows();
-	void unbindFlows();
-	UServerConnectionSubsystem* connection() const;
-
-	/** From -autologin=account,password,character in development builds: the character to enter once the list arrives. */
-	FString _autoEnter;
-
-	TSharedPtr<SWidget> _shown;
-	TSharedPtr<SLoginScreen> _login;
-	TSharedPtr<SCharacterScreen> _characters;
-	TSharedPtr<SCreateScreen> _create;
+	UFUNCTION()
+	void handleIntroFinished();
 };

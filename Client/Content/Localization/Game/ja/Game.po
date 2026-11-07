@@ -1,0 +1,897 @@
+﻿# Game Japanese translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Game\n"
+"POT-Creation-Date: 2026-11-07 10:46\n"
+"PO-Revision-Date: 2026-11-07 10:46\n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. Key:	charcreate.eye_amber
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_amber"
+msgid "Amber"
+msgstr "琥珀色"
+
+#. Key:	charcreate.eye_black
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_black"
+msgid "Black"
+msgstr "黒"
+
+#. Key:	charcreate.eye_blue
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_blue"
+msgid "Blue"
+msgstr "青"
+
+#. Key:	charcreate.eye_brown
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_brown"
+msgid "Brown"
+msgstr "茶色"
+
+#. Key:	charcreate.eye_green
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_green"
+msgid "Green"
+msgstr "緑"
+
+#. Key:	charcreate.eye_grey
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_grey"
+msgid "Grey"
+msgstr "灰色"
+
+#. Key:	charcreate.hair_auburn
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_auburn"
+msgid "Auburn"
+msgstr "赤褐色"
+
+#. Key:	charcreate.hair_black
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_black"
+msgid "Black"
+msgstr "黒"
+
+#. Key:	charcreate.hair_blonde
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_blonde"
+msgid "Blonde"
+msgstr "ブロンド"
+
+#. Key:	charcreate.hair_brown
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_brown"
+msgid "Brown"
+msgstr "茶色"
+
+#. Key:	charcreate.hair_red
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_red"
+msgid "Red"
+msgstr "赤"
+
+#. Key:	charcreate.name_required
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.name_required"
+msgid "A name is required."
+msgstr "名前を入力してください。"
+
+#. Key:	charcreate.row_beard
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_beard"
+msgid "Beard"
+msgstr "あごひげ"
+
+#. Key:	charcreate.row_eyebrows
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_eyebrows"
+msgid "Eyebrows"
+msgstr "眉"
+
+#. Key:	charcreate.row_eyes
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_eyes"
+msgid "Eyes"
+msgstr "目"
+
+#. Key:	charcreate.row_face
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_face"
+msgid "Face"
+msgstr "顔"
+
+#. Key:	charcreate.row_hair
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_hair"
+msgid "Hair"
+msgstr "髪"
+
+#. Key:	charcreate.row_hair_color
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_hair_color"
+msgid "Hair Color"
+msgstr "髪の色"
+
+#. Key:	charcreate.row_moustache
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_moustache"
+msgid "Moustache"
+msgstr "口ひげ"
+
+#. Key:	charcreate.row_tone
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_tone"
+msgid "Tone"
+msgstr "肌の色"
+
+#. Key:	charcreate.sex_female
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.sex_female"
+msgid "Female"
+msgstr "女性"
+
+#. Key:	charcreate.sex_male
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.sex_male"
+msgid "Male"
+msgstr "男性"
+
+#. Key:	charcreate.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.title"
+msgid "Create a character"
+msgstr "キャラクターを作成"
+
+#. Key:	charcreate.value_none
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.value_none"
+msgid "None"
+msgstr "なし"
+
+#. Key:	charcreate.value_type
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.value_type"
+msgid "Type {0}"
+msgstr "タイプ {0}"
+
+#. Key:	charcreate.working
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.working"
+msgid "Asking the server."
+msgstr "サーバーに問い合わせています。"
+
+#. Key:	charselect.exit_game
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.exit_game"
+msgid "Exit Game"
+msgstr "ゲーム終了"
+
+#. Key:	charselect.server_list
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.server_list"
+msgid "Server List"
+msgstr "サーバー一覧"
+
+#. Key:	charselect.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.title"
+msgid "Choose a character"
+msgstr "キャラクターを選択"
+
+#. Key:	keybind.Attack
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Attack"
+msgid "Attack"
+msgstr "攻撃"
+
+#. Key:	keybind.AutoRun
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.AutoRun"
+msgid "Auto Run"
+msgstr "オートラン"
+
+#. Key:	keybind.BackView
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.BackView"
+msgid "Back View"
+msgstr "後方視点"
+
+#. Key:	keybind.Chat
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Chat"
+msgid "Chat"
+msgstr "チャット"
+
+#. Key:	keybind.Interact
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Interact"
+msgid "Interact"
+msgstr "調べる"
+
+#. Key:	keybind.Inventory
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Inventory"
+msgid "Inventory"
+msgstr "インベントリ"
+
+#. Key:	keybind.Jump
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Jump"
+msgid "Jump"
+msgstr "ジャンプ"
+
+#. Key:	keybind.Map
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Map"
+msgid "Map"
+msgstr "マップ"
+
+#. Key:	keybind.Menu
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Menu"
+msgid "Menu"
+msgstr "メニュー"
+
+#. Key:	keybind.MoveBackward
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveBackward"
+msgid "Move Backward"
+msgstr "後退"
+
+#. Key:	keybind.MoveForward
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveForward"
+msgid "Move Forward"
+msgstr "前進"
+
+#. Key:	keybind.MoveLeft
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveLeft"
+msgid "Strafe Left"
+msgstr "左移動"
+
+#. Key:	keybind.MoveRight
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveRight"
+msgid "Strafe Right"
+msgstr "右移動"
+
+#. Key:	keybind.SwitchCamera
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.SwitchCamera"
+msgid "Switch Camera"
+msgstr "カメラ切替"
+
+#. Key:	keybind.unbound
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.unbound"
+msgid "Unbound"
+msgstr "未割り当て"
+
+#. Key:	login.account
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.account"
+msgid "Account"
+msgstr "アカウント"
+
+#. Key:	login.account_required
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.account_required"
+msgid "Enter an account name."
+msgstr "アカウント名を入力してください。"
+
+#. Key:	login.connecting
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.connecting"
+msgid "Connecting..."
+msgstr "接続中..."
+
+#. Key:	login.could_not_connect
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.could_not_connect"
+msgid "Could not connect."
+msgstr "接続できませんでした。"
+
+#. Key:	login.login
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.login"
+msgid "Login"
+msgstr "ログイン"
+
+#. Key:	login.password
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.password"
+msgid "Password"
+msgstr "パスワード"
+
+#. Key:	menu.back
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.back"
+msgid "Back"
+msgstr "戻る"
+
+#. Key:	menu.create
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.create"
+msgid "Create"
+msgstr "作成"
+
+#. Key:	menu.delete
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.delete"
+msgid "Delete"
+msgstr "削除"
+
+#. Key:	menu.delete_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.delete_confirm"
+msgid "Delete \"{0}\"?\nThis cannot be undone."
+msgstr "「{0}」を削除しますか？\nこの操作は元に戻せません。"
+
+#. Key:	menu.enter
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.enter"
+msgid "Enter"
+msgstr "入場"
+
+#. Key:	menu.exit
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.exit"
+msgid "Exit"
+msgstr "終了"
+
+#. Key:	menu.exit_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.exit_confirm"
+msgid "Exit game?"
+msgstr "ゲームを終了しますか？"
+
+#. Key:	menu.no
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.no"
+msgid "No"
+msgstr "いいえ"
+
+#. Key:	menu.options
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.options"
+msgid "Options"
+msgstr "設定"
+
+#. Key:	menu.options_title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.options_title"
+msgid "Options"
+msgstr "設定"
+
+#. Key:	menu.quit_to_menu
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.quit_to_menu"
+msgid "Quit to Menu"
+msgstr "メニューに戻る"
+
+#. Key:	menu.resume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.resume"
+msgid "Resume"
+msgstr "再開"
+
+#. Key:	menu.yes
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.yes"
+msgid "Yes"
+msgstr "はい"
+
+#. Key:	options.apply
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.apply"
+msgid "Apply"
+msgstr "適用"
+
+#. Key:	options.back
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.back"
+msgid "Back"
+msgstr "戻る"
+
+#. Key:	options.bucket_anti_aliasing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_anti_aliasing"
+msgid "Anti-Aliasing Quality"
+msgstr "アンチエイリアス品質"
+
+#. Key:	options.bucket_effects
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_effects"
+msgid "Effects"
+msgstr "エフェクト"
+
+#. Key:	options.bucket_foliage
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_foliage"
+msgid "Foliage"
+msgstr "植生"
+
+#. Key:	options.bucket_global_illumination
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_global_illumination"
+msgid "Global Illumination"
+msgstr "グローバルイルミネーション"
+
+#. Key:	options.bucket_landscape
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_landscape"
+msgid "Landscape"
+msgstr "地形"
+
+#. Key:	options.bucket_post_processing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_post_processing"
+msgid "Post Processing"
+msgstr "ポストプロセス"
+
+#. Key:	options.bucket_reflection
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_reflection"
+msgid "Reflections"
+msgstr "反射"
+
+#. Key:	options.bucket_shading
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_shading"
+msgid "Shading"
+msgstr "シェーディング"
+
+#. Key:	options.bucket_shadow
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_shadow"
+msgid "Shadows"
+msgstr "影"
+
+#. Key:	options.bucket_texture
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_texture"
+msgid "Textures"
+msgstr "テクスチャ"
+
+#. Key:	options.bucket_view_distance
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_view_distance"
+msgid "View Distance"
+msgstr "描画距離"
+
+#. Key:	options.camera_first_person
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_first_person"
+msgid "First Person"
+msgstr "一人称"
+
+#. Key:	options.camera_mode
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_mode"
+msgid "Camera"
+msgstr "カメラ"
+
+#. Key:	options.camera_third_person
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_third_person"
+msgid "Third Person"
+msgstr "三人称"
+
+#. Key:	options.chat_filter
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.chat_filter"
+msgid "Filter Chat Language"
+msgstr "チャットの言葉をフィルター"
+
+#. Key:	options.damage_numbers
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.damage_numbers"
+msgid "Damage Numbers"
+msgstr "ダメージ表示"
+
+#. Key:	options.defaults
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.defaults"
+msgid "Defaults"
+msgstr "デフォルト"
+
+#. Key:	options.fov
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.fov"
+msgid "Field of View"
+msgstr "視野角"
+
+#. Key:	options.frame_cap
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.frame_cap"
+msgid "Frame Rate Cap"
+msgstr "フレームレート上限"
+
+#. Key:	options.hud_scale
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.hud_scale"
+msgid "HUD Scale"
+msgstr "HUDの大きさ"
+
+#. Key:	options.keep
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.keep"
+msgid "Keep"
+msgstr "維持"
+
+#. Key:	options.language
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.language"
+msgid "Language"
+msgstr "言語"
+
+#. Key:	options.lumen
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.lumen"
+msgid "Lumen Lighting"
+msgstr "Lumen ライティング"
+
+#. Key:	options.master_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.master_volume"
+msgid "Master Volume"
+msgstr "マスター音量"
+
+#. Key:	options.music_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.music_volume"
+msgid "Music Volume"
+msgstr "音楽音量"
+
+#. Key:	options.nameplates
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.nameplates"
+msgid "Nameplates"
+msgstr "名前表示"
+
+#. Key:	options.nanite
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.nanite"
+msgid "Nanite Geometry"
+msgstr "Nanite ジオメトリ"
+
+#. Key:	options.quality
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality"
+msgid "Quality"
+msgstr "品質"
+
+#. Key:	options.quality_cinematic
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_cinematic"
+msgid "Cinematic"
+msgstr "シネマティック"
+
+#. Key:	options.quality_custom
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_custom"
+msgid "Custom"
+msgstr "カスタム"
+
+#. Key:	options.quality_epic
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_epic"
+msgid "Epic"
+msgstr "エピック"
+
+#. Key:	options.quality_high
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_high"
+msgid "High"
+msgstr "高"
+
+#. Key:	options.quality_low
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_low"
+msgid "Low"
+msgstr "低"
+
+#. Key:	options.quality_medium
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_medium"
+msgid "Medium"
+msgstr "中"
+
+#. Key:	options.reset_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.reset_confirm"
+msgid "Reset to defaults?"
+msgstr "デフォルトにリセットしますか？"
+
+#. Key:	options.resolution
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.resolution"
+msgid "Resolution"
+msgstr "解像度"
+
+#. Key:	options.revert
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.revert"
+msgid "Revert"
+msgstr "元に戻す"
+
+#. Key:	options.screen_percentage
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.screen_percentage"
+msgid "Render Scale"
+msgstr "レンダリング解像度"
+
+#. Key:	options.sensitivity
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.sensitivity"
+msgid "Sensitivity"
+msgstr "感度"
+
+#. Key:	options.sfx_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.sfx_volume"
+msgid "SFX Volume"
+msgstr "効果音音量"
+
+#. Key:	options.show_fps
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.show_fps"
+msgid "Show FPS"
+msgstr "FPSを表示"
+
+#. Key:	options.show_stats
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.show_stats"
+msgid "Show Stats"
+msgstr "統計を表示"
+
+#. Key:	options.tab_audio
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_audio"
+msgid "Audio"
+msgstr "サウンド"
+
+#. Key:	options.tab_display
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_display"
+msgid "Display"
+msgstr "画面"
+
+#. Key:	options.tab_gameplay
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_gameplay"
+msgid "Gameplay"
+msgstr "ゲームプレイ"
+
+#. Key:	options.tab_interface
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_interface"
+msgid "Interface"
+msgstr "インターフェース"
+
+#. Key:	options.tab_keybindings
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_keybindings"
+msgid "Keybindings"
+msgstr "キー設定"
+
+#. Key:	options.upscaler
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler"
+msgid "Anti-Aliasing"
+msgstr "アンチエイリアス"
+
+#. Key:	options.upscaler_fxaa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_fxaa"
+msgid "FXAA"
+msgstr "FXAA"
+
+#. Key:	options.upscaler_off
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_off"
+msgid "Off"
+msgstr "オフ"
+
+#. Key:	options.upscaler_smaa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_smaa"
+msgid "SMAA"
+msgstr "SMAA"
+
+#. Key:	options.upscaler_taa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_taa"
+msgid "TAA"
+msgstr "TAA"
+
+#. Key:	options.upscaler_tsr
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_tsr"
+msgid "TSR"
+msgstr "TSR"
+
+#. Key:	options.vsync
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.vsync"
+msgid "VSync"
+msgstr "垂直同期"
+
+#. Key:	options.window_mode
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.window_mode"
+msgid "Window Mode"
+msgstr "ウィンドウモード"
+
+#. Key:	server.none
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.none"
+msgid "The login server listed no servers."
+msgstr "ログインサーバーはサーバーを返しませんでした。"
+
+#. Key:	server.status_offline
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.status_offline"
+msgid "Offline"
+msgstr "オフライン"
+
+#. Key:	server.status_online
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.status_online"
+msgid "Online"
+msgstr "オンライン"
+
+#. Key:	server.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.title"
+msgid "Choose a server"
+msgstr "サーバーを選択"
+
+#. Key:	worldentry.preparing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,worldentry.preparing"
+msgid "Preparing {0}."
+msgstr "{0} を準備しています。"
+
+#. Key:	worldentry.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,worldentry.title"
+msgid "Entering the world"
+msgstr "ワールドに入っています"
+

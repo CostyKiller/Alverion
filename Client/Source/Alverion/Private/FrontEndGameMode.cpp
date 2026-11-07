@@ -1,23 +1,64 @@
 #include "FrontEndGameMode.h"
 
-#include "Engine/GameViewportClient.h"
-#include "Engine/World.h"
-#include "FrontEndScreens.h"
+#include "Appearance.h"
+#include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
+#include "CharacterCreateWidget.h"
+#include "CharacterSelectWidget.h"
+#include "ClientPlayerController.h"
+#include "Components/AudioComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/GameInstance.h"
+#include "Engine/StaticMeshActor.h"
+#include "EngineUtils.h"
+#include "GameSettings.h"
+#include "IntroWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "LoginWidget.h"
+#include "RootLayout.h"
 #include "SceneSetup.h"
-#include "ServerConnectionSubsystem.h"
-
-#define LOCTEXT_NAMESPACE "AlverionFrontEnd"
+#include "ServerSelectWidget.h"
+#include "Sound/SoundBase.h"
+#include "Widgets/CommonActivatableWidgetContainer.h"
 
 namespace
 {
-	constexpr int32 defaultLoginPort = 2106;
-
 	const TCHAR* const continentMap = TEXT("/Game/Maps/L_Continent");
+	const TCHAR* const menuMusicPath = TEXT("/Game/Audio/Music/MenuTheme.MenuTheme");
+
+	// The tags on the three camera actors in L_Login, one for each kind of screen.
+	const FName loginStop(TEXT("FrontEndStop.Login"));
+	const FName selectStop(TEXT("FrontEndStop.Select"));
+	const FName createStop(TEXT("FrontEndStop.Create"));
+
+	/**
+	 * The tags on the two marker actors an avatar can stand on.
+	 * Each marker carries the yaw a MetaHuman body wants, the camera's yaw plus ninety, since that mesh sits ninety degrees off its actor.
+	 */
+	const FName selectSpotTag(TEXT("FrontEndAvatarSpot.Select"));
+	const FName createSpotTag(TEXT("FrontEndAvatarSpot.Create"));
+
+	// A blend scaled by how far the camera travels, so a short hop is quick and a long one is not a lurch.
+	constexpr float blendSecondsPerMetre = 0.014f;
+	constexpr float shortestBlendSeconds = 0.9f;
+	constexpr float longestBlendSeconds = 3.2f;
+
+	// The narrowest a zoom goes, which frames a face from where the stops stand.
+	constexpr float minimumFieldOfView = 18.0f;
+
+	// The placeholder figure: the engine cylinder is centred on its origin, so it stands half its height above the spot.
+	constexpr double placeholderHalfHeightCm = 90.0;
+	constexpr double placeholderHeadHeightCm = 160.0;
+
+	// The placeholder's skin, darkened by the chosen tone. The MetaHuman body reads the same index from its own table.
+	const FLinearColor placeholderSkin(0.85f, 0.66f, 0.52f);
+	constexpr float skinToneShades[] = { 1.00f, 0.85f, 0.70f, 0.55f, 0.42f, 0.30f };
 }
 
 AFrontEndGameMode::AFrontEndGameMode()
 {
+	PlayerControllerClass = AClientPlayerController::StaticClass();
 	DefaultPawnClass = nullptr;
 }
 
@@ -30,7 +71,12 @@ void AFrontEndGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SceneSetup::buildDaylight(*GetWorld());
+	UGameSettings* settings = UGameSettings::get();
+	if (settings != nullptr)
+	{
+		settings->ApplySettings(false);
+		settings->onAudioSettingsChanged.AddUObject(this, &AFrontEndGameMode::applyMusicVolume);
+	}
 
 	APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
 	if (controller != nullptr)
@@ -39,250 +85,352 @@ void AFrontEndGameMode::BeginPlay()
 		controller->SetInputMode(FInputModeUIOnly());
 	}
 
-	bindFlows();
+	collectCameraStops();
+	focusStop(loginStop, true);
+	collectAvatarSpots();
+	installAvatarHooks();
 
-	// Back from the world, or from a lost link: the screen that matches where the game server conversation stands.
-	UServerConnectionSubsystem* link = connection();
-	if ((link != nullptr) && (link->gameServer().step() == Network::EGameServerStep::CharacterSelect))
+	createRootLayout();
+	watchMenuLayer();
+	startMenuMusic();
+	createIntro();
+}
+
+void AFrontEndGameMode::EndPlay(const EEndPlayReason::Type endPlayReason)
+{
+	UGameSettings* settings = UGameSettings::get();
+	if (settings != nullptr)
 	{
-		showCharacters();
+		settings->onAudioSettingsChanged.RemoveAll(this);
+	}
+
+	Super::EndPlay(endPlayReason);
+}
+
+void AFrontEndGameMode::collectCameraStops()
+{
+	for (TActorIterator<ACameraActor> it(GetWorld()); it; ++it)
+	{
+		ACameraActor* camera = *it;
+		for (const FName& tag : camera->Tags)
+		{
+			if ((tag == loginStop) || (tag == selectStop) || (tag == createStop))
+			{
+				_cameraStops.Add(tag, camera);
+
+				// A camera actor letterboxes to sixteen by nine by default, which bars any other window shape.
+				camera->GetCameraComponent()->SetConstraintAspectRatio(false);
+			}
+		}
+	}
+
+	if (_cameraStops.Num() < 3)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FrontEndGameMode found %d camera stops in the level, so some screens will not move the camera."), _cameraStops.Num());
+	}
+}
+
+void AFrontEndGameMode::focusStop(const FName& stopTag, bool instant)
+{
+	ACameraActor* camera = _cameraStops.FindRef(stopTag);
+	APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
+	if ((camera == nullptr) || (controller == nullptr))
+	{
 		return;
+	}
+
+	float blendSeconds = 0.0f;
+	if (!instant)
+	{
+		const AActor* from = controller->GetViewTarget();
+		const double centimetres = (from != nullptr) ? FVector::Dist(from->GetActorLocation(), camera->GetActorLocation()) : 0.0;
+		blendSeconds = FMath::Clamp((static_cast<float>(centimetres) / 100.0f) * blendSecondsPerMetre, shortestBlendSeconds, longestBlendSeconds);
+	}
+
+	controller->SetViewTargetWithBlend(camera, blendSeconds, EViewTargetBlendFunction::VTBlend_Cubic);
+}
+
+void AFrontEndGameMode::collectAvatarSpots()
+{
+	for (TActorIterator<AActor> it(GetWorld()); it; ++it)
+	{
+		AActor* actor = *it;
+		if (actor->ActorHasTag(selectSpotTag))
+		{
+			_avatarSpots.Add(EAvatarSpot::Select, actor);
+		}
+		else if (actor->ActorHasTag(createSpotTag))
+		{
+			_avatarSpots.Add(EAvatarSpot::Create, actor);
+		}
+	}
+
+	if (_avatarSpots.Num() < 2)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FrontEndGameMode found %d avatar spots in the level, so some screens will show nobody."), _avatarSpots.Num());
+	}
+}
+
+void AFrontEndGameMode::installAvatarHooks()
+{
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	if (subsystem == nullptr)
+	{
+		return;
+	}
+
+	// Weak, because the subsystem outlives this level and a hook left behind must do nothing.
+	TWeakObjectPtr<AFrontEndGameMode> weakThis(this);
+
+	subsystem->showAvatar = [weakThis](EAvatarSpot spot, TConstArrayView<uint8> appearance)
+	{
+		if (AFrontEndGameMode* gameMode = weakThis.Get())
+		{
+			gameMode->showAvatar(spot, appearance);
+		}
+	};
+
+	subsystem->clearAvatar = [weakThis]()
+	{
+		if (AFrontEndGameMode* gameMode = weakThis.Get())
+		{
+			gameMode->clearAvatar();
+		}
+	};
+
+	subsystem->turnAvatar = [weakThis](float degrees)
+	{
+		if (AFrontEndGameMode* gameMode = weakThis.Get())
+		{
+			gameMode->turnAvatar(degrees);
+		}
+	};
+
+	subsystem->zoomView = [weakThis](float degrees)
+	{
+		if (AFrontEndGameMode* gameMode = weakThis.Get())
+		{
+			gameMode->zoomView(degrees);
+		}
+	};
+}
+
+void AFrontEndGameMode::showAvatar(EAvatarSpot spot, TConstArrayView<uint8> appearance)
+{
+	AActor* marker = _avatarSpots.FindRef(spot);
+	if (marker == nullptr)
+	{
+		return;
+	}
+
+	// Empty or unreadable bytes stand as the defaults, since a character may predate the appearance block.
+	Network::FAppearance unpacked;
+	Network::FAppearance::unpack(appearance, unpacked);
+
+	// The seam the MetaHuman applier plugs into: spawn the body class for this appearance on the marker and dress it.
+	// Until then a placeholder figure stands there, tinted by the chosen skin tone.
+	if (_avatar == nullptr)
+	{
+		FActorSpawnParameters parameters;
+		parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		AStaticMeshActor* figure = GetWorld()->SpawnActor<AStaticMeshActor>(marker->GetActorLocation(), marker->GetActorRotation(), parameters);
+		figure->GetStaticMeshComponent()->SetMobility(EComponentMobility::Movable);
+		_avatar = figure;
+	}
+
+	_avatar->SetActorLocationAndRotation(marker->GetActorLocation() + FVector(0.0, 0.0, placeholderHalfHeightCm), marker->GetActorRotation());
+
+	const float shade = skinToneShades[unpacked.skinTone % UE_ARRAY_COUNT(skinToneShades)];
+	SceneSetup::paintPlaceholderBody(*Cast<AStaticMeshActor>(_avatar)->GetStaticMeshComponent(), placeholderSkin * shade);
+}
+
+void AFrontEndGameMode::clearAvatar()
+{
+	if (_avatar != nullptr)
+	{
+		_avatar->Destroy();
+		_avatar = nullptr;
+	}
+}
+
+void AFrontEndGameMode::turnAvatar(float degrees)
+{
+	// The body turns rather than the camera, since the camera stops are placed by hand.
+	if (_avatar != nullptr)
+	{
+		_avatar->AddActorWorldRotation(FRotator(0.0f, degrees, 0.0f));
+	}
+}
+
+FRotator AFrontEndGameMode::aimAtHead(const ACameraActor& camera) const
+{
+	if (_avatar == nullptr)
+	{
+		return camera.GetActorRotation();
+	}
+
+	// A MetaHuman's face mesh where there is one, the placeholder's head height otherwise.
+	TArray<USkeletalMeshComponent*> meshes;
+	_avatar->GetComponents<USkeletalMeshComponent>(meshes);
+	for (const USkeletalMeshComponent* mesh : meshes)
+	{
+		if (mesh->GetName().Contains(TEXT("Face")))
+		{
+			return (mesh->Bounds.Origin - camera.GetActorLocation()).Rotation();
+		}
+	}
+
+	const FVector head = _avatar->GetActorLocation() + FVector(0.0, 0.0, placeholderHeadHeightCm - placeholderHalfHeightCm);
+	return (head - camera.GetActorLocation()).Rotation();
+}
+
+void AFrontEndGameMode::zoomView(float degrees)
+{
+	APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
+	ACameraActor* camera = (controller != nullptr) ? Cast<ACameraActor>(controller->GetViewTarget()) : nullptr;
+	UCameraComponent* component = (camera != nullptr) ? camera->GetCameraComponent() : nullptr;
+	if (component == nullptr)
+	{
+		return;
+	}
+
+	if (_restingFieldOfView <= 0.0f)
+	{
+		_restingFieldOfView = component->FieldOfView;
+		_restingRotation = camera->GetActorRotation();
+	}
+
+	// Zero puts the stop back as it was placed.
+	if (degrees == 0.0f)
+	{
+		component->SetFieldOfView(_restingFieldOfView);
+		camera->SetActorRotation(_restingRotation);
+		_restingFieldOfView = 0.0f;
+		return;
+	}
+
+	const float wanted = FMath::Clamp(component->FieldOfView + degrees, minimumFieldOfView, _restingFieldOfView);
+	component->SetFieldOfView(wanted);
+
+	// The closer the zoom, the more the camera turns toward the face, so narrowing never crops the head out.
+	const float span = _restingFieldOfView - minimumFieldOfView;
+	const float closeness = (span > KINDA_SMALL_NUMBER) ? ((_restingFieldOfView - wanted) / span) : 0.0f;
+	camera->SetActorRotation(FMath::Lerp(_restingRotation, aimAtHead(*camera), closeness));
+}
+
+void AFrontEndGameMode::watchMenuLayer()
+{
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	UCommonActivatableWidgetStack* menu = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::Menu) : nullptr;
+	if (menu == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FrontEndGameMode found no Menu layer, so the camera will hold the login stop."));
+		return;
+	}
+
+	menu->OnDisplayedWidgetChanged().AddUObject(this, &AFrontEndGameMode::handleMenuWidgetChanged);
+}
+
+void AFrontEndGameMode::handleMenuWidgetChanged(UCommonActivatableWidget* widget)
+{
+	if (widget == nullptr)
+	{
+		return;
+	}
+
+	if (widget->IsA<UCharacterSelectWidget>())
+	{
+		focusStop(selectStop, false);
+	}
+	else if (widget->IsA<UCharacterCreateWidget>())
+	{
+		focusStop(createStop, false);
+	}
+	else if (widget->IsA<ULoginWidget>() || widget->IsA<UServerSelectWidget>())
+	{
+		focusStop(loginStop, false);
+		clearAvatar();
+	}
+}
+
+void AFrontEndGameMode::startMenuMusic()
+{
+	_menuMusic = LoadObject<USoundBase>(nullptr, menuMusicPath);
+	if (_menuMusic == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FrontEndGameMode could not load %s, so the front end has no music."), menuMusicPath);
+		return;
+	}
+
+	_musicComponent = UGameplayStatics::SpawnSound2D(this, _menuMusic);
+	applyMusicVolume();
+}
+
+void AFrontEndGameMode::applyMusicVolume()
+{
+	const UGameSettings* settings = UGameSettings::get();
+	if ((_musicComponent != nullptr) && (settings != nullptr))
+	{
+		_musicComponent->SetVolumeMultiplier(settings->getEffectiveMusicVolume());
+	}
+}
+
+void AFrontEndGameMode::createRootLayout()
+{
+	_rootLayout = CreateWidget<URootLayout>(GetWorld(), URootLayout::StaticClass());
+	if (_rootLayout != nullptr)
+	{
+		_rootLayout->AddToViewport();
+	}
+}
+
+void AFrontEndGameMode::createIntro()
+{
+	// The studio card plays once per install, then every later launch goes straight to the login screen.
+	const UGameSettings* settings = UGameSettings::get();
+	if ((settings != nullptr) && settings->hasPlayedIntro())
+	{
+		showLogin();
+		return;
+	}
+
+	_introWidget = CreateWidget<UIntroWidget>(GetWorld(), UIntroWidget::StaticClass());
+	if (_introWidget == nullptr)
+	{
+		showLogin();
+		return;
+	}
+
+	_introWidget->onIntroFinished.AddDynamic(this, &AFrontEndGameMode::handleIntroFinished);
+	_introWidget->AddToViewport(100);
+}
+
+void AFrontEndGameMode::handleIntroFinished()
+{
+	if (_introWidget != nullptr)
+	{
+		_introWidget->RemoveFromParent();
+		_introWidget = nullptr;
+	}
+
+	UGameSettings* settings = UGameSettings::get();
+	if (settings != nullptr)
+	{
+		settings->markIntroPlayed();
 	}
 
 	showLogin();
-
-#if !UE_BUILD_SHIPPING
-	// For testing without a hand on the keyboard. Shipping builds have no such door.
-	FString autoLogin;
-	TArray<FString> parts;
-	if (FParse::Value(FCommandLine::Get(), TEXT("autologin="), autoLogin, false) && (autoLogin.ParseIntoArray(parts, TEXT(",")) >= 2))
-	{
-		_autoEnter = parts.IsValidIndex(2) ? parts[2] : FString();
-		login(TEXT("127.0.0.1"), parts[0], parts[1]);
-	}
-#endif
-}
-
-void AFrontEndGameMode::EndPlay(const EEndPlayReason::Type reason)
-{
-	unbindFlows();
-
-	if (_shown.IsValid() && (GEngine != nullptr) && (GEngine->GameViewport != nullptr))
-	{
-		GEngine->GameViewport->RemoveViewportWidgetContent(_shown.ToSharedRef());
-	}
-
-	Super::EndPlay(reason);
-}
-
-UServerConnectionSubsystem* AFrontEndGameMode::connection() const
-{
-	UGameInstance* instance = GetGameInstance();
-	return (instance != nullptr) ? instance->GetSubsystem<UServerConnectionSubsystem>() : nullptr;
-}
-
-void AFrontEndGameMode::show(const TSharedRef<SWidget>& screen)
-{
-	UGameViewportClient* viewport = (GEngine != nullptr) ? GEngine->GameViewport : nullptr;
-	if (viewport == nullptr)
-	{
-		return;
-	}
-
-	if (_shown.IsValid())
-	{
-		viewport->RemoveViewportWidgetContent(_shown.ToSharedRef());
-	}
-
-	_shown = screen;
-	viewport->AddViewportWidgetContent(screen);
 }
 
 void AFrontEndGameMode::showLogin()
 {
-	_login = SNew(SLoginScreen).OnLogin(FOnLoginRequested::CreateUObject(this, &AFrontEndGameMode::login));
-	show(_login.ToSharedRef());
-}
-
-void AFrontEndGameMode::showCharacters()
-{
-	UServerConnectionSubsystem* link = connection();
-	if (link == nullptr)
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	if (subsystem != nullptr)
 	{
-		return;
-	}
-
-	_characters = SNew(SCharacterScreen)
-		.Characters(link->gameServer().characters())
-		.OnEnter_Lambda([this](uint32 objectId)
-		{
-			if (!connection()->gameServer().selectCharacter(objectId))
-			{
-				_characters->setStatus(LOCTEXT("CannotEnter", "That character cannot be entered now."));
-			}
-		})
-		.OnDelete_Lambda([this](uint32 objectId)
-		{
-			connection()->gameServer().deleteCharacter(objectId);
-		})
-		.OnCreate_Lambda([this]()
-		{
-			showCreate();
-		})
-		.OnBack_Lambda([this]()
-		{
-			connection()->disconnectAll();
-			showLogin();
-		});
-
-	show(_characters.ToSharedRef());
-}
-
-void AFrontEndGameMode::showCreate()
-{
-	_create = SNew(SCreateScreen)
-		.OnCreate_Lambda([this](const FString& name, const Network::FAppearance& appearance)
-		{
-			if (!connection()->gameServer().createCharacter(name, appearance))
-			{
-				_create->setStatus(LOCTEXT("CannotCreate", "Not connected to a game server."));
-			}
-		})
-		.OnBack_Lambda([this]()
-		{
-			showCharacters();
-		});
-
-	show(_create.ToSharedRef());
-}
-
-void AFrontEndGameMode::login(const FString& host, const FString& account, const FString& password)
-{
-	UServerConnectionSubsystem* link = connection();
-	if ((link == nullptr) || account.IsEmpty() || password.IsEmpty())
-	{
-		_login->setStatus(LOCTEXT("Missing", "Enter an account and a password."));
-		return;
-	}
-
-	FString address = host;
-	FString portText;
-	int32 port = defaultLoginPort;
-	if (host.Split(TEXT(":"), &address, &portText))
-	{
-		port = FCString::Atoi(*portText);
-	}
-
-	_login->setBusy(true);
-	_login->setStatus(LOCTEXT("Connecting", "Connecting..."));
-
-	if (!link->startLogin(address, port, account, password))
-	{
-		_login->setBusy(false);
-		_login->setStatus(LOCTEXT("NoConnect", "Could not connect."));
+		subsystem->pushWidget(EUILayer::Menu, ULoginWidget::StaticClass());
 	}
 }
-
-void AFrontEndGameMode::bindFlows()
-{
-	UServerConnectionSubsystem* link = connection();
-	if (link == nullptr)
-	{
-		return;
-	}
-
-	link->loginServer().onStepChanged.BindWeakLambda(this, [this](Network::ELoginServerStep step)
-	{
-		UServerConnectionSubsystem* subsystem = connection();
-		if (step == Network::ELoginServerStep::ServerSelect)
-		{
-			// One game server is all this client has met, so it takes the first one up. A list comes when a second exists.
-			const Network::FServerListEntry* online = subsystem->loginServer().servers().FindByPredicate([](const Network::FServerListEntry& entry)
-			{
-				return entry.status == Network::EServerStatus::Online;
-			});
-
-			if ((online == nullptr) || !subsystem->loginServer().selectServer(online->serverId))
-			{
-				_login->setBusy(false);
-				_login->setStatus(LOCTEXT("NoServer", "No game server is online."));
-			}
-		}
-		else if (step == Network::ELoginServerStep::TokenIssued)
-		{
-			subsystem->startGameServer();
-		}
-	});
-
-	link->loginServer().onFailed.BindWeakLambda(this, [this](const FString& reason)
-	{
-		if (_login.IsValid())
-		{
-			_login->setBusy(false);
-			_login->setStatus(FText::FromString(reason));
-		}
-	});
-
-	link->gameServer().onStepChanged.BindWeakLambda(this, [this](Network::EGameServerStep step)
-	{
-		if (step == Network::EGameServerStep::CharacterSelect)
-		{
-			showCharacters();
-
-			const Network::FCharacterListEntry* wanted = connection()->gameServer().characters().FindByPredicate([this](const Network::FCharacterListEntry& entry)
-			{
-				return entry.name == _autoEnter;
-			});
-
-			if (wanted != nullptr)
-			{
-				_autoEnter.Reset();
-				connection()->gameServer().selectCharacter(wanted->objectId);
-			}
-		}
-		else if (step == Network::EGameServerStep::Selected)
-		{
-			travelToWorld(this);
-		}
-	});
-
-	link->gameServer().onFailed.BindWeakLambda(this, [this](const FString& reason)
-	{
-		showLogin();
-		_login->setStatus(FText::FromString(reason));
-	});
-
-	link->gameServer().onCreateRejected.BindWeakLambda(this, [this](Network::ECreateRejectReason reason)
-	{
-		if (_create.IsValid())
-		{
-			_create->setStatus(FText::FromString(Network::createRejectReasonName(reason)));
-		}
-	});
-
-	link->gameServer().onDeleteRejected.BindWeakLambda(this, [this]()
-	{
-		if (_characters.IsValid())
-		{
-			_characters->setStatus(LOCTEXT("DeleteRefused", "That character cannot be deleted."));
-		}
-	});
-}
-
-void AFrontEndGameMode::unbindFlows()
-{
-	UServerConnectionSubsystem* link = connection();
-	if (link == nullptr)
-	{
-		return;
-	}
-
-	link->loginServer().onStepChanged.Unbind();
-	link->loginServer().onFailed.Unbind();
-	link->gameServer().onStepChanged.Unbind();
-	link->gameServer().onFailed.Unbind();
-	link->gameServer().onCreateRejected.Unbind();
-	link->gameServer().onDeleteRejected.Unbind();
-}
-
-#undef LOCTEXT_NAMESPACE

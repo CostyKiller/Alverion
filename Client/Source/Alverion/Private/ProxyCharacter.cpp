@@ -3,6 +3,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/World.h"
+#include "GameSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "SceneSetup.h"
 
@@ -100,9 +101,17 @@ void AProxyCharacter::Tick(float deltaSeconds)
 		}
 	}
 
+	// The options screen's nameplate switch, read every frame so turning it shows at once.
+	const UGameSettings* settings = UGameSettings::get();
+	const bool showName = (settings == nullptr) || settings->getShowNameplates();
+	if (_label->IsVisible() != showName)
+	{
+		_label->SetVisibility(showName);
+	}
+
 	// The name turns to whoever is looking.
 	const APlayerCameraManager* camera = UGameplayStatics::GetPlayerCameraManager(this, 0);
-	if (camera != nullptr)
+	if (showName && (camera != nullptr))
 	{
 		const FVector toCamera = camera->GetCameraLocation() - _label->GetComponentLocation();
 		_label->SetWorldRotation(FRotator(0.0f, toCamera.Rotation().Yaw, 0.0f));

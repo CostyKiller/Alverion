@@ -1,8 +1,11 @@
 #include "WorldGameMode.h"
 
+#include "ClientPlayerController.h"
 #include "Engine/World.h"
+#include "GameSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "ProxyCharacter.h"
+#include "RootLayout.h"
 #include "ServerConnectionSubsystem.h"
 #include "WorldCharacter.h"
 
@@ -14,6 +17,7 @@ namespace
 
 AWorldGameMode::AWorldGameMode()
 {
+	PlayerControllerClass = AClientPlayerController::StaticClass();
 	DefaultPawnClass = nullptr;
 }
 
@@ -32,6 +36,20 @@ void AWorldGameMode::BeginPlay()
 	if ((world == nullptr) || (link == nullptr))
 	{
 		return;
+	}
+
+	// The display, sound and language settings, for a world started without passing the front end.
+	UGameSettings* settings = UGameSettings::get();
+	if (settings != nullptr)
+	{
+		settings->ApplySettings(false);
+	}
+
+	// The layers the game menu and its options open on. A layout does not survive travel, so every level makes its own.
+	_rootLayout = CreateWidget<URootLayout>(world, URootLayout::StaticClass());
+	if (_rootLayout != nullptr)
+	{
+		_rootLayout->AddToViewport();
 	}
 
 	FActorSpawnParameters parameters;
@@ -57,7 +75,7 @@ void AWorldGameMode::BeginPlay()
 	// A lost link goes back to the login screen, which is what the front end shows for anything but a character list.
 	link->gameServer().onFailed.BindWeakLambda(this, [this](const FString& reason)
 	{
-		UGameplayStatics::OpenLevel(this, FName(TEXT("/Engine/Maps/Entry")));
+		UGameplayStatics::OpenLevel(this, FName(TEXT("/Game/Maps/L_Login")));
 	});
 
 	flow.begin(link->gameServer());

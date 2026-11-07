@@ -32,8 +32,11 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type reason) override;
 
 private:
-	void move(const FInputActionValue& value);
-	void stopMoving(const FInputActionValue& value);
+	void moveForward();
+	void moveBackward();
+	void moveLeft();
+	void moveRight();
+	void move(float forward, float right);
 	void look(const FInputActionValue& value);
 	void corrected(const Network::FObjectPlace& place, bool teleport);
 
@@ -53,15 +56,29 @@ private:
 	UPROPERTY()
 	TObjectPtr<UWorldPartitionStreamingSourceComponent> _streaming;
 
+	/** Mouse look only. The movement keys live in the rebindable context the input bootstrap builds from the action assets. */
 	UPROPERTY()
-	TObjectPtr<UInputMappingContext> _mapping;
-
-	UPROPERTY()
-	TObjectPtr<UInputAction> _moveAction;
+	TObjectPtr<UInputMappingContext> _lookMapping;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> _lookAction;
 
-	bool _wantsToMove = false;
+	UPROPERTY()
+	TObjectPtr<UInputAction> _moveForwardAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _moveBackwardAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _moveLeftAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _moveRightAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _jumpAction;
+
+	/** Set by any movement key this frame, read and cleared by Tick: four keys can be held at once, so no single release means stopped. */
+	bool _movedThisFrame = false;
 	bool _onGround = false;
 };

@@ -7,12 +7,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "GameSettings.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "InputModifiers.h"
 #include "SceneSetup.h"
 #include "ServerConnectionSubsystem.h"
 
@@ -26,9 +26,18 @@ namespace
 	constexpr float cameraDistanceCm = 450.0f;
 
 	// How far above and below the server's height to look for ground, which is shaped by hand and need not match it.
-	constexpr double groundSearchCm = 20000.0;
+	constexpr double settleSearchCm = 20000.0;
 
-	const FLinearColor playerColor(0.2f, 0.45f, 0.9f);
+	const FLinearColor ownBodyColor(0.2f, 0.45f, 0.9f);
+
+	// What the options screen's sensitivity reads on a fresh install, which is the turn rate the mouse had before the slider existed.
+	constexpr float defaultMouseSensitivity = 0.3f;
+
+	const TCHAR* const moveForwardPath = TEXT("/Game/Input/Actions/IA_MoveForward.IA_MoveForward");
+	const TCHAR* const moveBackwardPath = TEXT("/Game/Input/Actions/IA_MoveBackward.IA_MoveBackward");
+	const TCHAR* const moveLeftPath = TEXT("/Game/Input/Actions/IA_MoveLeft.IA_MoveLeft");
+	const TCHAR* const moveRightPath = TEXT("/Game/Input/Actions/IA_MoveRight.IA_MoveRight");
+	const TCHAR* const jumpPath = TEXT("/Game/Input/Actions/IA_Jump.IA_Jump");
 
 	UServerConnectionSubsystem* connectionOf(const AActor& actor)
 	{
@@ -68,7 +77,7 @@ void AWorldCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SceneSetup::paintPlaceholderBody(*_body, playerColor);
+	SceneSetup::paintPlaceholderBody(*_body, ownBodyColor);
 
 	// Held in the air until the ground streams in, or it would fall through the sea before the first section loads.
 	GetCharacterMovement()->DisableMovement();
@@ -93,40 +102,31 @@ void AWorldCharacter::EndPlay(const EEndPlayReason::Type reason)
 
 void AWorldCharacter::PawnClientRestart()
 {
-	// Made here rather than as assets, since the project keeps no input assets: forward and back are the swizzled vertical axis, left is negated.
 	// Before the parent's restart, because that is where SetupPlayerInputComponent binds them.
-	if (_mapping == nullptr)
+	// The movement actions are the rebindable assets the options screen lists. Look stays a raw mouse action made here, since no look action is rebindable.
+	if (_lookMapping == nullptr)
 	{
-		_moveAction = NewObject<UInputAction>(this);
-		_moveAction->ValueType = EInputActionValueType::Axis2D;
+		_moveForwardAction = LoadObject<UInputAction>(nullptr, moveForwardPath);
+		_moveBackwardAction = LoadObject<UInputAction>(nullptr, moveBackwardPath);
+		_moveLeftAction = LoadObject<UInputAction>(nullptr, moveLeftPath);
+		_moveRightAction = LoadObject<UInputAction>(nullptr, moveRightPath);
+		_jumpAction = LoadObject<UInputAction>(nullptr, jumpPath);
 
 		_lookAction = NewObject<UInputAction>(this);
 		_lookAction->ValueType = EInputActionValueType::Axis2D;
 
-		_mapping = NewObject<UInputMappingContext>(this);
-
-		FEnhancedActionKeyMapping& forward = _mapping->MapKey(_moveAction, EKeys::W);
-		forward.Modifiers.Add(NewObject<UInputModifierSwizzleAxis>(_mapping));
-
-		FEnhancedActionKeyMapping& back = _mapping->MapKey(_moveAction, EKeys::S);
-		back.Modifiers.Add(NewObject<UInputModifierSwizzleAxis>(_mapping));
-		back.Modifiers.Add(NewObject<UInputModifierNegate>(_mapping));
-
-		FEnhancedActionKeyMapping& left = _mapping->MapKey(_moveAction, EKeys::A);
-		left.Modifiers.Add(NewObject<UInputModifierNegate>(_mapping));
-
-		_mapping->MapKey(_moveAction, EKeys::D);
-		_mapping->MapKey(_lookAction, EKeys::Mouse2D);
+		_lookMapping = NewObject<UInputMappingContext>(this);
+		_lookMapping->MapKey(_lookAction, EKeys::Mouse2D);
 	}
 
 	Super::PawnClientRestart();
 
+	// Added beside the bootstrap's context rather than in place of it, which the controller applies once per level.
 	APlayerController* controller = Cast<APlayerController>(GetController());
 	UEnhancedInputLocalPlayerSubsystem* input = (controller != nullptr) ? ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(controller->GetLocalPlayer()) : nullptr;
 	if (input != nullptr)
 	{
-		input->ClearAllMappings();
-		input->AddMappingContext(_mapping, 0);
+		input->AddMappingContext(_lookMapping, 1);
 	}
 }
 
@@ -135,36 +135,87 @@ void AWorldCharacter::SetupPlayerInputComponent(UInputComponent* input)
 	Super::SetupPlayerInputComponent(input);
 
 	UEnhancedInputComponent* enhanced = Cast<UEnhancedInputComponent>(input);
-	if ((enhanced == nullptr) || (_moveAction == nullptr))
+	if (enhanced == nullptr)
 	{
 		return;
 	}
 
-	enhanced->BindAction(_moveAction, ETriggerEvent::Triggered, this, &AWorldCharacter::move);
-	enhanced->BindAction(_moveAction, ETriggerEvent::Completed, this, &AWorldCharacter::stopMoving);
-	enhanced->BindAction(_lookAction, ETriggerEvent::Triggered, this, &AWorldCharacter::look);
+	if ((_moveForwardAction == nullptr) || (_moveBackwardAction == nullptr) || (_moveLeftAction == nullptr) || (_moveRightAction == nullptr))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WorldCharacter is missing a movement action asset, so some movement keys do nothing."));
+	}
+
+	if (_moveForwardAction != nullptr)
+	{
+		enhanced->BindAction(_moveForwardAction, ETriggerEvent::Triggered, this, &AWorldCharacter::moveForward);
+	}
+
+	if (_moveBackwardAction != nullptr)
+	{
+		enhanced->BindAction(_moveBackwardAction, ETriggerEvent::Triggered, this, &AWorldCharacter::moveBackward);
+	}
+
+	if (_moveLeftAction != nullptr)
+	{
+		enhanced->BindAction(_moveLeftAction, ETriggerEvent::Triggered, this, &AWorldCharacter::moveLeft);
+	}
+
+	if (_moveRightAction != nullptr)
+	{
+		enhanced->BindAction(_moveRightAction, ETriggerEvent::Triggered, this, &AWorldCharacter::moveRight);
+	}
+
+	if (_jumpAction != nullptr)
+	{
+		enhanced->BindAction(_jumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		enhanced->BindAction(_jumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	}
+
+	if (_lookAction != nullptr)
+	{
+		enhanced->BindAction(_lookAction, ETriggerEvent::Triggered, this, &AWorldCharacter::look);
+	}
 }
 
-void AWorldCharacter::move(const FInputActionValue& value)
+void AWorldCharacter::moveForward()
 {
-	const FVector2D axes = value.Get<FVector2D>();
+	move(1.0f, 0.0f);
+}
+
+void AWorldCharacter::moveBackward()
+{
+	move(-1.0f, 0.0f);
+}
+
+void AWorldCharacter::moveLeft()
+{
+	move(0.0f, -1.0f);
+}
+
+void AWorldCharacter::moveRight()
+{
+	move(0.0f, 1.0f);
+}
+
+void AWorldCharacter::move(float forward, float right)
+{
+	// Yaw only, so looking up does not walk the character into the ground.
 	const FRotator facing(0.0f, GetControlRotation().Yaw, 0.0f);
 
-	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::X), axes.Y);
-	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::Y), axes.X);
-	_wantsToMove = true;
-}
-
-void AWorldCharacter::stopMoving(const FInputActionValue& value)
-{
-	_wantsToMove = false;
+	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::X), forward);
+	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::Y), right);
+	_movedThisFrame = true;
 }
 
 void AWorldCharacter::look(const FInputActionValue& value)
 {
+	// Measured against the default sensitivity, so a fresh install turns exactly as it always did and the slider scales from there.
+	const UGameSettings* settings = UGameSettings::get();
+	const float scale = (settings != nullptr) ? (settings->getMouseSensitivity() / defaultMouseSensitivity) : 1.0f;
+
 	const FVector2D axes = value.Get<FVector2D>();
-	AddControllerYawInput(axes.X);
-	AddControllerPitchInput(-axes.Y);
+	AddControllerYawInput(axes.X * scale);
+	AddControllerPitchInput(-axes.Y * scale);
 }
 
 void AWorldCharacter::Tick(float deltaSeconds)
@@ -176,13 +227,23 @@ void AWorldCharacter::Tick(float deltaSeconds)
 		_onGround = settleOnGround();
 	}
 
+	// Read every frame, so a change made in the options screen over the world shows at once.
+	const UGameSettings* settings = UGameSettings::get();
+	if ((settings != nullptr) && (_camera->FieldOfView != settings->getFieldOfView()))
+	{
+		_camera->SetFieldOfView(settings->getFieldOfView());
+	}
+
 	// The server places a character by its feet, and the actor stands at the middle of its capsule.
+	// The movement bindings fire before this tick, so the flag says whether a key was held this frame.
 	UServerConnectionSubsystem* connection = connectionOf(*this);
 	if (connection != nullptr)
 	{
 		const FVector feet = GetActorLocation() - FVector(0.0f, 0.0f, capsuleHalfHeightCm);
-		connection->world().setLocalState(feet, GetActorRotation().Yaw, _wantsToMove);
+		connection->world().setLocalState(feet, GetActorRotation().Yaw, _movedThisFrame);
 	}
+
+	_movedThisFrame = false;
 }
 
 bool AWorldCharacter::settleOnGround()
@@ -192,7 +253,7 @@ bool AWorldCharacter::settleOnGround()
 	query.AddIgnoredActor(this);
 
 	FHitResult hit;
-	if (!GetWorld()->LineTraceSingleByChannel(hit, here + FVector(0.0, 0.0, groundSearchCm), here - FVector(0.0, 0.0, groundSearchCm), ECC_WorldStatic, query))
+	if (!GetWorld()->LineTraceSingleByChannel(hit, here + FVector(0.0, 0.0, settleSearchCm), here - FVector(0.0, 0.0, settleSearchCm), ECC_WorldStatic, query))
 	{
 		return false;
 	}

@@ -1,0 +1,897 @@
+﻿# Game French translation.
+# Fill out your copyright notice in the Description page of Project Settings.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Game\n"
+"POT-Creation-Date: 2026-11-07 10:46\n"
+"PO-Revision-Date: 2026-11-07 10:46\n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Key:	charcreate.eye_amber
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_amber"
+msgid "Amber"
+msgstr "Ambre"
+
+#. Key:	charcreate.eye_black
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_black"
+msgid "Black"
+msgstr "Noir"
+
+#. Key:	charcreate.eye_blue
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_blue"
+msgid "Blue"
+msgstr "Bleu"
+
+#. Key:	charcreate.eye_brown
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_brown"
+msgid "Brown"
+msgstr "Marron"
+
+#. Key:	charcreate.eye_green
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_green"
+msgid "Green"
+msgstr "Vert"
+
+#. Key:	charcreate.eye_grey
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.eye_grey"
+msgid "Grey"
+msgstr "Gris"
+
+#. Key:	charcreate.hair_auburn
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_auburn"
+msgid "Auburn"
+msgstr "Auburn"
+
+#. Key:	charcreate.hair_black
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_black"
+msgid "Black"
+msgstr "Noir"
+
+#. Key:	charcreate.hair_blonde
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_blonde"
+msgid "Blonde"
+msgstr "Blond"
+
+#. Key:	charcreate.hair_brown
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_brown"
+msgid "Brown"
+msgstr "Châtain"
+
+#. Key:	charcreate.hair_red
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.hair_red"
+msgid "Red"
+msgstr "Roux"
+
+#. Key:	charcreate.name_required
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.name_required"
+msgid "A name is required."
+msgstr "Un nom est requis."
+
+#. Key:	charcreate.row_beard
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_beard"
+msgid "Beard"
+msgstr "Barbe"
+
+#. Key:	charcreate.row_eyebrows
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_eyebrows"
+msgid "Eyebrows"
+msgstr "Sourcils"
+
+#. Key:	charcreate.row_eyes
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_eyes"
+msgid "Eyes"
+msgstr "Yeux"
+
+#. Key:	charcreate.row_face
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_face"
+msgid "Face"
+msgstr "Visage"
+
+#. Key:	charcreate.row_hair
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_hair"
+msgid "Hair"
+msgstr "Cheveux"
+
+#. Key:	charcreate.row_hair_color
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_hair_color"
+msgid "Hair Color"
+msgstr "Couleur des cheveux"
+
+#. Key:	charcreate.row_moustache
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_moustache"
+msgid "Moustache"
+msgstr "Moustache"
+
+#. Key:	charcreate.row_tone
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.row_tone"
+msgid "Tone"
+msgstr "Teint"
+
+#. Key:	charcreate.sex_female
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.sex_female"
+msgid "Female"
+msgstr "Femme"
+
+#. Key:	charcreate.sex_male
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.sex_male"
+msgid "Male"
+msgstr "Homme"
+
+#. Key:	charcreate.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.title"
+msgid "Create a character"
+msgstr "Créer un personnage"
+
+#. Key:	charcreate.value_none
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.value_none"
+msgid "None"
+msgstr "Aucun"
+
+#. Key:	charcreate.value_type
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.value_type"
+msgid "Type {0}"
+msgstr "Type {0}"
+
+#. Key:	charcreate.working
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charcreate.working"
+msgid "Asking the server."
+msgstr "Interrogation du serveur."
+
+#. Key:	charselect.exit_game
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.exit_game"
+msgid "Exit Game"
+msgstr "Quitter le jeu"
+
+#. Key:	charselect.server_list
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.server_list"
+msgid "Server List"
+msgstr "Liste des serveurs"
+
+#. Key:	charselect.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,charselect.title"
+msgid "Choose a character"
+msgstr "Choisissez un personnage"
+
+#. Key:	keybind.Attack
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Attack"
+msgid "Attack"
+msgstr "Attaquer"
+
+#. Key:	keybind.AutoRun
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.AutoRun"
+msgid "Auto Run"
+msgstr "Course automatique"
+
+#. Key:	keybind.BackView
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.BackView"
+msgid "Back View"
+msgstr "Vue arrière"
+
+#. Key:	keybind.Chat
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Chat"
+msgid "Chat"
+msgstr "Discussion"
+
+#. Key:	keybind.Interact
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Interact"
+msgid "Interact"
+msgstr "Interagir"
+
+#. Key:	keybind.Inventory
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Inventory"
+msgid "Inventory"
+msgstr "Inventaire"
+
+#. Key:	keybind.Jump
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Jump"
+msgid "Jump"
+msgstr "Sauter"
+
+#. Key:	keybind.Map
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Map"
+msgid "Map"
+msgstr "Carte"
+
+#. Key:	keybind.Menu
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.Menu"
+msgid "Menu"
+msgstr "Menu"
+
+#. Key:	keybind.MoveBackward
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveBackward"
+msgid "Move Backward"
+msgstr "Reculer"
+
+#. Key:	keybind.MoveForward
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveForward"
+msgid "Move Forward"
+msgstr "Avancer"
+
+#. Key:	keybind.MoveLeft
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveLeft"
+msgid "Strafe Left"
+msgstr "Aller à gauche"
+
+#. Key:	keybind.MoveRight
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.MoveRight"
+msgid "Strafe Right"
+msgstr "Aller à droite"
+
+#. Key:	keybind.SwitchCamera
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.SwitchCamera"
+msgid "Switch Camera"
+msgstr "Changer de caméra"
+
+#. Key:	keybind.unbound
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,keybind.unbound"
+msgid "Unbound"
+msgstr "Non attribué"
+
+#. Key:	login.account
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.account"
+msgid "Account"
+msgstr "Compte"
+
+#. Key:	login.account_required
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.account_required"
+msgid "Enter an account name."
+msgstr "Saisissez un nom de compte."
+
+#. Key:	login.connecting
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.connecting"
+msgid "Connecting..."
+msgstr "Connexion..."
+
+#. Key:	login.could_not_connect
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.could_not_connect"
+msgid "Could not connect."
+msgstr "Connexion impossible."
+
+#. Key:	login.login
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.login"
+msgid "Login"
+msgstr "Se connecter"
+
+#. Key:	login.password
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,login.password"
+msgid "Password"
+msgstr "Mot de passe"
+
+#. Key:	menu.back
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.back"
+msgid "Back"
+msgstr "Retour"
+
+#. Key:	menu.create
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.create"
+msgid "Create"
+msgstr "Créer"
+
+#. Key:	menu.delete
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.delete"
+msgid "Delete"
+msgstr "Supprimer"
+
+#. Key:	menu.delete_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.delete_confirm"
+msgid "Delete \"{0}\"?\nThis cannot be undone."
+msgstr "Supprimer \"{0}\" ?\nCette action est irréversible."
+
+#. Key:	menu.enter
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.enter"
+msgid "Enter"
+msgstr "Entrer"
+
+#. Key:	menu.exit
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.exit"
+msgid "Exit"
+msgstr "Quitter"
+
+#. Key:	menu.exit_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.exit_confirm"
+msgid "Exit game?"
+msgstr "Quitter le jeu ?"
+
+#. Key:	menu.no
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.no"
+msgid "No"
+msgstr "Non"
+
+#. Key:	menu.options
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.options"
+msgid "Options"
+msgstr "Options"
+
+#. Key:	menu.options_title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.options_title"
+msgid "Options"
+msgstr "Options"
+
+#. Key:	menu.quit_to_menu
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.quit_to_menu"
+msgid "Quit to Menu"
+msgstr "Retour au menu"
+
+#. Key:	menu.resume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.resume"
+msgid "Resume"
+msgstr "Reprendre"
+
+#. Key:	menu.yes
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.yes"
+msgid "Yes"
+msgstr "Oui"
+
+#. Key:	options.apply
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.apply"
+msgid "Apply"
+msgstr "Appliquer"
+
+#. Key:	options.back
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.back"
+msgid "Back"
+msgstr "Retour"
+
+#. Key:	options.bucket_anti_aliasing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_anti_aliasing"
+msgid "Anti-Aliasing Quality"
+msgstr "Qualité de l'anticrénelage"
+
+#. Key:	options.bucket_effects
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_effects"
+msgid "Effects"
+msgstr "Effets"
+
+#. Key:	options.bucket_foliage
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_foliage"
+msgid "Foliage"
+msgstr "Végétation"
+
+#. Key:	options.bucket_global_illumination
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_global_illumination"
+msgid "Global Illumination"
+msgstr "Éclairage global"
+
+#. Key:	options.bucket_landscape
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_landscape"
+msgid "Landscape"
+msgstr "Terrain"
+
+#. Key:	options.bucket_post_processing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_post_processing"
+msgid "Post Processing"
+msgstr "Post-traitement"
+
+#. Key:	options.bucket_reflection
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_reflection"
+msgid "Reflections"
+msgstr "Réflexions"
+
+#. Key:	options.bucket_shading
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_shading"
+msgid "Shading"
+msgstr "Ombrage"
+
+#. Key:	options.bucket_shadow
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_shadow"
+msgid "Shadows"
+msgstr "Ombres"
+
+#. Key:	options.bucket_texture
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_texture"
+msgid "Textures"
+msgstr "Textures"
+
+#. Key:	options.bucket_view_distance
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.bucket_view_distance"
+msgid "View Distance"
+msgstr "Distance d'affichage"
+
+#. Key:	options.camera_first_person
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_first_person"
+msgid "First Person"
+msgstr "Première personne"
+
+#. Key:	options.camera_mode
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_mode"
+msgid "Camera"
+msgstr "Caméra"
+
+#. Key:	options.camera_third_person
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.camera_third_person"
+msgid "Third Person"
+msgstr "Troisième personne"
+
+#. Key:	options.chat_filter
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.chat_filter"
+msgid "Filter Chat Language"
+msgstr "Filtrer le langage du chat"
+
+#. Key:	options.damage_numbers
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.damage_numbers"
+msgid "Damage Numbers"
+msgstr "Chiffres de dégâts"
+
+#. Key:	options.defaults
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.defaults"
+msgid "Defaults"
+msgstr "Par défaut"
+
+#. Key:	options.fov
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.fov"
+msgid "Field of View"
+msgstr "Champ de vision"
+
+#. Key:	options.frame_cap
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.frame_cap"
+msgid "Frame Rate Cap"
+msgstr "Limite d'images par seconde"
+
+#. Key:	options.hud_scale
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.hud_scale"
+msgid "HUD Scale"
+msgstr "Échelle de l'interface"
+
+#. Key:	options.keep
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.keep"
+msgid "Keep"
+msgstr "Conserver"
+
+#. Key:	options.language
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.language"
+msgid "Language"
+msgstr "Langue"
+
+#. Key:	options.lumen
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.lumen"
+msgid "Lumen Lighting"
+msgstr "Éclairage Lumen"
+
+#. Key:	options.master_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.master_volume"
+msgid "Master Volume"
+msgstr "Volume général"
+
+#. Key:	options.music_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.music_volume"
+msgid "Music Volume"
+msgstr "Volume musique"
+
+#. Key:	options.nameplates
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.nameplates"
+msgid "Nameplates"
+msgstr "Noms des personnages"
+
+#. Key:	options.nanite
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.nanite"
+msgid "Nanite Geometry"
+msgstr "Géométrie Nanite"
+
+#. Key:	options.quality
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality"
+msgid "Quality"
+msgstr "Qualité"
+
+#. Key:	options.quality_cinematic
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_cinematic"
+msgid "Cinematic"
+msgstr "Cinématique"
+
+#. Key:	options.quality_custom
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_custom"
+msgid "Custom"
+msgstr "Personnalisée"
+
+#. Key:	options.quality_epic
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_epic"
+msgid "Epic"
+msgstr "Épique"
+
+#. Key:	options.quality_high
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_high"
+msgid "High"
+msgstr "Élevée"
+
+#. Key:	options.quality_low
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_low"
+msgid "Low"
+msgstr "Faible"
+
+#. Key:	options.quality_medium
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.quality_medium"
+msgid "Medium"
+msgstr "Moyenne"
+
+#. Key:	options.reset_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.reset_confirm"
+msgid "Reset to defaults?"
+msgstr "Réinitialiser les paramètres ?"
+
+#. Key:	options.resolution
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.resolution"
+msgid "Resolution"
+msgstr "Résolution"
+
+#. Key:	options.revert
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.revert"
+msgid "Revert"
+msgstr "Rétablir"
+
+#. Key:	options.screen_percentage
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.screen_percentage"
+msgid "Render Scale"
+msgstr "Échelle de rendu"
+
+#. Key:	options.sensitivity
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.sensitivity"
+msgid "Sensitivity"
+msgstr "Sensibilité"
+
+#. Key:	options.sfx_volume
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.sfx_volume"
+msgid "SFX Volume"
+msgstr "Volume effets"
+
+#. Key:	options.show_fps
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.show_fps"
+msgid "Show FPS"
+msgstr "FPS"
+
+#. Key:	options.show_stats
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.show_stats"
+msgid "Show Stats"
+msgstr "Stats"
+
+#. Key:	options.tab_audio
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_audio"
+msgid "Audio"
+msgstr "Audio"
+
+#. Key:	options.tab_display
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_display"
+msgid "Display"
+msgstr "Affichage"
+
+#. Key:	options.tab_gameplay
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_gameplay"
+msgid "Gameplay"
+msgstr "Jeu"
+
+#. Key:	options.tab_interface
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_interface"
+msgid "Interface"
+msgstr "Interface"
+
+#. Key:	options.tab_keybindings
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.tab_keybindings"
+msgid "Keybindings"
+msgstr "Touches"
+
+#. Key:	options.upscaler
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler"
+msgid "Anti-Aliasing"
+msgstr "Anticrénelage"
+
+#. Key:	options.upscaler_fxaa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_fxaa"
+msgid "FXAA"
+msgstr "FXAA"
+
+#. Key:	options.upscaler_off
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_off"
+msgid "Off"
+msgstr "Désactivé"
+
+#. Key:	options.upscaler_smaa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_smaa"
+msgid "SMAA"
+msgstr "SMAA"
+
+#. Key:	options.upscaler_taa
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_taa"
+msgid "TAA"
+msgstr "TAA"
+
+#. Key:	options.upscaler_tsr
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.upscaler_tsr"
+msgid "TSR"
+msgstr "TSR"
+
+#. Key:	options.vsync
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.vsync"
+msgid "VSync"
+msgstr "VSync"
+
+#. Key:	options.window_mode
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,options.window_mode"
+msgid "Window Mode"
+msgstr "Mode d'affichage"
+
+#. Key:	server.none
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.none"
+msgid "The login server listed no servers."
+msgstr "Le serveur de connexion n'a listé aucun serveur."
+
+#. Key:	server.status_offline
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.status_offline"
+msgid "Offline"
+msgstr "Hors ligne"
+
+#. Key:	server.status_online
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.status_online"
+msgid "Online"
+msgstr "En ligne"
+
+#. Key:	server.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,server.title"
+msgid "Choose a server"
+msgstr "Choisissez un serveur"
+
+#. Key:	worldentry.preparing
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,worldentry.preparing"
+msgid "Preparing {0}."
+msgstr "Préparation de {0}."
+
+#. Key:	worldentry.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,worldentry.title"
+msgid "Entering the world"
+msgstr "Entrée dans le monde"
+

@@ -140,6 +140,36 @@ struct NETWORK_API FCharacterSelected
 	int32 currentHp = 0;
 };
 
+/** This client's own character as UserInfo describes it: who it is and the figures the character sheet shows. */
+struct NETWORK_API FUserInfo
+{
+	uint32 objectId = 0;
+	int32 level = 0;
+
+	int32 strength = 0;
+	int32 dexterity = 0;
+	int32 constitution = 0;
+	int32 intelligence = 0;
+	int32 wit = 0;
+	int32 spirit = 0;
+
+	int32 maxHp = 0;
+	int32 currentHp = 0;
+	int32 maxMp = 0;
+	int32 currentMp = 0;
+
+	int32 attack = 0;
+	int32 defense = 0;
+	int32 magicAttack = 0;
+	int32 magicDefense = 0;
+	int32 accuracy = 0;
+	int32 evasion = 0;
+	int32 critical = 0;
+
+	/** In the server's units, as the server states it. */
+	int32 runSpeed = 0;
+};
+
 /** Somebody or something coming into view: a player from CharInfo, or a monster or townsperson from NpcInfo. */
 struct NETWORK_API FCharacterSpawn
 {

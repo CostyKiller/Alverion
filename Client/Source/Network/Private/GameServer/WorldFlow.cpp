@@ -32,6 +32,7 @@ bool FWorldFlow::begin(FGameServerFlow& gameServer)
 {
 	_gameServer = &gameServer;
 	_localObjectId = gameServer.selected().objectId;
+	_userInfo = FUserInfo();
 	_hasLocalState = false;
 	_moving = false;
 	_sinceMoveSent = 0.0f;
@@ -53,6 +54,11 @@ void FWorldFlow::end()
 bool FWorldFlow::isActive() const
 {
 	return _gameServer != nullptr;
+}
+
+const FUserInfo& FWorldFlow::userInfo() const
+{
+	return _userInfo;
 }
 
 void FWorldFlow::setLocalState(const FVector& location, float yaw, bool wantsToMove)
@@ -137,10 +143,11 @@ void FWorldFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 	{
 		case GameServer::Opcode::userInfo:
 		{
-			uint32 objectId = 0;
-			if (GameServer::readUserInfoObjectId(buffer, objectId))
+			FUserInfo info;
+			if (GameServer::readUserInfo(buffer, info))
 			{
-				_localObjectId = objectId;
+				_localObjectId = info.objectId;
+				_userInfo = info;
 			}
 
 			return;

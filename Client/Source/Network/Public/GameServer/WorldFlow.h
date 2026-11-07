@@ -37,6 +37,9 @@ public:
 
 	bool isActive() const;
 
+	/** The latest UserInfo, all zero until the first one arrives after EnterWorld. */
+	const FUserInfo& userInfo() const;
+
 	FCharacterSpawned onSpawned;
 	FCharacterDespawned onDespawned;
 	FCharacterMoved onMoved;
@@ -51,6 +54,7 @@ private:
 
 	FGameServerFlow* _gameServer = nullptr;
 	uint32 _localObjectId = 0;
+	FUserInfo _userInfo;
 
 	FVector _location = FVector::ZeroVector;
 	FVector _previousLocation = FVector::ZeroVector;

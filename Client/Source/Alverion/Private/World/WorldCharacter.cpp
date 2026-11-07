@@ -3,11 +3,13 @@
 #include "Appearance/AppearanceApplier.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/WorldPartitionStreamingSourceComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "Core/GameSettings.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
@@ -30,6 +32,12 @@ namespace
 	// Where the camera arm starts above the capsule's middle: over the shoulders from behind, at the eyes in first person.
 	constexpr float thirdPersonArmHeightCm = 60.0f;
 	constexpr float firstPersonArmHeightCm = 75.0f;
+
+	// The character sheet's picture is upright; its camera stands in front of the body far enough off to take it head to foot.
+	constexpr int32 portraitWidth = 400;
+	constexpr int32 portraitHeight = 560;
+	constexpr float portraitDistanceCm = 260.0f;
+	constexpr float portraitFieldOfView = 35.0f;
 
 	// The mouse wheel's reach, from over the shoulder to a wide view, how far one notch moves the camera and how quickly it glides there.
 	constexpr float cameraNearestCm = 150.0f;
@@ -152,6 +160,38 @@ void AWorldCharacter::wear(const Network::FAppearance& appearance)
 		character->_body->SetVisibility(false);
 		body->SetActorHiddenInGame(character->_firstPerson);
 	});
+}
+
+UTextureRenderTarget2D* AWorldCharacter::beginPortrait()
+{
+	if (_portraitCapture == nullptr)
+	{
+		UTextureRenderTarget2D* target = NewObject<UTextureRenderTarget2D>(this);
+		target->InitAutoFormat(portraitWidth, portraitHeight);
+
+		// On the capsule, which turns with the body, so the camera always stands in front of the face looking back at it.
+		_portraitCapture = NewObject<USceneCaptureComponent2D>(this);
+		_portraitCapture->SetupAttachment(RootComponent);
+		_portraitCapture->SetRelativeLocationAndRotation(FVector(portraitDistanceCm, 0.0, 0.0), FRotator(0.0, 180.0, 0.0));
+		_portraitCapture->FOVAngle = portraitFieldOfView;
+		_portraitCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+		_portraitCapture->TextureTarget = target;
+		_portraitCapture->bCaptureEveryFrame = false;
+		_portraitCapture->bCaptureOnMovement = false;
+		_portraitCapture->RegisterComponent();
+	}
+
+	_portraitCapture->bCaptureEveryFrame = true;
+	return _portraitCapture->TextureTarget;
+}
+
+void AWorldCharacter::endPortrait()
+{
+	// Filming the whole scene again is a second view's cost, so it stops the moment nobody looks at the picture.
+	if (_portraitCapture != nullptr)
+	{
+		_portraitCapture->bCaptureEveryFrame = false;
+	}
 }
 
 void AWorldCharacter::PawnClientRestart()

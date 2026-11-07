@@ -5,6 +5,7 @@
 #include "Core/GameSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "World/ProxyCharacter.h"
+#include "UI/ActionBarWidget.h"
 #include "UI/RootLayout.h"
 #include "ServerConnectionSubsystem.h"
 #include "World/WorldCharacter.h"
@@ -50,6 +51,13 @@ void AWorldGameMode::BeginPlay()
 	if (_rootLayout != nullptr)
 	{
 		_rootLayout->AddToViewport();
+	}
+
+	// Under the layout, so every screen opened over the world covers it.
+	UActionBarWidget* actionBar = CreateWidget<UActionBarWidget>(world, UActionBarWidget::StaticClass());
+	if (actionBar != nullptr)
+	{
+		actionBar->AddToViewport(-1);
 	}
 
 	FActorSpawnParameters parameters;

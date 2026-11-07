@@ -5,6 +5,7 @@
 #include "Engine/GameInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "UI/GameMenuWidget.h"
+#include "UI/InventoryWidget.h"
 #include "InputAction.h"
 #include "Core/InputBootstrapSubsystem.h"
 #include "UI/UISubsystem.h"
@@ -13,6 +14,7 @@
 namespace
 {
 	const TCHAR* const menuActionPath = TEXT("/Game/Input/Actions/IA_Menu.IA_Menu");
+	const TCHAR* const inventoryActionPath = TEXT("/Game/Input/Actions/IA_Inventory.IA_Inventory");
 }
 
 void AClientPlayerController::SetupInputComponent()
@@ -28,14 +30,31 @@ void AClientPlayerController::SetupInputComponent()
 	}
 
 	UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
-	UInputAction* menuAction = LoadObject<UInputAction>(nullptr, menuActionPath);
-	if ((enhancedInput == nullptr) || (menuAction == nullptr))
+	if (enhancedInput == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not bind %s, so the menu key does nothing."), menuActionPath);
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController has no Enhanced Input component, so the menu and inventory keys do nothing."));
 		return;
 	}
 
-	enhancedInput->BindAction(menuAction, ETriggerEvent::Started, this, &AClientPlayerController::toggleGameMenu);
+	UInputAction* menuAction = LoadObject<UInputAction>(nullptr, menuActionPath);
+	if (menuAction != nullptr)
+	{
+		enhancedInput->BindAction(menuAction, ETriggerEvent::Started, this, &AClientPlayerController::toggleGameMenu);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the menu key does nothing."), menuActionPath);
+	}
+
+	UInputAction* inventoryAction = LoadObject<UInputAction>(nullptr, inventoryActionPath);
+	if (inventoryAction != nullptr)
+	{
+		enhancedInput->BindAction(inventoryAction, ETriggerEvent::Started, this, &AClientPlayerController::toggleInventory);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the inventory key does nothing."), inventoryActionPath);
+	}
 }
 
 void AClientPlayerController::toggleGameMenu()
@@ -57,22 +76,48 @@ void AClientPlayerController::toggleGameMenu()
 		return;
 	}
 
-	// The layer is watched rather than the menu, because opening Options over the menu deactivates the menu without leaving it.
+	openScreen(UGameMenuWidget::StaticClass());
+}
+
+void AClientPlayerController::toggleInventory()
+{
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
+	if ((layer == nullptr) || (layer->GetActiveWidget() != nullptr))
+	{
+		return;
+	}
+
+	openScreen(UInventoryWidget::StaticClass());
+}
+
+void AClientPlayerController::openScreen(TSubclassOf<UCommonActivatableWidget> screenClass)
+{
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
+	if (layer == nullptr)
+	{
+		return;
+	}
+
+	// The layer is watched rather than the screen, because opening Options over the menu deactivates the menu without leaving it.
 	if (!_watchingGameMenuLayer)
 	{
 		layer->OnDisplayedWidgetChanged().AddUObject(this, &AClientPlayerController::handleGameMenuLayerChanged);
 		_watchingGameMenuLayer = true;
 	}
 
-	UCommonActivatableWidget* menu = subsystem->pushWidget(EUILayer::GameMenu, UGameMenuWidget::StaticClass());
-	if (menu == nullptr)
+	UCommonActivatableWidget* screen = subsystem->pushWidget(EUILayer::GameMenu, screenClass);
+	if (screen == nullptr)
 	{
 		return;
 	}
 
-	// The menu is read with a pointer, and game and UI together still lets the menu key through to close it again.
+	// The screen is read with a pointer, and game and UI together still lets its keys through to close it again.
 	SetShowMouseCursor(true);
-	SetInputMode(FInputModeGameAndUI().SetWidgetToFocus(menu->TakeWidget()));
+	SetInputMode(FInputModeGameAndUI().SetWidgetToFocus(screen->TakeWidget()));
 }
 
 void AClientPlayerController::handleGameMenuLayerChanged(UCommonActivatableWidget* widget)

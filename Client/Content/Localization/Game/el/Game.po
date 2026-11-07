@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Game\n"
-"POT-Creation-Date: 2026-11-07 16:34\n"
-"PO-Revision-Date: 2026-11-07 16:34\n"
+"POT-Creation-Date: 2026-11-07 18:48\n"
+"PO-Revision-Date: 2026-11-07 18:48\n"
 "Language-Team: \n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -215,6 +215,195 @@ msgstr "Λίστα διακομιστών"
 msgctxt "ST_Game,charselect.title"
 msgid "Choose a character"
 msgstr "Επιλέξτε χαρακτήρα"
+
+#. Key:	inventory.character
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.character"
+msgid "Character"
+msgstr "Χαρακτήρας"
+
+#. Key:	inventory.slot_back
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_back"
+msgid "Back"
+msgstr "Πλάτη"
+
+#. Key:	inventory.slot_chest
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_chest"
+msgid "Chest"
+msgstr "Στήθος"
+
+#. Key:	inventory.slot_feet
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_feet"
+msgid "Feet"
+msgstr "Υποδήματα"
+
+#. Key:	inventory.slot_hands
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_hands"
+msgid "Hands"
+msgstr "Χέρια"
+
+#. Key:	inventory.slot_head
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_head"
+msgid "Head"
+msgstr "Κεφάλι"
+
+#. Key:	inventory.slot_legs
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_legs"
+msgid "Legs"
+msgstr "Πόδια"
+
+#. Key:	inventory.slot_main_hand
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_main_hand"
+msgid "Main Hand"
+msgstr "Κύριο χέρι"
+
+#. Key:	inventory.slot_off_hand
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.slot_off_hand"
+msgid "Off Hand"
+msgstr "Δεύτερο χέρι"
+
+#. Key:	inventory.stat_accuracy
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_accuracy"
+msgid "Accuracy"
+msgstr "Ακρίβεια"
+
+#. Key:	inventory.stat_attack
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_attack"
+msgid "Attack"
+msgstr "Επίθεση"
+
+#. Key:	inventory.stat_constitution
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_constitution"
+msgid "Constitution"
+msgstr "Αντοχή"
+
+#. Key:	inventory.stat_critical
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_critical"
+msgid "Critical"
+msgstr "Καίριο"
+
+#. Key:	inventory.stat_defense
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_defense"
+msgid "Defense"
+msgstr "Άμυνα"
+
+#. Key:	inventory.stat_dexterity
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_dexterity"
+msgid "Dexterity"
+msgstr "Επιδεξιότητα"
+
+#. Key:	inventory.stat_evasion
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_evasion"
+msgid "Evasion"
+msgstr "Αποφυγή"
+
+#. Key:	inventory.stat_hp
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_hp"
+msgid "HP"
+msgstr "HP"
+
+#. Key:	inventory.stat_intelligence
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_intelligence"
+msgid "Intelligence"
+msgstr "Ευφυΐα"
+
+#. Key:	inventory.stat_magic_attack
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_magic_attack"
+msgid "Magic Attack"
+msgstr "Μαγική επίθεση"
+
+#. Key:	inventory.stat_magic_defense
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_magic_defense"
+msgid "Magic Defense"
+msgstr "Μαγική άμυνα"
+
+#. Key:	inventory.stat_mp
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_mp"
+msgid "MP"
+msgstr "MP"
+
+#. Key:	inventory.stat_speed
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_speed"
+msgid "Speed"
+msgstr "Ταχύτητα"
+
+#. Key:	inventory.stat_spirit
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_spirit"
+msgid "Spirit"
+msgstr "Πνεύμα"
+
+#. Key:	inventory.stat_strength
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_strength"
+msgid "Strength"
+msgstr "Δύναμη"
+
+#. Key:	inventory.stat_wit
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.stat_wit"
+msgid "Wit"
+msgstr "Οξύνοια"
+
+#. Key:	inventory.summary
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.summary"
+msgid "{0} - Level {1}"
+msgstr "{0} - Επίπεδο {1}"
+
+#. Key:	inventory.title
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,inventory.title"
+msgid "Inventory"
+msgstr "Αντικείμενα"
 
 #. Key:	keybind.Attack
 #. SourceLocation:	Localization/StringTables/ST_Game.csv

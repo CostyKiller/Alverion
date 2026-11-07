@@ -157,6 +157,10 @@ bool FLiveServerRoundTripTest::RunTest(const FString& parameters)
 	TestTrue(FString::Printf(TEXT("The world sends what stands around the character (%d spawns)"), spawns), spawns > 0);
 	TestTrue(TEXT("The link survives entering the world"), gameFlow.step() == Network::EGameServerStep::InWorld);
 
+	// The run speed sits after the three equipment blocks, so a sensible value proves the whole read stayed aligned.
+	const Network::FUserInfo& info = worldFlow.userInfo();
+	TestTrue(FString::Printf(TEXT("UserInfo reads through to the run speed (level %d, %d HP, speed %d)"), info.level, info.maxHp, info.runSpeed), (info.level > 0) && (info.maxHp > 0) && (info.runSpeed > 50) && (info.runSpeed < 400));
+
 	worldFlow.end();
 	gameFlow.end();
 	gameSession.disconnect();

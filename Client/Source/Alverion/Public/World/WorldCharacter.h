@@ -10,8 +10,10 @@ class APlayerController;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class USceneCaptureComponent2D;
 class USpringArmComponent;
 class UStaticMeshComponent;
+class UTextureRenderTarget2D;
 class UWorldPartitionStreamingSourceComponent;
 struct FInputActionValue;
 
@@ -30,6 +32,10 @@ public:
 
 	/** Stands the MetaHuman this appearance describes on the character, in place of the placeholder figure. */
 	void wear(const Network::FAppearance& appearance);
+
+	/** Films the character from the front for the character sheet, every frame until endPortrait, and returns the picture. */
+	UTextureRenderTarget2D* beginPortrait();
+	void endPortrait();
 
 protected:
 	virtual void BeginPlay() override;
@@ -75,6 +81,10 @@ private:
 	/** The continent streams around the player, and loads nothing without a source. */
 	UPROPERTY()
 	TObjectPtr<UWorldPartitionStreamingSourceComponent> _streaming;
+
+	/** Made on the first character sheet and kept, filming only while a sheet is open. */
+	UPROPERTY()
+	TObjectPtr<USceneCaptureComponent2D> _portraitCapture;
 
 	/** Mouse look and wheel zoom only. The movement keys live in the rebindable context the input bootstrap builds from the action assets. */
 	UPROPERTY()

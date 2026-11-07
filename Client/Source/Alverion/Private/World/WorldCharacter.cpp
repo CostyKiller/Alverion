@@ -27,6 +27,12 @@ namespace
 	constexpr float capsuleHalfHeightCm = 90.0f;
 	constexpr float cameraDistanceCm = 450.0f;
 
+	// The mouse wheel's reach, from over the shoulder to a wide view, how far one notch moves the camera and how quickly it glides there.
+	constexpr float cameraNearestCm = 150.0f;
+	constexpr float cameraFarthestCm = 1500.0f;
+	constexpr float cameraZoomStepCm = 75.0f;
+	constexpr float cameraZoomRate = 10.0f;
+
 	// How far above and below the server's height to look for ground, which is shaped by hand and need not match it.
 	constexpr double settleSearchCm = 20000.0;
 
@@ -77,6 +83,7 @@ AWorldCharacter::AWorldCharacter()
 	_arm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Arm"));
 	_arm->SetupAttachment(RootComponent);
 	_arm->TargetArmLength = cameraDistanceCm;
+	_cameraDistanceCm = cameraDistanceCm;
 	_arm->SetRelativeLocation(FVector(0.0f, 0.0f, 60.0f));
 	_arm->bUsePawnControlRotation = true;
 
@@ -154,8 +161,12 @@ void AWorldCharacter::PawnClientRestart()
 		_lookAction = NewObject<UInputAction>(this);
 		_lookAction->ValueType = EInputActionValueType::Axis2D;
 
+		_zoomAction = NewObject<UInputAction>(this);
+		_zoomAction->ValueType = EInputActionValueType::Axis1D;
+
 		_lookMapping = NewObject<UInputMappingContext>(this);
 		_lookMapping->MapKey(_lookAction, EKeys::Mouse2D);
+		_lookMapping->MapKey(_zoomAction, EKeys::MouseWheelAxis);
 	}
 
 	Super::PawnClientRestart();
@@ -215,6 +226,11 @@ void AWorldCharacter::SetupPlayerInputComponent(UInputComponent* input)
 	{
 		enhanced->BindAction(_lookAction, ETriggerEvent::Triggered, this, &AWorldCharacter::look);
 	}
+
+	if (_zoomAction != nullptr)
+	{
+		enhanced->BindAction(_zoomAction, ETriggerEvent::Triggered, this, &AWorldCharacter::zoom);
+	}
 }
 
 void AWorldCharacter::moveForward()
@@ -268,6 +284,12 @@ void AWorldCharacter::look(const FInputActionValue& value)
 	AddControllerPitchInput(-axes.Y * scale);
 }
 
+void AWorldCharacter::zoom(const FInputActionValue& value)
+{
+	// The wheel rolled forward reads positive and brings the camera in.
+	_cameraDistanceCm = FMath::Clamp(_cameraDistanceCm - (value.Get<float>() * cameraZoomStepCm), cameraNearestCm, cameraFarthestCm);
+}
+
 void AWorldCharacter::Tick(float deltaSeconds)
 {
 	Super::Tick(deltaSeconds);
@@ -290,6 +312,8 @@ void AWorldCharacter::Tick(float deltaSeconds)
 	{
 		_camera->SetFieldOfView(settings->getFieldOfView());
 	}
+
+	_arm->TargetArmLength = FMath::FInterpTo(_arm->TargetArmLength, _cameraDistanceCm, deltaSeconds, cameraZoomRate);
 
 	if (_onGround)
 	{

@@ -42,6 +42,7 @@ private:
 	void move(float forward, float right);
 	void rise();
 	void look(const FInputActionValue& value);
+	void zoom(const FInputActionValue& value);
 	void corrected(const Network::FObjectPlace& place, bool teleport);
 
 	/** Puts the character on the ground under it and lets it walk, once streamed ground is there. */
@@ -67,12 +68,18 @@ private:
 	UPROPERTY()
 	TObjectPtr<UWorldPartitionStreamingSourceComponent> _streaming;
 
-	/** Mouse look only. The movement keys live in the rebindable context the input bootstrap builds from the action assets. */
+	/** Mouse look and wheel zoom only. The movement keys live in the rebindable context the input bootstrap builds from the action assets. */
 	UPROPERTY()
 	TObjectPtr<UInputMappingContext> _lookMapping;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> _lookAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _zoomAction;
+
+	/** Where the wheel asked the camera to be. Tick glides the arm there, so a notch is not a jump. */
+	float _cameraDistanceCm = 0.0f;
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> _moveForwardAction;

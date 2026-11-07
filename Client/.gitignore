@@ -1,0 +1,15 @@
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.vscode/
+*.sln
+*.slnx
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+Content/Characters/MetaHumans/
+Build/Windows/FileOpenOrder/

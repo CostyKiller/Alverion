@@ -1,0 +1,288 @@
+diff --git a/dist/db_installer/sql/game/character_appearance.sql b/dist/db_installer/sql/game/character_appearance.sql
+new file mode 100644
+index 0000000..16d29c4
+--- /dev/null
++++ b/dist/db_installer/sql/game/character_appearance.sql
+@@ -0,0 +1,6 @@
++-- Alverion appearance extension: each character's appearance block, as the Alverion client sent it at creation.
++CREATE TABLE IF NOT EXISTS `character_appearance` (
++  `charId` INT UNSIGNED NOT NULL DEFAULT 0,
++  `data` VARBINARY(64) NOT NULL,
++  PRIMARY KEY (`charId`)
++) DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+diff --git a/java/org/l2jmobius/gameserver/data/sql/CharacterAppearanceTable.java b/java/org/l2jmobius/gameserver/data/sql/CharacterAppearanceTable.java
+new file mode 100644
+index 0000000..f9419b5
+--- /dev/null
++++ b/java/org/l2jmobius/gameserver/data/sql/CharacterAppearanceTable.java
+@@ -0,0 +1,150 @@
++package org.l2jmobius.gameserver.data.sql;
++
++import java.sql.Connection;
++import java.sql.PreparedStatement;
++import java.sql.ResultSet;
++import java.util.List;
++import java.util.Map;
++import java.util.concurrent.ConcurrentHashMap;
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++import org.l2jmobius.commons.database.DatabaseFactory;
++import org.l2jmobius.commons.network.buffer.WriteBuffer;
++
++/**
++ * Alverion appearance extension.<br>
++ * Keeps each character's appearance block exactly as the Alverion client sent it at creation, and writes it back to that client.<br>
++ * The server never reads the bytes; only the client gives them meaning.<br>
++ * On the wire the block follows a magic number, so a client that never sends one and a server without this patch both carry on as before.
++ */
++public class CharacterAppearanceTable
++{
++	private static final Logger LOGGER = Logger.getLogger(CharacterAppearanceTable.class.getName());
++	
++	/** The bytes 'A' 'L' 'V' '1', read as a little-endian int. */
++	public static final int MAGIC = 0x31564C41;
++	
++	/** The longest block accepted. The client sends 24 bytes today. */
++	public static final int MAX_SIZE = 64;
++	
++	private static final byte[] NONE = new byte[0];
++	
++	private final Map<Integer, byte[]> _appearances = new ConcurrentHashMap<>();
++	
++	protected CharacterAppearanceTable()
++	{
++	}
++	
++	/**
++	 * @param objectId the character's object id
++	 * @return the stored block, or an empty array for a character created without one
++	 */
++	public byte[] get(int objectId)
++	{
++		return _appearances.computeIfAbsent(objectId, this::load);
++	}
++	
++	public void store(int objectId, byte[] appearance)
++	{
++		if ((appearance == null) || (appearance.length == 0) || (appearance.length > MAX_SIZE))
++		{
++			return;
++		}
++		
++		try (Connection con = DatabaseFactory.getConnection();
++			PreparedStatement ps = con.prepareStatement("REPLACE INTO character_appearance (charId, data) VALUES (?, ?)"))
++		{
++			ps.setInt(1, objectId);
++			ps.setBytes(2, appearance);
++			ps.execute();
++			_appearances.put(objectId, appearance);
++		}
++		catch (Exception e)
++		{
++			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not store the appearance of " + objectId + ".", e);
++		}
++	}
++	
++	public void delete(int objectId)
++	{
++		_appearances.remove(objectId);
++		
++		try (Connection con = DatabaseFactory.getConnection();
++			PreparedStatement ps = con.prepareStatement("DELETE FROM character_appearance WHERE charId=?"))
++		{
++			ps.setInt(1, objectId);
++			ps.execute();
++		}
++		catch (Exception e)
++		{
++			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not delete the appearance of " + objectId + ".", e);
++		}
++	}
++	
++	private byte[] load(int objectId)
++	{
++		try (Connection con = DatabaseFactory.getConnection();
++			PreparedStatement ps = con.prepareStatement("SELECT data FROM character_appearance WHERE charId=?"))
++		{
++			ps.setInt(1, objectId);
++			try (ResultSet rs = ps.executeQuery())
++			{
++				if (rs.next())
++				{
++					final byte[] data = rs.getBytes(1);
++					return data != null ? data : NONE;
++				}
++			}
++		}
++		catch (Exception e)
++		{
++			LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Could not load the appearance of " + objectId + ".", e);
++		}
++		
++		return NONE;
++	}
++	
++	/**
++	 * Appends the blocks to the end of a packet: every block padded to the longest, then that size and the count as shorts, then the magic.<br>
++	 * The client reads it from the end, so nothing before it changes. Writes nothing when no block exists, leaving the packet exactly as stock.
++	 * @param buffer the packet being written
++	 * @param blocks one block per entry the packet lists, in order, empty for an entry without one
++	 */
++	public static void writeTrailer(WriteBuffer buffer, List<byte[]> blocks)
++	{
++		int size = 0;
++		for (byte[] block : blocks)
++		{
++			size = Math.max(size, block.length);
++		}
++		
++		if (size == 0)
++		{
++			return;
++		}
++		
++		for (byte[] block : blocks)
++		{
++			buffer.writeBytes(block);
++			for (int i = block.length; i < size; i++)
++			{
++				buffer.writeByte(0);
++			}
++		}
++		
++		buffer.writeShort(size);
++		buffer.writeShort(blocks.size());
++		buffer.writeInt(MAGIC);
++	}
++	
++	public static CharacterAppearanceTable getInstance()
++	{
++		return SingletonHolder.INSTANCE;
++	}
++	
++	private static class SingletonHolder
++	{
++		protected static final CharacterAppearanceTable INSTANCE = new CharacterAppearanceTable();
++	}
++}
+diff --git a/java/org/l2jmobius/gameserver/network/GameClient.java b/java/org/l2jmobius/gameserver/network/GameClient.java
+index db1eb76..94271c0 100644
+--- a/java/org/l2jmobius/gameserver/network/GameClient.java
++++ b/java/org/l2jmobius/gameserver/network/GameClient.java
+@@ -40,6 +40,7 @@ import org.l2jmobius.gameserver.config.GeneralConfig;
+ import org.l2jmobius.gameserver.config.PlayerConfig;
+ import org.l2jmobius.gameserver.config.ServerConfig;
+ import org.l2jmobius.gameserver.config.custom.WeddingConfig;
++import org.l2jmobius.gameserver.data.sql.CharacterAppearanceTable;
+ import org.l2jmobius.gameserver.data.sql.ClanTable;
+ import org.l2jmobius.gameserver.data.sql.PlayerInfoTable;
+ import org.l2jmobius.gameserver.data.sql.SummonInfoTable;
+@@ -509,6 +510,7 @@ public class GameClient extends Client<org.l2jmobius.commons.network.Connection<
+ 		
+ 		PlayerInfoTable.getInstance().removeName(objectId);
+ 		SummonInfoTable.getInstance().removeCharacter(objectId);
++		CharacterAppearanceTable.getInstance().delete(objectId);
+ 		
+ 		try (Connection con = DatabaseFactory.getConnection())
+ 		{
+diff --git a/java/org/l2jmobius/gameserver/network/clientpackets/CharacterCreate.java b/java/org/l2jmobius/gameserver/network/clientpackets/CharacterCreate.java
+index b961b60..fa39575 100644
+--- a/java/org/l2jmobius/gameserver/network/clientpackets/CharacterCreate.java
++++ b/java/org/l2jmobius/gameserver/network/clientpackets/CharacterCreate.java
+@@ -30,6 +30,7 @@ import org.l2jmobius.gameserver.config.custom.AllowedPlayerRacesConfig;
+ import org.l2jmobius.gameserver.config.custom.FactionSystemConfig;
+ import org.l2jmobius.gameserver.config.custom.StartingLocationConfig;
+ import org.l2jmobius.gameserver.config.custom.StartingTitleConfig;
++import org.l2jmobius.gameserver.data.sql.CharacterAppearanceTable;
+ import org.l2jmobius.gameserver.data.sql.PlayerInfoTable;
+ import org.l2jmobius.gameserver.data.xml.FakePlayerData;
+ import org.l2jmobius.gameserver.data.xml.InitialEquipmentData;
+@@ -76,6 +77,7 @@ public class CharacterCreate extends ClientPacket
+ 	private byte _hairStyle;
+ 	private byte _hairColor;
+ 	private byte _face;
++	private byte[] _appearance;
+ 	
+ 	@Override
+ 	protected void readImpl()
+@@ -93,6 +95,16 @@ public class CharacterCreate extends ClientPacket
+ 		_hairStyle = (byte) readInt();
+ 		_hairColor = (byte) readInt();
+ 		_face = (byte) readInt();
++		
++		// Alverion appearance extension: the client's appearance block, after its magic number.
++		if ((remaining() >= 5) && (readInt() == CharacterAppearanceTable.MAGIC))
++		{
++			final int size = readUnsignedByte();
++			if ((size > 0) && (size <= CharacterAppearanceTable.MAX_SIZE) && (remaining() >= size))
++			{
++				_appearance = readBytes(size);
++			}
++		}
+ 	}
+ 	
+ 	@Override
+@@ -249,6 +261,7 @@ public class CharacterCreate extends ClientPacket
+ 		// newChar.setMaxLoad(template.getBaseLoad());
+ 		
+ 		initNewChar(client, newChar);
++		CharacterAppearanceTable.getInstance().store(newChar.getObjectId(), _appearance);
+ 		client.sendPacket(CharCreateOk.STATIC_PACKET);
+ 		
+ 		LOGGER_ACCOUNTING.info("Created new character, " + newChar + ", " + client);
+diff --git a/java/org/l2jmobius/gameserver/network/serverpackets/CharInfo.java b/java/org/l2jmobius/gameserver/network/serverpackets/CharInfo.java
+index 2f0a129..784d175 100644
+--- a/java/org/l2jmobius/gameserver/network/serverpackets/CharInfo.java
++++ b/java/org/l2jmobius/gameserver/network/serverpackets/CharInfo.java
+@@ -20,10 +20,12 @@
+  */
+ package org.l2jmobius.gameserver.network.serverpackets;
+ 
++import java.util.List;
+ import java.util.Map;
+ 
+ import org.l2jmobius.commons.network.buffer.WriteBuffer;
+ import org.l2jmobius.gameserver.config.GeneralConfig;
++import org.l2jmobius.gameserver.data.sql.CharacterAppearanceTable;
+ import org.l2jmobius.gameserver.entity.actor.Player;
+ import org.l2jmobius.gameserver.entity.actor.appearance.PlayerAppearance;
+ import org.l2jmobius.gameserver.entity.actor.instance.Decoy;
+@@ -254,6 +256,9 @@ public class CharInfo extends ServerPacket
+ 		
+ 		// T2.3
+ 		buffer.writeInt(_player.getAbnormalVisualEffectSpecial());
++		
++		// Alverion appearance extension.
++		CharacterAppearanceTable.writeTrailer(buffer, List.of(CharacterAppearanceTable.getInstance().get(_objId)));
+ 	}
+ 	
+ 	/**
+diff --git a/java/org/l2jmobius/gameserver/network/serverpackets/CharSelectionInfo.java b/java/org/l2jmobius/gameserver/network/serverpackets/CharSelectionInfo.java
+index 1785a70..eb93143 100644
+--- a/java/org/l2jmobius/gameserver/network/serverpackets/CharSelectionInfo.java
++++ b/java/org/l2jmobius/gameserver/network/serverpackets/CharSelectionInfo.java
+@@ -32,6 +32,7 @@ import org.l2jmobius.gameserver.config.ServerConfig;
+ import org.l2jmobius.gameserver.config.custom.MultilingualSupportConfig;
+ import org.l2jmobius.gameserver.config.custom.OfflinePlayConfig;
+ import org.l2jmobius.gameserver.config.custom.OfflineTradeConfig;
++import org.l2jmobius.gameserver.data.sql.CharacterAppearanceTable;
+ import org.l2jmobius.gameserver.data.sql.ClanTable;
+ import org.l2jmobius.gameserver.data.xml.ExperienceData;
+ import org.l2jmobius.gameserver.entity.World;
+@@ -191,6 +192,15 @@ public class CharSelectionInfo extends ServerPacket
+ 			buffer.writeDouble(0); // Current pet MP
+ 			buffer.writeInt(charInfoPackage.getVitalityPoints()); // Vitality
+ 		}
++		
++		// Alverion appearance extension.
++		final List<byte[]> appearances = new ArrayList<>(size);
++		for (CharacterInfoHolder charInfoPackage : _characterPackages)
++		{
++			appearances.add(CharacterAppearanceTable.getInstance().get(charInfoPackage.getObjectId()));
++		}
++		
++		CharacterAppearanceTable.writeTrailer(buffer, appearances);
+ 	}
+ 	
+ 	/**

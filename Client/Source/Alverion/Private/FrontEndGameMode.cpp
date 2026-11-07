@@ -3,7 +3,6 @@
 #include "Appearance.h"
 #include "AppearanceApplier.h"
 #include "Camera/CameraActor.h"
-#include "CardGameModes.h"
 #include "Camera/CameraComponent.h"
 #include "CharacterCreateWidget.h"
 #include "CharacterSelectWidget.h"
@@ -82,8 +81,8 @@ void AFrontEndGameMode::travelToWorld(UObject* worldContext)
 	}
 #endif
 
-	// By way of the loading card. The continent's world settings name its game mode.
-	ALoadingGameMode::travelTo(worldContext, continentMap);
+	// By way of the loading map, which loads the continent behind its screen. The continent's world settings name its game mode.
+	UGameplayStatics::OpenLevel(worldContext, FName(TEXT("L_Loading")), true, FString::Printf(TEXT("target=%s"), continentMap));
 }
 
 void AFrontEndGameMode::BeginPlay()
@@ -425,7 +424,17 @@ void AFrontEndGameMode::startMenuMusic()
 	}
 
 	_musicComponent = UGameplayStatics::SpawnSound2D(this, _menuMusic);
+	if (_musicComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FrontEndGameMode loaded the menu theme but got no audio component back, so nothing is playing."));
+		return;
+	}
+
 	applyMusicVolume();
+
+	// Reports what reached the component rather than what was asked for.
+	// A missing line is a failed load, a zero is the volume, a number with nothing audible is the device.
+	UE_LOG(LogTemp, Display, TEXT("FrontEndGameMode started the menu theme at volume %.2f."), _musicComponent->VolumeMultiplier);
 }
 
 void AFrontEndGameMode::applyMusicVolume()

@@ -146,6 +146,7 @@ Key,SourceString
 "options.upscaler_tsr","TSR"
 "options.vsync","VSync"
 "options.window_mode","Window Mode"
+"screenshot.saved","Screenshot saved"
 "server.none","The login server listed no servers."
 "server.status_offline","Offline"
 "server.status_online","Online"

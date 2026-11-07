@@ -1,6 +1,7 @@
 #include "FrontEndGameMode.h"
 
 #include "Appearance.h"
+#include "AppearanceApplier.h"
 #include "Camera/CameraActor.h"
 #include "CardGameModes.h"
 #include "Camera/CameraComponent.h"
@@ -95,6 +96,9 @@ void AFrontEndGameMode::BeginPlay()
 		settings->ApplySettings(false);
 		settings->onAudioSettingsChanged.AddUObject(this, &AFrontEndGameMode::applyMusicVolume);
 	}
+
+	// The bodies and the eye material start loading now, so the first character shown does not stall the screen.
+	Appearance::warm();
 
 	APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
 	if (controller != nullptr)
@@ -246,22 +250,59 @@ void AFrontEndGameMode::showAvatar(EAvatarSpot spot, TConstArrayView<uint8> appe
 	Network::FAppearance unpacked;
 	Network::FAppearance::unpack(appearance, unpacked);
 
-	// The seam the MetaHuman applier plugs into: spawn the body class for this appearance on the marker and dress it.
-	// Until then a placeholder figure stands there, tinted by the chosen skin tone.
+	// The body may have to be fetched first, and only the newest request is worth standing up when it lands.
+	const uint32 request = ++_avatarRequest;
+	const TWeakObjectPtr<AFrontEndGameMode> weakThis(this);
+	Appearance::requestBodyClass(unpacked, [weakThis, request, spot, unpacked](UClass* bodyClass)
+	{
+		AFrontEndGameMode* gameMode = weakThis.Get();
+		if ((gameMode != nullptr) && (request == gameMode->_avatarRequest))
+		{
+			gameMode->standAvatar(spot, bodyClass, unpacked);
+		}
+	});
+}
+
+void AFrontEndGameMode::standAvatar(EAvatarSpot spot, UClass* bodyClass, const Network::FAppearance& appearance)
+{
+	AActor* marker = _avatarSpots.FindRef(spot);
+	if (marker == nullptr)
+	{
+		return;
+	}
+
+	// Without the MetaHuman assets, which a fresh clone does not have, a placeholder figure tinted by the skin tone stands in.
+	UClass* wanted = (bodyClass != nullptr) ? bodyClass : AStaticMeshActor::StaticClass();
+	if ((_avatar != nullptr) && (_avatar->GetClass() != wanted))
+	{
+		clearAvatar();
+	}
+
 	if (_avatar == nullptr)
 	{
 		FActorSpawnParameters parameters;
 		parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		AStaticMeshActor* figure = GetWorld()->SpawnActor<AStaticMeshActor>(marker->GetActorLocation(), marker->GetActorRotation(), parameters);
-		figure->GetStaticMeshComponent()->SetMobility(EComponentMobility::Movable);
-		_avatar = figure;
+		_avatar = GetWorld()->SpawnActor<AActor>(wanted, marker->GetActorLocation(), marker->GetActorRotation(), parameters);
+		if (_avatar == nullptr)
+		{
+			return;
+		}
 	}
 
-	_avatar->SetActorLocationAndRotation(marker->GetActorLocation() + FVector(0.0, 0.0, placeholderHalfHeightCm), marker->GetActorRotation());
+	if (bodyClass != nullptr)
+	{
+		// A MetaHuman stands on its feet at the marker, which carries the yaw its mesh needs to face the camera.
+		_avatar->SetActorLocationAndRotation(marker->GetActorLocation(), marker->GetActorRotation());
+		Appearance::apply(*_avatar, appearance);
+		return;
+	}
 
-	const float shade = skinToneShades[unpacked.skinTone % UE_ARRAY_COUNT(skinToneShades)];
-	SceneSetup::paintPlaceholderBody(*Cast<AStaticMeshActor>(_avatar)->GetStaticMeshComponent(), placeholderSkin * shade);
+	AStaticMeshActor* figure = Cast<AStaticMeshActor>(_avatar);
+	figure->GetStaticMeshComponent()->SetMobility(EComponentMobility::Movable);
+	figure->SetActorLocationAndRotation(marker->GetActorLocation() + FVector(0.0, 0.0, placeholderHalfHeightCm), marker->GetActorRotation());
+
+	const float shade = skinToneShades[appearance.skinTone % UE_ARRAY_COUNT(skinToneShades)];
+	SceneSetup::paintPlaceholderBody(*figure->GetStaticMeshComponent(), placeholderSkin * shade);
 }
 
 void AFrontEndGameMode::clearAvatar()

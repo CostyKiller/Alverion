@@ -13,6 +13,11 @@ class UIntroWidget;
 class URootLayout;
 class USoundBase;
 
+namespace Network
+{
+	struct FAppearance;
+}
+
 /**
  * The front end on L_Login: the root layout and its screens, the hand-placed camera stops they move between,
  * the figure standing on a preview spot, and the menu theme. Hands over to the world when a character is chosen.
@@ -64,7 +69,11 @@ private:
 	void collectAvatarSpots();
 	void installAvatarHooks();
 	void showAvatar(EAvatarSpot spot, TConstArrayView<uint8> appearance);
+	void standAvatar(EAvatarSpot spot, UClass* bodyClass, const Network::FAppearance& appearance);
 	void clearAvatar();
+
+	// Counts avatar requests, so a body that arrives after the player has moved on is dropped rather than shown.
+	uint32 _avatarRequest = 0;
 	void turnAvatar(float degrees);
 	void zoomView(float degrees);
 	FRotator aimAtHead(const ACameraActor& camera) const;

@@ -11,7 +11,7 @@ Unreal Engine 5 client for L2J Mobius.
 - Lists, creates and deletes characters, and enters the world.
 - The world is `L_Continent`, a World Partition map with Mesh Terrain. Start Island, its first land, sits under the server's human starting area so its spawns stand on something. Shape it in the editor's Mesh Terrain mode.
 - Runs in keyboard mode, where the server takes the client's position as true. Other players, townspeople and monsters walk where the server sends them.
-- Characters are coloured placeholders for now. MetaHumans are next, and the server patch already stores the appearance they will wear.
+- Character select and creation show the MetaHuman the stored appearance describes. In the world, characters are still coloured placeholders.
 
 ## Layout
 
@@ -20,11 +20,22 @@ Unreal Engine 5 client for L2J Mobius.
 | `Client` | The Unreal Engine 5.8 project. `Network` speaks the server protocol, `Alverion` is the game. |
 | `ServerPatch` | A patch for `L2J_Mobius` that stores each character's appearance block. See its README. |
 
+## MetaHumans
+
+The characters are MetaHumans, about 3 GB, so they are not in the repository. Download them here:
+
+https://drive.google.com/file/d/1DZWQk5yhEA7fCeuYtKLhv3QjR7KzBW7A/view?usp=sharing
+
+Extract the zip at the root of the repository, so that its folders land in `Client/Content/Characters/MetaHumans/` (`Grooms` and `Unpacked`). Git ignores that folder. Without it the game still runs, with coloured placeholder figures standing in for the characters.
+
+MetaHumans are covered by the Unreal Engine EULA: share the download only with people who have accepted it.
+
 ## Running it
 
 1. Run an L2J Mobius login server and game server, with the patch applied and `character_appearance.sql` imported.
-2. Build `Client/Alverion.uproject` with Unreal Engine 5.8 and run it.
-3. Log in. A server with `AutoCreateAccounts` on makes the account the first time.
+2. Download the MetaHumans, see above.
+3. Build `Client/Alverion.uproject` with Unreal Engine 5.8 and run it.
+4. Log in. A server with `AutoCreateAccounts` on makes the account the first time.
 
 Development builds also accept `-autologin=account,password,character`.
 

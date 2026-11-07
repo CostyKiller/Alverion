@@ -25,6 +25,8 @@ Key,SourceString
 "charcreate.value_none","None"
 "charcreate.value_type","Type {0}"
 "charcreate.working","Asking the server."
+"chat.say","Say"
+"chat.shout","Shout"
 "charselect.exit_game","Exit Game"
 "charselect.server_list","Server List"
 "charselect.title","Choose a character"

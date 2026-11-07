@@ -10,6 +10,7 @@
 #include "GameServer/ServerPackets/CharInfo.h"
 #include "GameServer/ServerPackets/NpcInfo.h"
 #include "GameServer/ServerPackets/ObjectPlace.h"
+#include "GameServer/ServerPackets/CreatureSay.h"
 #include "GameServer/ClientPackets/ProtocolVersion.h"
 #include "GameServer/ClientPackets/AuthLogin.h"
 #include "GameServer/ClientPackets/CharacterCreate.h"
@@ -22,3 +23,4 @@
 #include "GameServer/ClientPackets/RequestGotoLobby.h"
 #include "GameServer/ClientPackets/RequestRestart.h"
 #include "GameServer/ClientPackets/Logout.h"
+#include "GameServer/ClientPackets/Say2.h"

@@ -9,6 +9,7 @@
 #include "Engine/GameInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "UI/GameMenuWidget.h"
+#include "UI/ChatLineWidget.h"
 #include "UI/InventoryWidget.h"
 #include "UI/MapWidget.h"
 #include "InputAction.h"
@@ -21,6 +22,7 @@ namespace
 	const TCHAR* const menuActionPath = TEXT("/Game/Input/Actions/IA_Menu.IA_Menu");
 	const TCHAR* const inventoryActionPath = TEXT("/Game/Input/Actions/IA_Inventory.IA_Inventory");
 	const TCHAR* const mapScreenActionPath = TEXT("/Game/Input/Actions/IA_Map.IA_Map");
+	const TCHAR* const chatActionPath = TEXT("/Game/Input/Actions/IA_Chat.IA_Chat");
 }
 
 void AClientPlayerController::SetupInputComponent()
@@ -70,6 +72,16 @@ void AClientPlayerController::SetupInputComponent()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the map key does nothing."), mapScreenActionPath);
+	}
+
+	UInputAction* chatAction = LoadObject<UInputAction>(nullptr, chatActionPath);
+	if (chatAction != nullptr)
+	{
+		enhancedInput->BindAction(chatAction, ETriggerEvent::Started, this, &AClientPlayerController::startChat);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the chat key does nothing."), chatActionPath);
 	}
 
 	// Alt+H for a clean screenshot: a fixed chord made here rather than a rebindable action asset, read as H with Alt held.
@@ -158,6 +170,12 @@ void AClientPlayerController::toggleInventory()
 void AClientPlayerController::toggleMap()
 {
 	openOverBareWorld(UMapWidget::StaticClass());
+}
+
+void AClientPlayerController::startChat()
+{
+	// A screen like the map, so CommonUI gives its box the keys; openScreen also brings back an interface Alt+H hid.
+	openOverBareWorld(UChatLineWidget::StaticClass());
 }
 
 void AClientPlayerController::openOverBareWorld(TSubclassOf<UCommonActivatableWidget> screenClass)

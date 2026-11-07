@@ -17,6 +17,7 @@ DECLARE_DELEGATE_OneParam(FCharacterSpawned, const FCharacterSpawn&);
 DECLARE_DELEGATE_OneParam(FCharacterDespawned, uint32);
 DECLARE_DELEGATE_TwoParams(FCharacterMoved, const FObjectPlace&, EMoveKind);
 DECLARE_DELEGATE_TwoParams(FLocalCorrected, const FObjectPlace&, bool);
+DECLARE_DELEGATE_OneParam(FChatReceived, const FChatMessage&);
 
 /**
  * The world, from EnterWorld on.
@@ -46,6 +47,12 @@ public:
 
 	/** The server moving this client's own character. True for a teleport, which snaps rather than blends. */
 	FLocalCorrected onCorrected;
+
+	/** A line of chat heard, this client's own included, since the server says it back to the speaker too. */
+	FChatReceived onChat;
+
+	/** Says a line on a channel. Empty lines are not sent, and nothing goes out outside the world. */
+	bool say(const FString& text, EChatChannel channel);
 
 private:
 	void handlePacket(uint32 opcode, TArrayView<const uint8> body);

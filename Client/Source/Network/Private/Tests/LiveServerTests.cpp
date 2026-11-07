@@ -161,6 +161,15 @@ bool FLiveServerRoundTripTest::RunTest(const FString& parameters)
 	const Network::FUserInfo& info = worldFlow.userInfo();
 	TestTrue(FString::Printf(TEXT("UserInfo reads through to the run speed (level %d, %d HP, speed %d)"), info.level, info.maxHp, info.runSpeed), (info.level > 0) && (info.maxHp > 0) && (info.runSpeed > 50) && (info.runSpeed < 400));
 
+	// A line said on the general channel comes back from the server to whoever said it, which checks both chat packets.
+	FString heard;
+	worldFlow.onChat.BindLambda([&heard](const Network::FChatMessage& message) { heard = message.text; });
+	const FString line = TEXT("Probe line");
+	TestTrue(TEXT("A chat line goes out"), worldFlow.say(line, Network::EChatChannel::General));
+	pump([&]() { return heard == line; }, 5.0);
+	worldFlow.onChat.Unbind();
+	TestEqual(TEXT("The server says the chat line back"), heard, line);
+
 	worldFlow.end();
 	gameFlow.end();
 	gameSession.disconnect();

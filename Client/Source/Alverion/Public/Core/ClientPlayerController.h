@@ -26,6 +26,9 @@ private:
 	void toggleInventory();
 	void toggleMap();
 
+	/** The chat key opens the line to type chat on. Once it is open the line takes the keys, and Enter sends rather than reaching here. */
+	void startChat();
+
 	/** Opens the inventory or the map over the bare world. With a screen up CommonUI holds these keys back, and each screen closes on its own key by itself. */
 	void openOverBareWorld(TSubclassOf<UCommonActivatableWidget> screenClass);
 

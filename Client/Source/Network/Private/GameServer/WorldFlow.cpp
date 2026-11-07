@@ -61,6 +61,19 @@ const FUserInfo& FWorldFlow::userInfo() const
 	return _userInfo;
 }
 
+bool FWorldFlow::say(const FString& text, EChatChannel channel)
+{
+	if ((_gameServer == nullptr) || (_gameServer->session() == nullptr) || text.TrimStartAndEnd().IsEmpty())
+	{
+		return false;
+	}
+
+	FWriteBuffer buffer;
+	GameServer::writeSay2(buffer, text, channel);
+	_gameServer->session()->send(buffer.bytes());
+	return true;
+}
+
 void FWorldFlow::setLocalState(const FVector& location, float yaw, bool wantsToMove)
 {
 	_location = location;
@@ -148,6 +161,16 @@ void FWorldFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 			{
 				_localObjectId = info.objectId;
 				_userInfo = info;
+			}
+
+			return;
+		}
+		case GameServer::Opcode::creatureSay:
+		{
+			FChatMessage message;
+			if (GameServer::readCreatureSay(buffer, message))
+			{
+				onChat.ExecuteIfBound(message);
 			}
 
 			return;

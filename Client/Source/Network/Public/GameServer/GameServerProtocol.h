@@ -140,6 +140,25 @@ struct NETWORK_API FCharacterSelected
 	int32 currentHp = 0;
 };
 
+/** The chat channels the client speaks on, numbered as the server numbers them. The server sends others too, such as announcements. */
+enum class EChatChannel : int32
+{
+	General = 0,
+	Shout = 1
+};
+
+/** One line of chat as the server sends it. */
+struct NETWORK_API FChatMessage
+{
+	uint32 senderObjectId = 0;
+
+	/** The server's channel number: an EChatChannel, or one of the channels the client only listens to. */
+	int32 channel = 0;
+
+	FString senderName;
+	FString text;
+};
+
 /** This client's own character as UserInfo describes it: who it is and the figures the character sheet shows. */
 struct NETWORK_API FUserInfo
 {
@@ -232,6 +251,7 @@ namespace Opcode
 	inline constexpr uint32 charInfo = 0x31;
 	inline constexpr uint32 userInfo = 0x32;
 	inline constexpr uint32 stopMove = 0x47;
+	inline constexpr uint32 creatureSay = 0x4A;
 	inline constexpr uint32 restartResponse = 0x71;
 	inline constexpr uint32 validateLocation = 0x79;
 
@@ -245,6 +265,7 @@ namespace Opcode
 	inline constexpr uint8 characterSelect = 0x12;
 	inline constexpr uint8 authLogin = 0x2B;
 	inline constexpr uint8 appearing = 0x3A;
+	inline constexpr uint8 say2 = 0x49;
 	inline constexpr uint8 requestRestart = 0x57;
 	inline constexpr uint8 validatePosition = 0x59;
 

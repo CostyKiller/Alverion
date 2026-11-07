@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Game\n"
-"POT-Creation-Date: 2026-11-07 20:23\n"
-"PO-Revision-Date: 2026-11-07 20:23\n"
+"POT-Creation-Date: 2026-11-07 20:36\n"
+"PO-Revision-Date: 2026-11-07 20:36\n"
 "Language-Team: \n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -215,6 +215,20 @@ msgstr "Список серверов"
 msgctxt "ST_Game,charselect.title"
 msgid "Choose a character"
 msgstr "Выберите персонажа"
+
+#. Key:	chat.say
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,chat.say"
+msgid "Say"
+msgstr "Сказать"
+
+#. Key:	chat.shout
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,chat.shout"
+msgid "Shout"
+msgstr "Крикнуть"
 
 #. Key:	inventory.character
 #. SourceLocation:	Localization/StringTables/ST_Game.csv

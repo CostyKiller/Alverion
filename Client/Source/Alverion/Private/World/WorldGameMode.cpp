@@ -8,6 +8,7 @@
 #include "Core/MusicSubsystem.h"
 #include "UI/ActionBarWidget.h"
 #include "UI/ArrivalCover.h"
+#include "UI/ChatWidget.h"
 #include "UI/RootLayout.h"
 #include "ServerConnectionSubsystem.h"
 #include "World/WorldCharacter.h"
@@ -60,6 +61,12 @@ void AWorldGameMode::BeginPlay()
 	if (actionBar != nullptr)
 	{
 		actionBar->AddToViewport(-1);
+	}
+
+	UChatWidget* chat = CreateWidget<UChatWidget>(world, UChatWidget::StaticClass());
+	if (chat != nullptr)
+	{
+		chat->AddToViewport(-1);
 	}
 
 	// Black for a second while the world draws, then a fade.

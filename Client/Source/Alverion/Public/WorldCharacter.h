@@ -27,6 +27,9 @@ public:
 	virtual void PawnClientRestart() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* input) override;
 
+	/** Stands the MetaHuman this appearance describes on the character, in place of the placeholder figure. */
+	void wear(const Network::FAppearance& appearance);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type reason) override;
@@ -51,6 +54,10 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> _body;
+
+	/** The worn MetaHuman, riding on the capsule. Destroyed with the character, since an attached actor outlives its parent. */
+	UPROPERTY()
+	TObjectPtr<AActor> _metaHuman;
 
 	/** The continent streams around the player, and loads nothing without a source. */
 	UPROPERTY()

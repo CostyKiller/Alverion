@@ -29,4 +29,11 @@ namespace Appearance
 	 * The answer is null when the MetaHuman assets are not installed, which a fresh clone is.
 	 */
 	ALVERION_API void requestBodyClass(const Network::FAppearance& appearance, TFunction<void(UClass*)> whenReady);
+
+	/**
+	 * Stands the MetaHuman an appearance describes on a host whose feet are feetOffset from its root, facing the host's forward, and dresses it.
+	 * The body has no collision of its own, so it never blocks the host it rides on. The callback gets it once it stands, or null when the MetaHuman assets are missing.
+	 * The host owns it from then on and destroys it with itself, since an attached actor outlives its parent otherwise.
+	 */
+	ALVERION_API void attachTo(AActor& host, const Network::FAppearance& appearance, const FVector& feetOffset, TFunction<void(AActor*)> whenAttached);
 }

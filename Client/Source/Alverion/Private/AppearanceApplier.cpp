@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
+#include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "GroomAsset.h"
 #include "GroomBindingAsset.h"
@@ -548,5 +549,45 @@ namespace Appearance
 			pendingBodies.Remove(path);
 			whenReady(FindObject<UClass>(nullptr, *path));
 		}));
+	}
+
+	void attachTo(AActor& host, const Network::FAppearance& appearance, const FVector& feetOffset, TFunction<void(AActor*)> whenAttached)
+	{
+		// A MetaHuman's mesh sits a quarter turn off its actor's yaw, the same offset the front end's spots carry.
+		static constexpr float bodyYawOffset = -90.0f;
+
+		const TWeakObjectPtr<AActor> weakHost(&host);
+		requestBodyClass(appearance, [weakHost, appearance, feetOffset, whenAttached](UClass* bodyClass)
+		{
+			AActor* hostActor = weakHost.Get();
+			if (hostActor == nullptr)
+			{
+				return;
+			}
+
+			UWorld* world = hostActor->GetWorld();
+			if ((bodyClass == nullptr) || (world == nullptr))
+			{
+				whenAttached(nullptr);
+				return;
+			}
+
+			FActorSpawnParameters parameters;
+			parameters.Owner = hostActor;
+			parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AActor* body = world->SpawnActor<AActor>(bodyClass, hostActor->GetActorTransform(), parameters);
+			if (body == nullptr)
+			{
+				whenAttached(nullptr);
+				return;
+			}
+
+			body->SetActorEnableCollision(false);
+			body->AttachToActor(hostActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			body->SetActorRelativeLocation(feetOffset);
+			body->SetActorRelativeRotation(FRotator(0.0f, bodyYawOffset, 0.0f));
+			apply(*body, appearance);
+			whenAttached(body);
+		});
 	}
 }

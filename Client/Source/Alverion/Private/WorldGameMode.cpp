@@ -59,6 +59,18 @@ void AWorldGameMode::BeginPlay()
 	const Network::FCharacterSelected& selected = link->gameServer().selected();
 	AWorldCharacter* character = world->SpawnActor<AWorldCharacter>(selected.location + FVector(0.0, 0.0, spawnLiftCm), FRotator::ZeroRotator, parameters);
 
+	// The server does not repeat our own appearance once we are in, so it comes from the character list the selection was made from.
+	const Network::FCharacterListEntry* entry = link->gameServer().characters().FindByPredicate([&selected](const Network::FCharacterListEntry& candidate)
+	{
+		return candidate.objectId == selected.objectId;
+	});
+
+	Network::FAppearance appearance;
+	if ((character != nullptr) && (entry != nullptr) && Network::FAppearance::unpack(entry->appearance, appearance))
+	{
+		character->wear(appearance);
+	}
+
 	APlayerController* controller = UGameplayStatics::GetPlayerController(this, 0);
 	if ((controller != nullptr) && (character != nullptr))
 	{

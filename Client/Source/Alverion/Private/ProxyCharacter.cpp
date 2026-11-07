@@ -1,5 +1,7 @@
 #include "ProxyCharacter.h"
 
+#include "Appearance.h"
+#include "AppearanceApplier.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/World.h"
@@ -48,6 +50,46 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 
 	_speed = spawn.runSpeed;
 	standAt(spawn.location, spawn.yaw);
+
+	// Players carry an appearance and wear it; a repeated spawn with the same bytes keeps the body already standing.
+	Network::FAppearance appearance;
+	if (spawn.isNpc || (spawn.appearance == _wornAppearance) || !Network::FAppearance::unpack(spawn.appearance, appearance))
+	{
+		return;
+	}
+
+	_wornAppearance = spawn.appearance;
+	if (_metaHuman != nullptr)
+	{
+		_metaHuman->Destroy();
+		_metaHuman = nullptr;
+	}
+
+	// The root is the feet, so the body stands on it; the placeholder hides once the body is there to take its place.
+	const TWeakObjectPtr<AProxyCharacter> weakThis(this);
+	Appearance::attachTo(*this, appearance, FVector::ZeroVector, [weakThis](AActor* body)
+	{
+		AProxyCharacter* proxy = weakThis.Get();
+		if ((proxy == nullptr) || (body == nullptr))
+		{
+			return;
+		}
+
+		proxy->_metaHuman = body;
+		proxy->_body->SetVisibility(false);
+	});
+}
+
+void AProxyCharacter::EndPlay(const EEndPlayReason::Type reason)
+{
+	// Attached actors outlive their parent, so the body goes with the proxy.
+	if (_metaHuman != nullptr)
+	{
+		_metaHuman->Destroy();
+		_metaHuman = nullptr;
+	}
+
+	Super::EndPlay(reason);
 }
 
 void AProxyCharacter::walkTo(const FVector& destination)

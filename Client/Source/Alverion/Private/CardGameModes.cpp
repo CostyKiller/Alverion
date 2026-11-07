@@ -25,6 +25,12 @@ namespace
 
 	constexpr int32 loadingFontSize = 28;
 
+	/** The travel options that bring up the loading card and name the map it loads. */
+	FString loadingOptions(const FString& mapPackage)
+	{
+		return FString::Printf(TEXT("game=/Script/Alverion.LoadingGameMode?%s=%s"), targetOption, *mapPackage);
+	}
+
 	/** One colour over the whole viewport, with a line of text centred on it when there is one. */
 	TSharedRef<SWidget> makeCard(const FLinearColor& color, const FText& text, const FSlateFontInfo& font)
 	{
@@ -145,6 +151,14 @@ void AIntroGameMode::frontEndLoaded(const FName& packageName, UPackage* package,
 void AIntroGameMode::holdElapsed()
 {
 	_held = true;
+
+	// A front end still loading once the card has had its time is a long load, and the loading card says so in words rather than leaving the studio card up.
+	if (!_frontEndLoaded)
+	{
+		travelOnce(emptyMap, loadingOptions(frontEndMap));
+		return;
+	}
+
 	leaveWhenReady();
 }
 
@@ -158,7 +172,7 @@ void AIntroGameMode::leaveWhenReady()
 
 void ALoadingGameMode::travelTo(UObject* worldContext, const FString& mapPackage)
 {
-	UGameplayStatics::OpenLevel(worldContext, FName(emptyMap), true, FString::Printf(TEXT("game=/Script/Alverion.LoadingGameMode?%s=%s"), targetOption, *mapPackage));
+	UGameplayStatics::OpenLevel(worldContext, FName(emptyMap), true, loadingOptions(mapPackage));
 }
 
 void ALoadingGameMode::BeginPlay()

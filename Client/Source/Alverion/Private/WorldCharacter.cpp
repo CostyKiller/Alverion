@@ -1,5 +1,6 @@
 #include "WorldCharacter.h"
 
+#include "AppearanceApplier.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -97,7 +98,30 @@ void AWorldCharacter::EndPlay(const EEndPlayReason::Type reason)
 		connection->world().onCorrected.Unbind();
 	}
 
+	if (_metaHuman != nullptr)
+	{
+		_metaHuman->Destroy();
+		_metaHuman = nullptr;
+	}
+
 	Super::EndPlay(reason);
+}
+
+void AWorldCharacter::wear(const Network::FAppearance& appearance)
+{
+	// The actor stands at the middle of its capsule, so the feet are half its height below.
+	const TWeakObjectPtr<AWorldCharacter> weakThis(this);
+	Appearance::attachTo(*this, appearance, FVector(0.0, 0.0, -capsuleHalfHeightCm), [weakThis](AActor* body)
+	{
+		AWorldCharacter* character = weakThis.Get();
+		if ((character == nullptr) || (body == nullptr))
+		{
+			return;
+		}
+
+		character->_metaHuman = body;
+		character->_body->SetVisibility(false);
+	});
 }
 
 void AWorldCharacter::PawnClientRestart()

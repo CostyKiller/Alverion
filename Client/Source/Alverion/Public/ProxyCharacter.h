@@ -27,6 +27,9 @@ public:
 
 	virtual void Tick(float deltaSeconds) override;
 
+protected:
+	virtual void EndPlay(const EEndPlayReason::Type reason) override;
+
 private:
 	/** The island's surface under a place, or the place itself where there is none. */
 	FVector onGround(const FVector& location) const;
@@ -36,6 +39,13 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UTextRenderComponent> _label;
+
+	/** The MetaHuman a player wears, riding on this actor. Townspeople and monsters have no appearance and keep the placeholder. */
+	UPROPERTY()
+	TObjectPtr<AActor> _metaHuman;
+
+	/** The bytes the MetaHuman was dressed from, so a repeated spawn does not stand up a second body. */
+	TArray<uint8> _wornAppearance;
 
 	FVector _destination = FVector::ZeroVector;
 	float _speed = 0.0f;

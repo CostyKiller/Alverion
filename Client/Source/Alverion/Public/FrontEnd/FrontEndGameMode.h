@@ -7,11 +7,9 @@
 #include "FrontEndGameMode.generated.h"
 
 class ACameraActor;
-class UAudioComponent;
 class UCommonActivatableWidget;
 class UIntroWidget;
 class URootLayout;
-class USoundBase;
 
 namespace Network
 {
@@ -34,7 +32,6 @@ public:
 	static void travelToWorld(UObject* worldContext);
 
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
 
 private:
 #if WITH_DEV_AUTOMATION_TESTS
@@ -42,16 +39,10 @@ private:
 #endif
 
 	UPROPERTY()
-	TObjectPtr<USoundBase> _menuMusic;
-
-	UPROPERTY()
 	TObjectPtr<URootLayout> _rootLayout;
 
 	UPROPERTY()
 	TObjectPtr<UIntroWidget> _introWidget;
-
-	UPROPERTY()
-	TObjectPtr<UAudioComponent> _musicComponent;
 
 	// The camera actors placed in the level, by the tag that says which screen each one frames.
 	UPROPERTY()
@@ -91,8 +82,6 @@ private:
 	void createRootLayout();
 	void createIntro();
 	void showLogin();
-	void startMenuMusic();
-	void applyMusicVolume();
 
 	UFUNCTION()
 	void handleIntroFinished();

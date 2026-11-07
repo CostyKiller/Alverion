@@ -7,7 +7,7 @@
 #include "FrontEnd/CharacterCreateWidget.h"
 #include "FrontEnd/CharacterSelectWidget.h"
 #include "Core/ClientPlayerController.h"
-#include "Components/AudioComponent.h"
+#include "Core/MusicSubsystem.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/GameInstance.h"
@@ -17,16 +17,15 @@
 #include "Boot/IntroWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "FrontEnd/LoginWidget.h"
+#include "UI/ArrivalCover.h"
 #include "UI/RootLayout.h"
 #include "World/SceneSetup.h"
 #include "FrontEnd/ServerSelectWidget.h"
-#include "Sound/SoundBase.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
 
 namespace
 {
 	const TCHAR* const continentMap = TEXT("/Game/Maps/L_Continent");
-	const TCHAR* const menuMusicPath = TEXT("/Game/Audio/Music/MenuTheme.MenuTheme");
 
 	// The tags on the three camera actors in L_Login, one for each kind of screen.
 	const FName loginStop(TEXT("FrontEndStop.Login"));
@@ -93,7 +92,6 @@ void AFrontEndGameMode::BeginPlay()
 	if (settings != nullptr)
 	{
 		settings->ApplySettings(false);
-		settings->onAudioSettingsChanged.AddUObject(this, &AFrontEndGameMode::applyMusicVolume);
 	}
 
 	// The bodies and the eye material start loading now, so the first character shown does not stall the screen.
@@ -113,19 +111,23 @@ void AFrontEndGameMode::BeginPlay()
 
 	createRootLayout();
 	watchMenuLayer();
-	startMenuMusic();
-	createIntro();
-}
 
-void AFrontEndGameMode::EndPlay(const EEndPlayReason::Type endPlayReason)
-{
-	UGameSettings* settings = UGameSettings::get();
-	if (settings != nullptr)
+	// Running on from the intro when the game starts, and started again on the way back from the world.
+	UGameInstance* gameInstance = GetGameInstance();
+	UMusicSubsystem* music = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UMusicSubsystem>() : nullptr;
+	if (music != nullptr)
 	{
-		settings->onAudioSettingsChanged.RemoveAll(this);
+		music->playMenuTheme(*this);
 	}
 
-	Super::EndPlay(endPlayReason);
+	createIntro();
+
+	// Black for a second while the scene behind the menus draws, then a fade.
+	UArrivalCover* cover = CreateWidget<UArrivalCover>(GetWorld(), UArrivalCover::StaticClass());
+	if (cover != nullptr)
+	{
+		cover->AddToViewport(UArrivalCover::coverZOrder);
+	}
 }
 
 void AFrontEndGameMode::collectCameraStops()
@@ -417,38 +419,6 @@ void AFrontEndGameMode::handleMenuWidgetChanged(UCommonActivatableWidget* widget
 	{
 		focusStop(loginStop, false);
 		clearAvatar();
-	}
-}
-
-void AFrontEndGameMode::startMenuMusic()
-{
-	_menuMusic = LoadObject<USoundBase>(nullptr, menuMusicPath);
-	if (_menuMusic == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("FrontEndGameMode could not load %s, so the front end has no music."), menuMusicPath);
-		return;
-	}
-
-	_musicComponent = UGameplayStatics::SpawnSound2D(this, _menuMusic);
-	if (_musicComponent == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("FrontEndGameMode loaded the menu theme but got no audio component back, so nothing is playing."));
-		return;
-	}
-
-	applyMusicVolume();
-
-	// Reports what reached the component rather than what was asked for.
-	// A missing line is a failed load, a zero is the volume, a number with nothing audible is the device.
-	UE_LOG(LogTemp, Display, TEXT("FrontEndGameMode started the menu theme at volume %.2f."), _musicComponent->VolumeMultiplier);
-}
-
-void AFrontEndGameMode::applyMusicVolume()
-{
-	const UGameSettings* settings = UGameSettings::get();
-	if ((_musicComponent != nullptr) && (settings != nullptr))
-	{
-		_musicComponent->SetVolumeMultiplier(settings->getEffectiveMusicVolume());
 	}
 }
 

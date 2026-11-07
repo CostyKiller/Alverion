@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/TimerHandle.h"
 #include "GameFramework/GameModeBase.h"
+#include "Styling/SlateColor.h"
 #include "UObject/UObjectGlobals.h"
 
 #include "IntroGameMode.generated.h"
@@ -33,8 +34,27 @@ private:
 	/** Travels once both of the above have happened, and does nothing until then. */
 	void travelWhenReady();
 
+	/** Fades the mark to black, then opens the map with the options. */
+	void leave(const FString& mapName, const FString& options);
+
+	/** Opens the map leave was asked for, once the screen is black. */
+	void openPendingMap();
+
+	/** The black over the mark: opaque at the start, clear while the mark is up, opaque again on the way out. */
+	FSlateColor fadeColor() const;
+
 	/** The screen, held so it can be taken off the viewport again on the way out. */
 	TSharedPtr<SWidget> _screen;
+
+	/** When the mark went up and when the fade out began, in platform seconds. Zero for a fade out not begun. */
+	double _shownSeconds = 0.0;
+	double _leavingSeconds = 0.0;
+
+	FString _pendingMapName;
+	FString _pendingOptions;
+
+	/** The timer behind the fade out, cleared on the way out like the hold. */
+	FTimerHandle _fadeTimer;
 
 	bool _frontEndLoaded = false;
 	bool _holdElapsed = false;

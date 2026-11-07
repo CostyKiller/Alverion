@@ -5,7 +5,9 @@
 #include "Core/GameSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "World/ProxyCharacter.h"
+#include "Core/MusicSubsystem.h"
 #include "UI/ActionBarWidget.h"
+#include "UI/ArrivalCover.h"
 #include "UI/RootLayout.h"
 #include "ServerConnectionSubsystem.h"
 #include "World/WorldCharacter.h"
@@ -58,6 +60,20 @@ void AWorldGameMode::BeginPlay()
 	if (actionBar != nullptr)
 	{
 		actionBar->AddToViewport(-1);
+	}
+
+	// Black for a second while the world draws, then a fade.
+	UArrivalCover* cover = CreateWidget<UArrivalCover>(world, UArrivalCover::StaticClass());
+	if (cover != nullptr)
+	{
+		cover->AddToViewport(UArrivalCover::coverZOrder);
+	}
+
+	// The menu theme played on through the loading screen and gives way to the world here.
+	UMusicSubsystem* music = GetGameInstance()->GetSubsystem<UMusicSubsystem>();
+	if (music != nullptr)
+	{
+		music->stopMenuTheme();
 	}
 
 	FActorSpawnParameters parameters;

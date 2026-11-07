@@ -26,21 +26,21 @@
 
 namespace
 {
-	const TCHAR* const inventoryActionPath = TEXT("/Game/Input/Actions/IA_Inventory.IA_Inventory");
+	const TCHAR* const sheetInventoryActionPath = TEXT("/Game/Input/Actions/IA_Inventory.IA_Inventory");
 
 	constexpr FLinearColor backdropColor = FLinearColor(0.01f, 0.01f, 0.015f, 0.55f);
 	constexpr FLinearColor panelFill = FLinearColor(0.035f, 0.03f, 0.028f, 0.94f);
-	constexpr FLinearColor slotFill = FLinearColor(0.02f, 0.018f, 0.016f, 1.0f);
+	constexpr FLinearColor bagSlotFill = FLinearColor(0.02f, 0.018f, 0.016f, 1.0f);
 	constexpr FLinearColor headingColor = FLinearColor(0.86f, 0.68f, 0.36f, 1.0f);
 
 	constexpr float panelRadius = 8.0f;
-	constexpr float slotRadius = 4.0f;
+	constexpr float bagSlotRadius = 4.0f;
 	constexpr float panelPadding = 20.0f;
 	constexpr float panelGap = 16.0f;
-	constexpr float slotSize = 56.0f;
-	constexpr float slotGap = 6.0f;
-	constexpr float portraitWidth = 200.0f;
-	constexpr float portraitHeight = 280.0f;
+	constexpr float bagSlotSize = 56.0f;
+	constexpr float bagSlotGap = 6.0f;
+	constexpr float sheetPortraitWidth = 200.0f;
+	constexpr float sheetPortraitHeight = 280.0f;
 	constexpr float statColumnWidth = 190.0f;
 	constexpr int32 bagColumns = 8;
 	constexpr int32 bagRows = 9;
@@ -69,11 +69,11 @@ namespace
 	USizeBox* makeSlot(UWidgetTree& tree, UWidget* caption)
 	{
 		USizeBox* box = tree.ConstructWidget<USizeBox>(USizeBox::StaticClass());
-		box->SetWidthOverride(slotSize);
-		box->SetHeightOverride(slotSize);
+		box->SetWidthOverride(bagSlotSize);
+		box->SetHeightOverride(bagSlotSize);
 
 		UBorder* frame = tree.ConstructWidget<UBorder>(UBorder::StaticClass());
-		frame->SetBrush(UIStyle::stateBrush(slotFill, UIStyle::outline, slotRadius));
+		frame->SetBrush(UIStyle::stateBrush(bagSlotFill, UIStyle::outline, bagSlotRadius));
 		frame->SetHorizontalAlignment(HAlign_Center);
 		frame->SetVerticalAlignment(VAlign_Bottom);
 		frame->SetPadding(FMargin(2.0f, 0.0f, 2.0f, 4.0f));
@@ -155,20 +155,20 @@ TSharedRef<SWidget> UInventoryWidget::RebuildWidget()
 			UTextBlock* caption = makeCaption(key, slotFontSize, UIStyle::mutedColor);
 			caption->SetJustification(ETextJustify::Center);
 			UVerticalBoxSlot* slot = leftSlots->AddChildToVerticalBox(makeSlot(*WidgetTree, caption));
-			slot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, slotGap));
+			slot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, bagSlotGap));
 		}
 
 		paperdoll->AddChildToHorizontalBox(leftSlots);
 
 		USizeBox* portraitBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
-		portraitBox->SetWidthOverride(portraitWidth);
-		portraitBox->SetHeightOverride(portraitHeight);
+		portraitBox->SetWidthOverride(sheetPortraitWidth);
+		portraitBox->SetHeightOverride(sheetPortraitHeight);
 
 		_portrait = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
 		portraitBox->AddChild(_portrait);
 
 		UHorizontalBoxSlot* portraitSlot = paperdoll->AddChildToHorizontalBox(portraitBox);
-		portraitSlot->SetPadding(FMargin(slotGap * 2.0f, 0.0f));
+		portraitSlot->SetPadding(FMargin(bagSlotGap * 2.0f, 0.0f));
 		portraitSlot->SetVerticalAlignment(VAlign_Top);
 
 		UVerticalBox* rightSlots = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
@@ -177,7 +177,7 @@ TSharedRef<SWidget> UInventoryWidget::RebuildWidget()
 			UTextBlock* caption = makeCaption(key, slotFontSize, UIStyle::mutedColor);
 			caption->SetJustification(ETextJustify::Center);
 			UVerticalBoxSlot* slot = rightSlots->AddChildToVerticalBox(makeSlot(*WidgetTree, caption));
-			slot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, slotGap));
+			slot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, bagSlotGap));
 		}
 
 		paperdoll->AddChildToHorizontalBox(rightSlots);
@@ -217,7 +217,7 @@ TSharedRef<SWidget> UInventoryWidget::RebuildWidget()
 		UVerticalBox* bag = makePanel(*WidgetTree, *panels, *makeCaption(TEXT("inventory.title"), headingFontSize, headingColor));
 
 		UUniformGridPanel* grid = WidgetTree->ConstructWidget<UUniformGridPanel>(UUniformGridPanel::StaticClass());
-		grid->SetSlotPadding(FMargin(slotGap * 0.5f));
+		grid->SetSlotPadding(FMargin(bagSlotGap * 0.5f));
 		for (int32 row = 0; row < bagRows; row++)
 		{
 			for (int32 column = 0; column < bagColumns; column++)
@@ -232,7 +232,7 @@ TSharedRef<SWidget> UInventoryWidget::RebuildWidget()
 
 		// Focusable, so the keys reach it once CommonUI puts the focus here.
 		SetIsFocusable(true);
-		_inventoryAction = LoadObject<UInputAction>(nullptr, inventoryActionPath);
+		_inventoryAction = LoadObject<UInputAction>(nullptr, sheetInventoryActionPath);
 	}
 
 	return Super::RebuildWidget();

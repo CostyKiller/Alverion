@@ -12,13 +12,13 @@
 
 namespace
 {
-	constexpr int32 slotCount = 10;
-	constexpr float slotSize = 52.0f;
-	constexpr float slotGap = 6.0f;
-	constexpr float slotRadius = 4.0f;
-	constexpr float bottomMargin = 24.0f;
-	constexpr int32 keyFontSize = 13;
-	constexpr FLinearColor slotFill = FLinearColor(0.02f, 0.018f, 0.016f, 0.85f);
+	constexpr int32 barSlotCount = 10;
+	constexpr float barSlotSize = 52.0f;
+	constexpr float barSlotGap = 6.0f;
+	constexpr float barSlotRadius = 4.0f;
+	constexpr float barBottomMargin = 24.0f;
+	constexpr int32 barKeyFontSize = 13;
+	constexpr FLinearColor barSlotFill = FLinearColor(0.02f, 0.018f, 0.016f, 0.85f);
 }
 
 TSharedRef<SWidget> UActionBarWidget::RebuildWidget()
@@ -31,28 +31,28 @@ TSharedRef<SWidget> UActionBarWidget::RebuildWidget()
 		UOverlaySlot* rowSlot = root->AddChildToOverlay(row);
 		rowSlot->SetHorizontalAlignment(HAlign_Center);
 		rowSlot->SetVerticalAlignment(VAlign_Bottom);
-		rowSlot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, bottomMargin));
+		rowSlot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, barBottomMargin));
 
-		for (int32 index = 0; index < slotCount; index++)
+		for (int32 index = 0; index < barSlotCount; index++)
 		{
 			USizeBox* box = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
-			box->SetWidthOverride(slotSize);
-			box->SetHeightOverride(slotSize);
+			box->SetWidthOverride(barSlotSize);
+			box->SetHeightOverride(barSlotSize);
 
 			UBorder* frame = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
-			frame->SetBrush(UIStyle::stateBrush(slotFill, UIStyle::outline, slotRadius));
+			frame->SetBrush(UIStyle::stateBrush(barSlotFill, UIStyle::outline, barSlotRadius));
 			frame->SetHorizontalAlignment(HAlign_Left);
 			frame->SetVerticalAlignment(VAlign_Top);
 			frame->SetPadding(FMargin(6.0f, 3.0f));
 
 			// The number keys along the top of the keyboard, 1 to 9 and then 0.
-			const int32 number = (index + 1) % slotCount;
-			frame->SetContent(UIStyle::makeLabel(*WidgetTree, FText::AsCultureInvariant(FString::FromInt(number)), keyFontSize, UIStyle::mutedColor));
+			const int32 number = (index + 1) % barSlotCount;
+			frame->SetContent(UIStyle::makeLabel(*WidgetTree, FText::AsCultureInvariant(FString::FromInt(number)), barKeyFontSize, UIStyle::mutedColor));
 
 			box->AddChild(frame);
 
 			UHorizontalBoxSlot* slot = row->AddChildToHorizontalBox(box);
-			slot->SetPadding(FMargin(slotGap * 0.5f, 0.0f));
+			slot->SetPadding(FMargin(barSlotGap * 0.5f, 0.0f));
 		}
 
 		WidgetTree->RootWidget = root;

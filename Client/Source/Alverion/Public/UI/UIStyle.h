@@ -49,12 +49,12 @@ namespace UIStyle
 	// A second literal would be a second thing to remember.
 	inline constexpr float cornerRadius = 10.0f;
 
-	// The studio mark is text until there is a logo to show, on a dark card where the full screen logo picture sat.
+	// The studio mark is text until there is a logo to show, on a black card where the full screen logo picture sat.
 	// Shared by the intro map and the front end's intro, so the two never drift apart.
 	inline const TCHAR* const studioName = TEXT("Mobius Development");
 	inline constexpr int32 studioFontSize = 96;
 	inline constexpr int32 studioLetterSpacing = 120;
-	inline constexpr FLinearColor cardColor = FLinearColor(0.02f, 0.02f, 0.025f, 1.0f);
+	inline constexpr FLinearColor cardColor = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Every front end screen clicks with the same sound,
 	// and three copies of the path already collided once in a unity build.

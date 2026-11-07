@@ -14,7 +14,7 @@ TSharedRef<SWidget> UIntroWidget::RebuildWidget()
 		// The studio mark, and over it the fade that covers it on the way in and out.
 		UOverlay* root = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
 
-		// The logo picture filled the screen and hid the scene behind it, so a dark card stands in for it.
+		// The logo picture filled the screen and hid the scene behind it, so a black card stands in for it.
 		FSlateBrush cardBrush;
 		cardBrush.TintColor = FSlateColor(UIStyle::cardColor);
 		UImage* card = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());

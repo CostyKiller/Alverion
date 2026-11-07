@@ -9,8 +9,10 @@ class UImage;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FIntroFinished);
 
-// Studio intro. Fades in from light gray, holds on the studio mark, fades out to black, then
-// broadcasts onIntroFinished. Any key or mouse button cuts straight to the fade out.
+/**
+ * Studio intro: fades in from black, holds on the studio mark, fades out to black, then broadcasts onIntroFinished.
+ * Any key or mouse button cuts straight to the fade out.
+ */
 UCLASS()
 class ALVERION_API UIntroWidget : public UUserWidget
 {
@@ -30,9 +32,9 @@ public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& geometry, const FPointerEvent& pointerEvent) override;
 
 protected:
-	// A slow fade in, a three second hold and a one second fade out, skippable at any point.
+	// A one second fade in, a three second hold and a one second fade out, skippable at any point.
 	UPROPERTY(EditDefaultsOnly, Category = "Intro")
-	float fadeInDuration = 1.33f;
+	float fadeInDuration = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Intro")
 	float holdDuration = 3.0f;
@@ -40,9 +42,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Intro")
 	float fadeOutDuration = 1.0f;
 
-	// Light gray, so the studio mark resolves out of a pale screen rather than out of the dark.
+	// Black, so the studio mark rises out of the same dark it sinks back into.
 	UPROPERTY(EditDefaultsOnly, Category = "Intro")
-	FLinearColor fadeInColor = FLinearColor(0.827f, 0.827f, 0.827f, 1.0f);
+	FLinearColor fadeInColor = FLinearColor::Black;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Intro")
 	FLinearColor fadeOutColor = FLinearColor::Black;

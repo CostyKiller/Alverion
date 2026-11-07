@@ -17,6 +17,18 @@ namespace Network
  */
 namespace Appearance
 {
+	/** What a body is doing, which picks the clip it plays. */
+	enum class EMotion : uint8
+	{
+		Idle,
+		Walk,
+		Run,
+		Fall
+	};
+
+	/** Plays the clip for a motion on a MetaHuman's body, looping, and leaves it alone while the motion stays the same, so a loop keeps its phase. */
+	ALVERION_API void animate(AActor& body, EMotion motion);
+
 	/** Applies what it can and leaves the rest: a missing groom or eye material is logged and skipped, since a bald character beats no character. */
 	ALVERION_API void apply(AActor& avatar, const Network::FAppearance& appearance);
 

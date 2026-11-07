@@ -60,9 +60,16 @@ namespace UIStyle
 	// and three copies of the path already collided once in a unity build.
 	inline const TCHAR* const clickSoundPath = TEXT("/Game/Audio/UI/Click.Click");
 
+	/** A Unicode block, inclusive at both ends. */
+	inline FInt32Range codepoints(int32 first, int32 last)
+	{
+		return FInt32Range(FInt32Range::BoundsType::Inclusive(first), FInt32Range::BoundsType::Inclusive(last));
+	}
+
 	/**
-	 * OSerif covers Latin only. Greek and Cyrillic fall back to the engine's Roboto and every other script to its Droid Sans Fallback,
-	 * so a translated label never renders as the missing-glyph diamonds Greek showed.
+	 * OSerif covers Latin only, so the other scripts the menus are translated into come from the Noto Serif family (SIL Open Font License).
+	 * Greek and Cyrillic from Noto Serif; kana from the Japanese face and Hangul from the Korean one, whatever the language.
+	 * The Han characters the three share are drawn differently in each, so they follow the language: Japanese, Korean or Simplified Chinese.
 	 * Built once and kept, because the font cache keys on the composite's address and its faces must outlive every widget.
 	 */
 	inline TSharedPtr<const FCompositeFont> compositeFont()
@@ -74,28 +81,49 @@ namespace UIStyle
 		}
 
 		UObject* latin = LoadObject<UObject>(nullptr, TEXT("/Game/Fonts/OSerif-Regular.OSerif-Regular"));
-		UObject* greekAndCyrillic = LoadObject<UObject>(nullptr, TEXT("/Engine/EngineFonts/Faces/RobotoRegular.RobotoRegular"));
-		UObject* otherScripts = LoadObject<UObject>(nullptr, TEXT("/Engine/EngineFonts/Faces/DroidSansFallback.DroidSansFallback"));
-		if ((latin == nullptr) || (greekAndCyrillic == nullptr) || (otherScripts == nullptr))
+		UObject* greekAndCyrillic = LoadObject<UObject>(nullptr, TEXT("/Game/Fonts/NotoSerif-Regular.NotoSerif-Regular"));
+		UObject* japanese = LoadObject<UObject>(nullptr, TEXT("/Game/Fonts/NotoSerifJP-Regular.NotoSerifJP-Regular"));
+		UObject* korean = LoadObject<UObject>(nullptr, TEXT("/Game/Fonts/NotoSerifKR-Regular.NotoSerifKR-Regular"));
+		UObject* chinese = LoadObject<UObject>(nullptr, TEXT("/Game/Fonts/NotoSerifSC-Regular.NotoSerifSC-Regular"));
+		if ((latin == nullptr) || (greekAndCyrillic == nullptr) || (japanese == nullptr) || (korean == nullptr) || (chinese == nullptr))
 		{
 			return nullptr;
 		}
 
 		// Nothing else holds these faces once the composite is made from them.
-		latin->AddToRoot();
-		greekAndCyrillic->AddToRoot();
-		otherScripts->AddToRoot();
+		for (UObject* face : { latin, greekAndCyrillic, japanese, korean, chinese })
+		{
+			face->AddToRoot();
+		}
 
 		const FName regular(TEXT("Regular"));
 		TSharedRef<FCompositeFont> font = MakeShared<FCompositeFont>();
 		font->DefaultTypeface.Fonts.Emplace_GetRef(regular).Font = FFontData(latin);
 
+		const TArray<FInt32Range> sharedHan = { codepoints(0x3000, 0x303F), codepoints(0x3400, 0x4DBF), codepoints(0x4E00, 0x9FFF), codepoints(0xF900, 0xFAFF), codepoints(0xFF00, 0xFFEF) };
+		const TPair<UObject*, const TCHAR*> hanByLanguage[] = { { japanese, TEXT("ja") }, { korean, TEXT("ko") }, { chinese, TEXT("zh") } };
+		for (const TPair<UObject*, const TCHAR*>& language : hanByLanguage)
+		{
+			FCompositeSubFont& han = font->SubTypefaces.AddDefaulted_GetRef();
+			han.Typeface.Fonts.Emplace_GetRef(regular).Font = FFontData(language.Key);
+			han.CharacterRanges = sharedHan;
+			han.Cultures = language.Value;
+		}
+
 		FCompositeSubFont& greekAndCyrillicFont = font->SubTypefaces.AddDefaulted_GetRef();
 		greekAndCyrillicFont.Typeface.Fonts.Emplace_GetRef(regular).Font = FFontData(greekAndCyrillic);
-		greekAndCyrillicFont.CharacterRanges.Add(FInt32Range(FInt32Range::BoundsType::Inclusive(0x0370), FInt32Range::BoundsType::Inclusive(0x04FF)));
-		greekAndCyrillicFont.CharacterRanges.Add(FInt32Range(FInt32Range::BoundsType::Inclusive(0x1F00), FInt32Range::BoundsType::Inclusive(0x1FFF)));
+		greekAndCyrillicFont.CharacterRanges = { codepoints(0x0370, 0x04FF), codepoints(0x1F00, 0x1FFF) };
 
-		font->FallbackTypeface.Typeface.Fonts.Emplace_GetRef(regular).Font = FFontData(otherScripts);
+		FCompositeSubFont& kana = font->SubTypefaces.AddDefaulted_GetRef();
+		kana.Typeface.Fonts.Emplace_GetRef(regular).Font = FFontData(japanese);
+		kana.CharacterRanges = { codepoints(0x3040, 0x30FF), codepoints(0x31F0, 0x31FF) };
+
+		FCompositeSubFont& hangul = font->SubTypefaces.AddDefaulted_GetRef();
+		hangul.Typeface.Fonts.Emplace_GetRef(regular).Font = FFontData(korean);
+		hangul.CharacterRanges = { codepoints(0x1100, 0x11FF), codepoints(0x3130, 0x318F), codepoints(0xAC00, 0xD7AF) };
+
+		// Han in any other language, a Chinese name in an English menu for one.
+		font->FallbackTypeface.Typeface.Fonts.Emplace_GetRef(regular).Font = FFontData(chinese);
 
 		composite = font;
 		return composite;

@@ -272,7 +272,7 @@ void AFrontEndGameMode::standAvatar(EAvatarSpot spot, UClass* bodyClass, const N
 
 	// Without the MetaHuman assets, which a fresh clone does not have, a placeholder figure tinted by the skin tone stands in.
 	UClass* wanted = (bodyClass != nullptr) ? bodyClass : AStaticMeshActor::StaticClass();
-	if ((_avatar != nullptr) && (_avatar->GetClass() != wanted))
+	if ((_avatar != nullptr) && ((_avatar->GetClass() != wanted) || (_avatarSpot != spot)))
 	{
 		clearAvatar();
 	}
@@ -285,6 +285,12 @@ void AFrontEndGameMode::standAvatar(EAvatarSpot spot, UClass* bodyClass, const N
 		if (_avatar == nullptr)
 		{
 			return;
+		}
+
+		_avatarSpot = spot;
+		if (bodyClass != nullptr)
+		{
+			Appearance::animate(*_avatar, Appearance::EMotion::Idle);
 		}
 	}
 

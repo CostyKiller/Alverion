@@ -21,6 +21,9 @@ namespace
 
 	// How far above and below a reported height to look for the island.
 	constexpr double groundSearchCm = 20000.0;
+
+	// The server's speed below which another player walks rather than runs, in centimetres a second.
+	constexpr float strollingSpeedCm = 250.0f;
 }
 
 AProxyCharacter::AProxyCharacter()
@@ -124,6 +127,13 @@ FVector AProxyCharacter::onGround(const FVector& location) const
 void AProxyCharacter::Tick(float deltaSeconds)
 {
 	Super::Tick(deltaSeconds);
+
+	// A player's body runs while it heads for a destination, at a walk when the server's speed is a walking one, and stands otherwise.
+	if (_metaHuman != nullptr)
+	{
+		const Appearance::EMotion moving = (_speed < strollingSpeedCm) ? Appearance::EMotion::Walk : Appearance::EMotion::Run;
+		Appearance::animate(*_metaHuman, _walking ? moving : Appearance::EMotion::Idle);
+	}
 
 	if (_walking)
 	{

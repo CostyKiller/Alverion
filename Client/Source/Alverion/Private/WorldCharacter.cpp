@@ -31,6 +31,10 @@ namespace
 
 	const FLinearColor ownBodyColor(0.2f, 0.45f, 0.9f);
 
+	// Speeds in centimetres a second below which the body stands still, and below which it walks rather than runs.
+	constexpr double standingSpeedCm = 10.0;
+	constexpr double walkingSpeedCm = 250.0;
+
 	// What the options screen's sensitivity reads on a fresh install, which is the turn rate the mouse had before the slider existed.
 	constexpr float defaultMouseSensitivity = 0.3f;
 
@@ -256,6 +260,27 @@ void AWorldCharacter::Tick(float deltaSeconds)
 	if ((settings != nullptr) && (_camera->FieldOfView != settings->getFieldOfView()))
 	{
 		_camera->SetFieldOfView(settings->getFieldOfView());
+	}
+
+	// The worn body plays what the capsule is doing: in the air, standing, walking or running.
+	if (_metaHuman != nullptr)
+	{
+		const double speed = GetVelocity().Size2D();
+		Appearance::EMotion motion = Appearance::EMotion::Run;
+		if (GetCharacterMovement()->IsFalling())
+		{
+			motion = Appearance::EMotion::Fall;
+		}
+		else if (speed < standingSpeedCm)
+		{
+			motion = Appearance::EMotion::Idle;
+		}
+		else if (speed < walkingSpeedCm)
+		{
+			motion = Appearance::EMotion::Walk;
+		}
+
+		Appearance::animate(*_metaHuman, motion);
 	}
 
 	// The server places a character by its feet, and the actor stands at the middle of its capsule.

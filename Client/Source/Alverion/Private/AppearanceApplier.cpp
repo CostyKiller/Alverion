@@ -2,6 +2,7 @@
 
 #include "Appearance.h"
 #include "AppearanceChoices.h"
+#include "Animation/AnimSingleNodeInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
@@ -489,6 +490,33 @@ namespace
 
 namespace Appearance
 {
+	void animate(AActor& body, EMotion motion)
+	{
+		// The Universal Animation Library clips, baked onto the MetaHuman skeleton with MetaHuman hands and shoulders.
+		static const TCHAR* const clips[] =
+		{
+			TEXT("/Game/Characters/Animations/UAL/Idle_Selection_Loop.Idle_Selection_Loop"),
+			TEXT("/Game/Characters/Animations/UAL/Walk_Loop.Walk_Loop"),
+			TEXT("/Game/Characters/Animations/UAL/Jog_Fwd_Loop.Jog_Fwd_Loop"),
+			TEXT("/Game/Characters/Animations/UAL/Jump_Loop.Jump_Loop")
+		};
+
+		USkeletalMeshComponent* mesh = findMesh(body, TEXT("Body"));
+		UAnimationAsset* clip = LoadObject<UAnimationAsset>(nullptr, clips[static_cast<uint8>(motion)]);
+		if ((mesh == nullptr) || (clip == nullptr))
+		{
+			return;
+		}
+
+		const UAnimSingleNodeInstance* player = mesh->GetSingleNodeInstance();
+		if ((mesh->GetAnimationMode() == EAnimationMode::AnimationSingleNode) && (player != nullptr) && (player->GetAnimationAsset() == clip))
+		{
+			return;
+		}
+
+		mesh->PlayAnimation(clip, true);
+	}
+
 	void apply(AActor& avatar, const Network::FAppearance& appearance)
 	{
 		USkeletalMeshComponent* face = findMesh(avatar, TEXT("Face"));

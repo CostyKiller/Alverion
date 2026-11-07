@@ -37,6 +37,10 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
 
 private:
+#if WITH_DEV_AUTOMATION_TESTS
+	friend class FCharacterSelectionIdleTest;
+#endif
+
 	UPROPERTY()
 	TObjectPtr<USoundBase> _menuMusic;
 
@@ -60,6 +64,8 @@ private:
 	// Whoever is standing on a spot right now. One at a time, since only one screen shows a body.
 	UPROPERTY()
 	TObjectPtr<AActor> _avatar;
+
+	EAvatarSpot _avatarSpot = EAvatarSpot::Select;
 
 	void collectCameraStops();
 	void focusStop(const FName& stopTag, bool instant);

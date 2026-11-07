@@ -6,6 +6,7 @@
 
 #include "WorldCharacter.generated.h"
 
+class APlayerController;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
@@ -41,6 +42,11 @@ private:
 	void moveRight();
 	void move(float forward, float right);
 	void rise();
+	void toggleAutoRun();
+
+	/** Whether a key, button or click other than the auto run key or the wheel went down this frame. */
+	bool pressedOtherThanAutoRun(const APlayerController& controller) const;
+
 	void look(const FInputActionValue& value);
 	void zoom(const FInputActionValue& value);
 	void corrected(const Network::FObjectPlace& place, bool teleport);
@@ -95,6 +101,12 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UInputAction> _jumpAction;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _autoRunAction;
+
+	/** Set by the auto run key and cleared by it or by any other press: while set the character runs, or swims, where the camera looks. */
+	bool _autoRun = false;
 
 	/** Set by any movement key this frame, read and cleared by Tick: four keys can be held at once, so no single release means stopped. */
 	bool _movedThisFrame = false;

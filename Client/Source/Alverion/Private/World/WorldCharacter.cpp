@@ -56,6 +56,7 @@ namespace
 	const TCHAR* const moveLeftPath = TEXT("/Game/Input/Actions/IA_MoveLeft.IA_MoveLeft");
 	const TCHAR* const moveRightPath = TEXT("/Game/Input/Actions/IA_MoveRight.IA_MoveRight");
 	const TCHAR* const jumpPath = TEXT("/Game/Input/Actions/IA_Jump.IA_Jump");
+	const TCHAR* const autoRunPath = TEXT("/Game/Input/Actions/IA_AutoRun.IA_AutoRun");
 
 	UServerConnectionSubsystem* connectionOf(const AActor& actor)
 	{
@@ -157,6 +158,7 @@ void AWorldCharacter::PawnClientRestart()
 		_moveLeftAction = LoadObject<UInputAction>(nullptr, moveLeftPath);
 		_moveRightAction = LoadObject<UInputAction>(nullptr, moveRightPath);
 		_jumpAction = LoadObject<UInputAction>(nullptr, jumpPath);
+		_autoRunAction = LoadObject<UInputAction>(nullptr, autoRunPath);
 
 		_lookAction = NewObject<UInputAction>(this);
 		_lookAction->ValueType = EInputActionValueType::Axis2D;
@@ -222,6 +224,11 @@ void AWorldCharacter::SetupPlayerInputComponent(UInputComponent* input)
 		enhanced->BindAction(_jumpAction, ETriggerEvent::Triggered, this, &AWorldCharacter::rise);
 	}
 
+	if (_autoRunAction != nullptr)
+	{
+		enhanced->BindAction(_autoRunAction, ETriggerEvent::Started, this, &AWorldCharacter::toggleAutoRun);
+	}
+
 	if (_lookAction != nullptr)
 	{
 		enhanced->BindAction(_lookAction, ETriggerEvent::Triggered, this, &AWorldCharacter::look);
@@ -273,6 +280,38 @@ void AWorldCharacter::rise()
 	}
 }
 
+void AWorldCharacter::toggleAutoRun()
+{
+	// One press starts it and the next stops it.
+	_autoRun = !_autoRun;
+}
+
+bool AWorldCharacter::pressedOtherThanAutoRun(const APlayerController& controller) const
+{
+	// The auto run key toggles it itself, wherever the player rebound it, so it is left to that binding.
+	TArray<FKey> autoRunKeys;
+	const UEnhancedInputLocalPlayerSubsystem* input = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(controller.GetLocalPlayer());
+	if ((input != nullptr) && (_autoRunAction != nullptr))
+	{
+		autoRunKeys = input->QueryKeysMappedToAction(_autoRunAction);
+	}
+
+	// ponytail: every key the engine knows, scanned only on a frame where something went down while auto running.
+	TArray<FKey> keys;
+	EKeys::GetAllKeys(keys);
+	for (const FKey& key : keys)
+	{
+		// Looking and zooming steer the run, so the mouse axes and the wheel do not stop it.
+		const bool steers = key.IsAnalog() || (key == EKeys::MouseScrollUp) || (key == EKeys::MouseScrollDown);
+		if (!steers && (key != EKeys::AnyKey) && !autoRunKeys.Contains(key) && controller.WasInputKeyJustPressed(key))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void AWorldCharacter::look(const FInputActionValue& value)
 {
 	// Measured against the default sensitivity, so a fresh install turns exactly as it always did and the slider scales from there.
@@ -299,9 +338,17 @@ void AWorldCharacter::Tick(float deltaSeconds)
 		_onGround = settleOnGround();
 	}
 
-	// Both mouse buttons held run where the camera looks, as the forward key does, so in water they dive and climb with the camera too.
 	const APlayerController* controller = Cast<APlayerController>(GetController());
-	if ((controller != nullptr) && controller->IsInputKeyDown(EKeys::LeftMouseButton) && controller->IsInputKeyDown(EKeys::RightMouseButton))
+
+	// Any other key, button or click stops auto run. The cheap any-key check comes first, so the full scan runs only on a press.
+	if (_autoRun && (controller != nullptr) && controller->WasInputKeyJustPressed(EKeys::AnyKey) && pressedOtherThanAutoRun(*controller))
+	{
+		_autoRun = false;
+	}
+
+	// Auto run, or both mouse buttons held, run where the camera looks, as the forward key does, so in water they dive and climb with the camera too.
+	const bool bothButtons = (controller != nullptr) && controller->IsInputKeyDown(EKeys::LeftMouseButton) && controller->IsInputKeyDown(EKeys::RightMouseButton);
+	if (_autoRun || bothButtons)
 	{
 		moveForward();
 	}

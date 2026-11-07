@@ -1,5 +1,5 @@
 #include "Internationalization/StringTableRegistry.h"
-#include "LoadingScreen.h"
+#include "Boot/LoadingScreen.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Modules/ModuleManager.h"

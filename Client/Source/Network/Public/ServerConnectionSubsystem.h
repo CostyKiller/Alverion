@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameServerFlow.h"
-#include "LoginServerFlow.h"
+#include "GameServer/GameServerFlow.h"
+#include "LoginServer/LoginServerFlow.h"
 #include "Session.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Tickable.h"
-#include "WorldFlow.h"
+#include "GameServer/WorldFlow.h"
 
 #include "ServerConnectionSubsystem.generated.h"
 

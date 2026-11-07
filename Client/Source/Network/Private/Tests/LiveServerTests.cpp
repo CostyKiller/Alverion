@@ -1,7 +1,7 @@
-#include "GameServerFlow.h"
-#include "LoginServerFlow.h"
+#include "GameServer/GameServerFlow.h"
+#include "LoginServer/LoginServerFlow.h"
 #include "Misc/AutomationTest.h"
-#include "WorldFlow.h"
+#include "GameServer/WorldFlow.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
 

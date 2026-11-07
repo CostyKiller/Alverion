@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ServerCrypt.h"
-#include "SocketThread.h"
+#include "Core/ServerCrypt.h"
+#include "Core/SocketThread.h"
 
 namespace Network
 {

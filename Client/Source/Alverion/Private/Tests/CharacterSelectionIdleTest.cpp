@@ -6,7 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "FrontEndGameMode.h"
+#include "FrontEnd/FrontEndGameMode.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/ScopeExit.h"
 

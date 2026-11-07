@@ -1,6 +1,6 @@
 #include "Session.h"
 
-#include "FrameStream.h"
+#include "Core/FrameStream.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogAlverionSession, Display, All);
 

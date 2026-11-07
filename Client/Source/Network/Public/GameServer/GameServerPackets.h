@@ -1,0 +1,23 @@
+#pragma once
+
+/** Every game server packet this client reads or writes, one per file under ClientPackets and ServerPackets. */
+#include "GameServer/GameServerProtocol.h"
+#include "GameServer/ServerPackets/AppearanceTrailer.h"
+#include "GameServer/ServerPackets/KeyPacket.h"
+#include "GameServer/ServerPackets/CharSelectionInfo.h"
+#include "GameServer/ServerPackets/CharSelected.h"
+#include "GameServer/ServerPackets/UserInfo.h"
+#include "GameServer/ServerPackets/CharInfo.h"
+#include "GameServer/ServerPackets/NpcInfo.h"
+#include "GameServer/ServerPackets/ObjectPlace.h"
+#include "GameServer/ClientPackets/ProtocolVersion.h"
+#include "GameServer/ClientPackets/AuthLogin.h"
+#include "GameServer/ClientPackets/CharacterCreate.h"
+#include "GameServer/ClientPackets/CharacterDelete.h"
+#include "GameServer/ClientPackets/CharacterSelect.h"
+#include "GameServer/ClientPackets/EnterWorld.h"
+#include "GameServer/ClientPackets/MoveBackwardToLocation.h"
+#include "GameServer/ClientPackets/ValidatePosition.h"
+#include "GameServer/ClientPackets/Appearing.h"
+#include "GameServer/ClientPackets/RequestGotoLobby.h"
+#include "GameServer/ClientPackets/Logout.h"

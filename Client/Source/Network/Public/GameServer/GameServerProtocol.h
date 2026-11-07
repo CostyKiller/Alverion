@@ -1,0 +1,223 @@
+#pragma once
+
+#include "Appearance.h"
+#include "CoreMinimal.h"
+#include "Core/ReadBuffer.h"
+#include "Core/WriteBuffer.h"
+
+/**
+ * The game server's packets, as L2J Mobius writes and reads them, plus the appearance extension in ServerPatch.
+ * Reads stop at the last field this client uses. Positions and headings become world centimetres and degrees here, so nothing past this header sees a server unit.
+ */
+namespace Network
+{
+/**
+ * How long one server world unit is here.
+ * A human's collision height is 23 units and it is a half height, so a 46 unit body against a 180cm MetaHuman puts a unit near 4cm.
+ * Run speeds agree at that scale: 115 units a second is a 4.6m/s run.
+ */
+inline constexpr double worldUnitCm = 4.0;
+
+inline double toCentimetres(int32 units)
+{
+	return static_cast<double>(units) * worldUnitCm;
+}
+
+inline int32 toUnits(double centimetres)
+{
+	return FMath::RoundToInt32(centimetres / worldUnitCm);
+}
+
+/** The sea surface around the starting island, rounded. The client puts it at Z zero, so heights are measured from the water. */
+inline constexpr int32 seaLevelUnits = -3800;
+
+inline FVector toLocation(int32 x, int32 y, int32 z)
+{
+	return FVector(toCentimetres(x), toCentimetres(y), toCentimetres(z - seaLevelUnits));
+}
+
+inline int32 toHeightUnits(double centimetres)
+{
+	return toUnits(centimetres) + seaLevelUnits;
+}
+
+/** Server headings run 0 to 65535 for a full turn, in the same direction as yaw. */
+inline float headingToYaw(int32 heading)
+{
+	return static_cast<float>(heading & 0xFFFF) * (360.0f / 65536.0f);
+}
+
+inline int32 yawToHeading(float yaw)
+{
+	const float wrapped = FMath::Fmod(FMath::Fmod(yaw, 360.0f) + 360.0f, 360.0f);
+	return FMath::RoundToInt32(wrapped * (65536.0f / 360.0f)) & 0xFFFF;
+}
+
+enum class ERace : int32
+{
+	Human = 0,
+	Elf = 1,
+	DarkElf = 2,
+	Orc = 3,
+	Dwarf = 4,
+	Kamael = 5
+};
+
+/** CharCreateFail's codes. */
+enum class ECreateRejectReason : int32
+{
+	CreationFailed = 0,
+	TooManyCharacters = 1,
+	NameTaken = 2,
+	NameTooLong = 3,
+	NameInvalid = 4,
+	CreationNotAllowed = 5,
+	ChooseAnotherServer = 6
+};
+
+inline const TCHAR* createRejectReasonName(ECreateRejectReason reason)
+{
+	switch (reason)
+	{
+		case ECreateRejectReason::TooManyCharacters:
+		{
+			return TEXT("This account cannot hold another character.");
+		}
+		case ECreateRejectReason::NameTaken:
+		{
+			return TEXT("That name is taken.");
+		}
+		case ECreateRejectReason::NameTooLong:
+		{
+			return TEXT("That name is too long.");
+		}
+		case ECreateRejectReason::NameInvalid:
+		{
+			return TEXT("Names are 2 to 16 letters and digits.");
+		}
+		default:
+		{
+			return TEXT("The character could not be created.");
+		}
+	}
+}
+
+struct NETWORK_API FCharacterListEntry
+{
+	uint32 objectId = 0;
+
+	/** The server picks characters by their place in the list, not by id. */
+	int32 slot = 0;
+
+	FString name;
+	int32 level = 0;
+	bool female = false;
+	int32 race = 0;
+	int32 classId = 0;
+	int32 hairStyle = 0;
+	int32 hairColor = 0;
+	int32 face = 0;
+
+	/** Seconds until a character marked for deletion goes, zero for one that is not. */
+	int32 deleteSeconds = 0;
+
+	FVector location = FVector::ZeroVector;
+
+	/** The extension's bytes, empty for a character made without them. */
+	TArray<uint8> appearance;
+};
+
+struct NETWORK_API FCharacterSelected
+{
+	uint32 objectId = 0;
+	FString name;
+	FString title;
+	int32 level = 0;
+	bool female = false;
+	int32 race = 0;
+	int32 classId = 0;
+	FVector location = FVector::ZeroVector;
+	int32 currentHp = 0;
+};
+
+/** Somebody or something coming into view: a player from CharInfo, or a monster or townsperson from NpcInfo. */
+struct NETWORK_API FCharacterSpawn
+{
+	uint32 objectId = 0;
+	FString name;
+	FString title;
+	FVector location = FVector::ZeroVector;
+	float yaw = 0.0f;
+
+	/** Centimetres a second, already multiplied by the server's move multiplier. */
+	float runSpeed = 0.0f;
+
+	bool isNpc = false;
+	int32 npcId = 0;
+	bool attackable = false;
+
+	bool female = false;
+	int32 race = 0;
+	int32 hairStyle = 0;
+	int32 hairColor = 0;
+	int32 face = 0;
+	TArray<uint8> appearance;
+};
+
+/** An object id and a place, which is all MoveToLocation, StopMove, ValidateLocation and TeleportToLocation carry. */
+struct NETWORK_API FObjectPlace
+{
+	uint32 objectId = 0;
+	FVector location = FVector::ZeroVector;
+	float yaw = 0.0f;
+};
+
+namespace GameServer
+{
+/** The newest protocol revision the server accepts. */
+inline constexpr int32 protocolRevision = 273;
+
+/** The paperdoll slots CharSelectionInfo and CharInfo list, one int each. */
+inline constexpr int32 paperdollSlots = 26;
+
+/** Marks the appearance extension, as the bytes 'A' 'L' 'V' '1'. A server without the patch never sends it and ignores it when sent. */
+inline constexpr int32 appearanceMagic = 0x31564C41;
+
+namespace Opcode
+{
+	// Server to client.
+	inline constexpr uint32 deleteObject = 0x08;
+	inline constexpr uint32 characterSelectionInfo = 0x09;
+	inline constexpr uint32 loginFail = 0x0A;
+	inline constexpr uint32 characterSelected = 0x0B;
+	inline constexpr uint32 npcInfo = 0x0C;
+	inline constexpr uint32 characterCreateSuccess = 0x0F;
+	inline constexpr uint32 characterCreateFail = 0x10;
+	inline constexpr uint32 characterDeleteSuccess = 0x1D;
+	inline constexpr uint32 characterDeleteFail = 0x1E;
+	inline constexpr uint32 teleportToLocation = 0x22;
+	inline constexpr uint32 versionCheck = 0x2E;
+	inline constexpr uint32 moveToLocation = 0x2F;
+	inline constexpr uint32 charInfo = 0x31;
+	inline constexpr uint32 userInfo = 0x32;
+	inline constexpr uint32 stopMove = 0x47;
+	inline constexpr uint32 validateLocation = 0x79;
+
+	// Client to server.
+	inline constexpr uint8 logout = 0x00;
+	inline constexpr uint8 characterCreate = 0x0C;
+	inline constexpr uint8 characterDelete = 0x0D;
+	inline constexpr uint8 protocolVersion = 0x0E;
+	inline constexpr uint8 moveBackwardToLocation = 0x0F;
+	inline constexpr uint8 enterWorld = 0x11;
+	inline constexpr uint8 characterSelect = 0x12;
+	inline constexpr uint8 authLogin = 0x2B;
+	inline constexpr uint8 appearing = 0x3A;
+	inline constexpr uint8 validatePosition = 0x59;
+
+	// Extended client packets: this byte, then a uint16 naming the packet.
+	inline constexpr uint8 extended = 0xD0;
+	inline constexpr int16 requestGotoLobby = 0x36;
+}
+}
+}

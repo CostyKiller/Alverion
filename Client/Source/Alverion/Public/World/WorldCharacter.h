@@ -43,6 +43,7 @@ private:
 	void move(float forward, float right);
 	void rise();
 	void toggleAutoRun();
+	void toggleRearView();
 
 	/** Whether a key, button or click other than the auto run key or the wheel went down this frame. */
 	bool pressedOtherThanAutoRun(const APlayerController& controller) const;
@@ -107,6 +108,12 @@ private:
 
 	/** Set by the auto run key and cleared by it or by any other press: while set the character runs, or swims, where the camera looks. */
 	bool _autoRun = false;
+
+	UPROPERTY()
+	TObjectPtr<UInputAction> _backViewAction;
+
+	/** Set and cleared by the rear view key: the camera looks behind, and movement keeps the way it faced before. */
+	bool _rearView = false;
 
 	/** Set by any movement key this frame, read and cleared by Tick: four keys can be held at once, so no single release means stopped. */
 	bool _movedThisFrame = false;

@@ -57,6 +57,7 @@ namespace
 	const TCHAR* const moveRightPath = TEXT("/Game/Input/Actions/IA_MoveRight.IA_MoveRight");
 	const TCHAR* const jumpPath = TEXT("/Game/Input/Actions/IA_Jump.IA_Jump");
 	const TCHAR* const autoRunPath = TEXT("/Game/Input/Actions/IA_AutoRun.IA_AutoRun");
+	const TCHAR* const backViewPath = TEXT("/Game/Input/Actions/IA_BackView.IA_BackView");
 
 	UServerConnectionSubsystem* connectionOf(const AActor& actor)
 	{
@@ -159,6 +160,7 @@ void AWorldCharacter::PawnClientRestart()
 		_moveRightAction = LoadObject<UInputAction>(nullptr, moveRightPath);
 		_jumpAction = LoadObject<UInputAction>(nullptr, jumpPath);
 		_autoRunAction = LoadObject<UInputAction>(nullptr, autoRunPath);
+		_backViewAction = LoadObject<UInputAction>(nullptr, backViewPath);
 
 		_lookAction = NewObject<UInputAction>(this);
 		_lookAction->ValueType = EInputActionValueType::Axis2D;
@@ -229,6 +231,11 @@ void AWorldCharacter::SetupPlayerInputComponent(UInputComponent* input)
 		enhanced->BindAction(_autoRunAction, ETriggerEvent::Started, this, &AWorldCharacter::toggleAutoRun);
 	}
 
+	if (_backViewAction != nullptr)
+	{
+		enhanced->BindAction(_backViewAction, ETriggerEvent::Started, this, &AWorldCharacter::toggleRearView);
+	}
+
 	if (_lookAction != nullptr)
 	{
 		enhanced->BindAction(_lookAction, ETriggerEvent::Triggered, this, &AWorldCharacter::look);
@@ -263,7 +270,9 @@ void AWorldCharacter::moveRight()
 void AWorldCharacter::move(float forward, float right)
 {
 	// Yaw only on land, so looking up does not walk the character into the ground; in water the pitch too, so looking down dives.
-	const FRotator facing(_swimming ? GetControlRotation().Pitch : 0.0f, GetControlRotation().Yaw, 0.0f);
+	// In rear view the camera faces back, so the half turn is undone and the keys still move the way the character faced.
+	const float yaw = GetControlRotation().Yaw + (_rearView ? 180.0f : 0.0f);
+	const FRotator facing(_swimming ? GetControlRotation().Pitch : 0.0f, yaw, 0.0f);
 
 	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::X), forward);
 	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::Y), right);
@@ -284,6 +293,20 @@ void AWorldCharacter::toggleAutoRun()
 {
 	// One press starts it and the next stops it.
 	_autoRun = !_autoRun;
+}
+
+void AWorldCharacter::toggleRearView()
+{
+	if (Controller == nullptr)
+	{
+		return;
+	}
+
+	// The camera follows the control rotation, so a half turn of it looks behind, and a second half turn looks ahead again.
+	_rearView = !_rearView;
+	FRotator rotation = Controller->GetControlRotation();
+	rotation.Yaw += 180.0f;
+	Controller->SetControlRotation(rotation);
 }
 
 bool AWorldCharacter::pressedOtherThanAutoRun(const APlayerController& controller) const

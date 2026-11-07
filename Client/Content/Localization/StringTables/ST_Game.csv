@@ -71,6 +71,7 @@ Key,SourceString
 "keybind.SwitchCamera","Switch Camera"
 "keybind.unbound","Unbound"
 "login.account","Account"
+"map.title","Map"
 "login.account_required","Enter an account name."
 "login.connecting","Connecting..."
 "login.could_not_connect","Could not connect."

@@ -10,6 +10,7 @@
 #include "Engine/LocalPlayer.h"
 #include "UI/GameMenuWidget.h"
 #include "UI/InventoryWidget.h"
+#include "UI/MapWidget.h"
 #include "InputAction.h"
 #include "Core/InputBootstrapSubsystem.h"
 #include "UI/UISubsystem.h"
@@ -19,6 +20,7 @@ namespace
 {
 	const TCHAR* const menuActionPath = TEXT("/Game/Input/Actions/IA_Menu.IA_Menu");
 	const TCHAR* const inventoryActionPath = TEXT("/Game/Input/Actions/IA_Inventory.IA_Inventory");
+	const TCHAR* const mapScreenActionPath = TEXT("/Game/Input/Actions/IA_Map.IA_Map");
 }
 
 void AClientPlayerController::SetupInputComponent()
@@ -36,7 +38,7 @@ void AClientPlayerController::SetupInputComponent()
 	UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
 	if (enhancedInput == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController has no Enhanced Input component, so the menu and inventory keys do nothing."));
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController has no Enhanced Input component, so the menu, inventory and map keys do nothing."));
 		return;
 	}
 
@@ -58,6 +60,16 @@ void AClientPlayerController::SetupInputComponent()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the inventory key does nothing."), inventoryActionPath);
+	}
+
+	UInputAction* mapAction = LoadObject<UInputAction>(nullptr, mapScreenActionPath);
+	if (mapAction != nullptr)
+	{
+		enhancedInput->BindAction(mapAction, ETriggerEvent::Started, this, &AClientPlayerController::toggleMap);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the map key does nothing."), mapScreenActionPath);
 	}
 
 	// Alt+H for a clean screenshot: a fixed chord made here rather than a rebindable action asset, read as H with Alt held.
@@ -140,6 +152,16 @@ void AClientPlayerController::toggleGameMenu()
 
 void AClientPlayerController::toggleInventory()
 {
+	openOverBareWorld(UInventoryWidget::StaticClass());
+}
+
+void AClientPlayerController::toggleMap()
+{
+	openOverBareWorld(UMapWidget::StaticClass());
+}
+
+void AClientPlayerController::openOverBareWorld(TSubclassOf<UCommonActivatableWidget> screenClass)
+{
 	UGameInstance* gameInstance = GetGameInstance();
 	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
 	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
@@ -148,7 +170,7 @@ void AClientPlayerController::toggleInventory()
 		return;
 	}
 
-	openScreen(UInventoryWidget::StaticClass());
+	openScreen(screenClass);
 }
 
 void AClientPlayerController::openScreen(TSubclassOf<UCommonActivatableWidget> screenClass)

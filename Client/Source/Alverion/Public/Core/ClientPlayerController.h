@@ -23,8 +23,11 @@ public:
 private:
 	void toggleGameMenu();
 
-	/** Opens the inventory over the bare world. With a screen up CommonUI holds this key back, and the inventory closes on it by itself. */
 	void toggleInventory();
+	void toggleMap();
+
+	/** Opens the inventory or the map over the bare world. With a screen up CommonUI holds these keys back, and each screen closes on its own key by itself. */
+	void openOverBareWorld(TSubclassOf<UCommonActivatableWidget> screenClass);
 
 	/** Pushes a screen onto the game menu layer and hands the player a cursor until the layer empties again. */
 	void openScreen(TSubclassOf<UCommonActivatableWidget> screenClass);

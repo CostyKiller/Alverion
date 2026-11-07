@@ -1,7 +1,11 @@
 #include "Core/ClientPlayerController.h"
 
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "CommonActivatableWidget.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 #include "Engine/GameInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "UI/GameMenuWidget.h"
@@ -55,6 +59,61 @@ void AClientPlayerController::SetupInputComponent()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the inventory key does nothing."), inventoryActionPath);
 	}
+
+	// Alt+H for a clean screenshot: a fixed chord made here rather than a rebindable action asset, read as H with Alt held.
+	if (_hideInterfaceAction == nullptr)
+	{
+		_hideInterfaceAction = NewObject<UInputAction>(this);
+		_hideInterfaceMapping = NewObject<UInputMappingContext>(this);
+		_hideInterfaceMapping->MapKey(_hideInterfaceAction, EKeys::H);
+	}
+
+	UEnhancedInputLocalPlayerSubsystem* input = (localPlayer != nullptr) ? localPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>() : nullptr;
+	if (input != nullptr)
+	{
+		input->AddMappingContext(_hideInterfaceMapping, 1);
+	}
+
+	enhancedInput->BindAction(_hideInterfaceAction, ETriggerEvent::Started, this, &AClientPlayerController::toggleInterface);
+}
+
+void AClientPlayerController::toggleInterface()
+{
+	if (!IsInputKeyDown(EKeys::LeftAlt) && !IsInputKeyDown(EKeys::RightAlt))
+	{
+		return;
+	}
+
+	if (_interfaceHidden)
+	{
+		showInterface();
+		return;
+	}
+
+	// Every screen on the viewport, the action bar and the layers the menus open on alike, each with the visibility it had so it comes back the same.
+	TArray<UUserWidget*> screens;
+	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, screens, UUserWidget::StaticClass(), true);
+	for (UUserWidget* screen : screens)
+	{
+		_hiddenScreens.Emplace(screen, screen->GetVisibility());
+		screen->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	_interfaceHidden = true;
+}
+
+void AClientPlayerController::showInterface()
+{
+	for (const TPair<TWeakObjectPtr<UUserWidget>, ESlateVisibility>& hidden : _hiddenScreens)
+	{
+		if (hidden.Key.IsValid())
+		{
+			hidden.Key->SetVisibility(hidden.Value);
+		}
+	}
+
+	_hiddenScreens.Reset();
+	_interfaceHidden = false;
 }
 
 void AClientPlayerController::toggleGameMenu()
@@ -94,6 +153,12 @@ void AClientPlayerController::toggleInventory()
 
 void AClientPlayerController::openScreen(TSubclassOf<UCommonActivatableWidget> screenClass)
 {
+	// A screen opened over a hidden interface would take the keys while showing nothing.
+	if (_interfaceHidden)
+	{
+		showInterface();
+	}
+
 	UGameInstance* gameInstance = GetGameInstance();
 	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
 	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;

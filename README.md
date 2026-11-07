@@ -45,9 +45,11 @@ Extract the zip so that the clips land in `Client/Content/Characters/Animations/
 3. Build `Client/Alverion.uproject` with Unreal Engine 5.8 and run it.
 4. Log in. A server with `AutoCreateAccounts` on makes the account the first time.
 
+The client logs in through 127.0.0.1 on port 2106. `-loginserver=host`, `-loginserver=host:port` or `-loginserver=:port` names another login server; the game server address comes from the login server's list.
+
 Development builds also accept `-autologin=account,password,character`.
 
-The menus run straight from the editor, but the world runs only in a packaged build: its terrain plugin needs an editor library to read the map, and that library cannot run inside a game.
+Everything runs straight from the editor with Play In Editor, the world included. In play, Escape opens the game menu and Shift+Escape stops play. A standalone `-game` run from the editor binary reaches the login screen but not the world, because the terrain plugin needs an editor library to read the map.
 
 ```
 RunUAT BuildCookRun -project=Client/Alverion.uproject -platform=Win64 -clientconfig=Development -build -cook -stage -pak -archive -archivedirectory=Client/Saved/Packaged

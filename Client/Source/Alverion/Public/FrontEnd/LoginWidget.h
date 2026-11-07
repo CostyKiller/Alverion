@@ -58,8 +58,10 @@ protected:
 private:
 	void playClickSound() const;
 
-	// Reads -autologin=account,password[,character] and -loginserver=host:port.
-	// Development builds only, because a password on a command line is visible in the process list.
+	/**
+	 * Reads -autologin=account,password[,character], development builds only, because a password on a command line is visible in the process list.
+	 * The server address, -loginserver=host[:port] or :port, is read by beginLogin in every build.
+	 */
 	void applyCommandLineCredentials();
 
 	void submitLogin();

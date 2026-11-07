@@ -28,7 +28,7 @@
 
 namespace
 {
-	// Loopback, because the only server that answers during development is a local one. -loginserver=host:port names another.
+	// Loopback, because the only server that answers during development is a local one. -loginserver=host, host:port or :port names another.
 	const TCHAR* const defaultHost = TEXT("127.0.0.1");
 	constexpr int32 defaultLoginPort = 2106;
 
@@ -434,16 +434,27 @@ void ULoginWidget::beginLogin(const FString& account, const FString& password)
 	FString target;
 	if (FParse::Value(FCommandLine::Get(), TEXT("loginserver="), target) && !target.IsEmpty())
 	{
+		FString hostText;
 		FString portText;
-		if (target.Split(TEXT(":"), &host, &portText))
+		if (!target.Split(TEXT(":"), &hostText, &portText))
 		{
-			port = FCString::Atoi(*portText);
+			hostText = target;
 		}
-		else
+
+		// host, host:port or :port. Whatever part is left out, or a port out of range, keeps its default.
+		if (!hostText.IsEmpty())
 		{
-			host = target;
+			host = hostText;
+		}
+
+		const int32 parsedPort = FCString::Atoi(*portText);
+		if ((parsedPort > 0) && (parsedPort <= 65535))
+		{
+			port = parsedPort;
 		}
 	}
+
+	UE_LOG(LogTemp, Display, TEXT("Logging in through %s on port %d."), *host, port);
 
 	// Weak, because the flow lives on the subsystem and outlives this screen.
 	network->loginServer().onStepChanged.BindWeakLambda(this, [this](Network::ELoginServerStep step)

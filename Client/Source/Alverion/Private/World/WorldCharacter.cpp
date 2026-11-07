@@ -277,6 +277,13 @@ void AWorldCharacter::Tick(float deltaSeconds)
 		_onGround = settleOnGround();
 	}
 
+	// Both mouse buttons held run where the camera looks, as the forward key does, so in water they dive and climb with the camera too.
+	const APlayerController* controller = Cast<APlayerController>(GetController());
+	if ((controller != nullptr) && controller->IsInputKeyDown(EKeys::LeftMouseButton) && controller->IsInputKeyDown(EKeys::RightMouseButton))
+	{
+		moveForward();
+	}
+
 	// Read every frame, so a change made in the options screen over the world shows at once.
 	const UGameSettings* settings = UGameSettings::get();
 	if ((settings != nullptr) && (_camera->FieldOfView != settings->getFieldOfView()))

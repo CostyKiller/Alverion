@@ -113,6 +113,10 @@ bool FLiveServerRoundTripTest::RunTest(const FString& parameters)
 		return false;
 	}
 
+	// The server's PacketEncryption decides this, and the test passes either way, so the log says which one ran.
+	const bool encrypted = static_cast<Network::FGameCipher*>(gameSession.cipher())->isEnabled();
+	AddInfo(encrypted ? TEXT("The game link is encrypted.") : TEXT("The game link runs in the clear."));
+
 	auto findProbe = [&]()
 	{
 		return gameFlow.characters().FindByPredicate([](const Network::FCharacterListEntry& entry) { return entry.name == probeCharacter; });

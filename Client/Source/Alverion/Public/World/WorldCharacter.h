@@ -40,11 +40,15 @@ private:
 	void moveLeft();
 	void moveRight();
 	void move(float forward, float right);
+	void rise();
 	void look(const FInputActionValue& value);
 	void corrected(const Network::FObjectPlace& place, bool teleport);
 
 	/** Puts the character on the ground under it and lets it walk, once streamed ground is there. */
 	bool settleOnGround();
+
+	/** Swims where the water is too deep to stand in, floating at the water line, and stands again where it shallows. */
+	void swimOrStand(float deltaSeconds);
 
 	UPROPERTY()
 	TObjectPtr<USpringArmComponent> _arm;
@@ -88,4 +92,8 @@ private:
 	/** Set by any movement key this frame, read and cleared by Tick: four keys can be held at once, so no single release means stopped. */
 	bool _movedThisFrame = false;
 	bool _onGround = false;
+	bool _swimming = false;
+
+	/** Set on wading in, while the swimmer floats up to the water line, and cleared there or once it dives. */
+	bool _surfacing = false;
 };

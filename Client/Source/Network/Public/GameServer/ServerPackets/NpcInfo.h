@@ -19,6 +19,7 @@ inline bool readNpcInfo(FReadBuffer& buffer, FCharacterSpawn& spawn)
 	int32 z = 0;
 	int32 heading = 0;
 	int32 runSpeed = 0;
+	int32 swimSpeed = 0;
 	double moveMultiplier = 1.0;
 
 	buffer.readInt32(objectId);
@@ -34,8 +35,13 @@ inline bool readNpcInfo(FReadBuffer& buffer, FCharacterSpawn& spawn)
 
 	buffer.readInt32(runSpeed);
 
-	// Walk, swim run, swim walk, flying run and walk twice over.
-	buffer.skip(7 * 4);
+	// Walk.
+	buffer.skip(4);
+
+	buffer.readInt32(swimSpeed);
+
+	// Swim walk, flying run and walk twice over.
+	buffer.skip(5 * 4);
 
 	buffer.readDouble(moveMultiplier);
 
@@ -56,6 +62,7 @@ inline bool readNpcInfo(FReadBuffer& buffer, FCharacterSpawn& spawn)
 	spawn.location = toLocation(x, y, z);
 	spawn.yaw = headingToYaw(heading);
 	spawn.runSpeed = static_cast<float>(toCentimetres(runSpeed) * moveMultiplier);
+	spawn.swimSpeed = static_cast<float>(toCentimetres(swimSpeed) * moveMultiplier);
 
 	if (spawn.name.IsEmpty())
 	{

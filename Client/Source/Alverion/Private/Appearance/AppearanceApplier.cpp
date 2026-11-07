@@ -496,9 +496,10 @@ namespace Appearance
 		static const TCHAR* const clips[] =
 		{
 			TEXT("/Game/Characters/Animations/UAL/Idle_Selection_Loop.Idle_Selection_Loop"),
-			TEXT("/Game/Characters/Animations/UAL/Walk_Loop.Walk_Loop"),
 			TEXT("/Game/Characters/Animations/UAL/Jog_Fwd_Loop.Jog_Fwd_Loop"),
-			TEXT("/Game/Characters/Animations/UAL/Jump_Loop.Jump_Loop")
+			TEXT("/Game/Characters/Animations/UAL/Jump_Loop.Jump_Loop"),
+			TEXT("/Game/Characters/Animations/UAL/Swim_Idle_Loop.Swim_Idle_Loop"),
+			TEXT("/Game/Characters/Animations/UAL/Swim_Fwd_Loop.Swim_Fwd_Loop")
 		};
 
 		USkeletalMeshComponent* mesh = findMesh(body, TEXT("Body"));

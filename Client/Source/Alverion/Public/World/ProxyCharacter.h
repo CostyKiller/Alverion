@@ -31,8 +31,8 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type reason) override;
 
 private:
-	/** The island's surface under a place, or the place itself where there is none. */
-	FVector onGround(const FVector& location) const;
+	/** Where this stands at a place: on the island, or at the water line where the island lies too deep to stand on, which sets it swimming. */
+	FVector settle(const FVector& location);
 
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> _body;
@@ -49,5 +49,7 @@ private:
 
 	FVector _destination = FVector::ZeroVector;
 	float _speed = 0.0f;
+	float _swimSpeed = 0.0f;
 	bool _walking = false;
+	bool _swimming = false;
 };

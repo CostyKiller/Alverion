@@ -151,6 +151,7 @@ struct NETWORK_API FCharacterSpawn
 
 	/** Centimetres a second, already multiplied by the server's move multiplier. */
 	float runSpeed = 0.0f;
+	float swimSpeed = 0.0f;
 
 	bool isNpc = false;
 	int32 npcId = 0;

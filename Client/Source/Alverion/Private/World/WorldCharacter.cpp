@@ -15,6 +15,7 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "World/SceneSetup.h"
+#include "World/Water.h"
 #include "ServerConnectionSubsystem.h"
 
 namespace
@@ -31,9 +32,15 @@ namespace
 
 	const FLinearColor ownBodyColor(0.2f, 0.45f, 0.9f);
 
-	// Speeds in centimetres a second below which the body stands still, and below which it walks rather than runs.
+	// The speed in centimetres a second below which the body stands still rather than runs or swims.
 	constexpr double standingSpeedCm = 10.0;
-	constexpr double walkingSpeedCm = 250.0;
+
+	// A starting character's 50 swim units a second at the client's scale, and how hard the water stops a swimmer who lets go of the keys.
+	constexpr float swimSpeedCm = 200.0f;
+	constexpr float swimBrakingCm = 1200.0f;
+
+	// How quickly a character wading in floats up to the water line.
+	constexpr float floatRate = 4.0f;
 
 	// What the options screen's sensitivity reads on a fresh install, which is the turn rate the mouse had before the slider existed.
 	constexpr float defaultMouseSensitivity = 0.3f;
@@ -62,6 +69,10 @@ AWorldCharacter::AWorldCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	GetCharacterMovement()->MaxWalkSpeed = runSpeedCm;
+
+	// A swimmer flies level at the water line, so the flying limits are the water's.
+	GetCharacterMovement()->MaxFlySpeed = swimSpeedCm;
+	GetCharacterMovement()->BrakingDecelerationFlying = swimBrakingCm;
 
 	_arm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Arm"));
 	_arm->SetupAttachment(RootComponent);
@@ -197,6 +208,7 @@ void AWorldCharacter::SetupPlayerInputComponent(UInputComponent* input)
 	{
 		enhanced->BindAction(_jumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		enhanced->BindAction(_jumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		enhanced->BindAction(_jumpAction, ETriggerEvent::Triggered, this, &AWorldCharacter::rise);
 	}
 
 	if (_lookAction != nullptr)
@@ -227,12 +239,22 @@ void AWorldCharacter::moveRight()
 
 void AWorldCharacter::move(float forward, float right)
 {
-	// Yaw only, so looking up does not walk the character into the ground.
-	const FRotator facing(0.0f, GetControlRotation().Yaw, 0.0f);
+	// Yaw only on land, so looking up does not walk the character into the ground; in water the pitch too, so looking down dives.
+	const FRotator facing(_swimming ? GetControlRotation().Pitch : 0.0f, GetControlRotation().Yaw, 0.0f);
 
 	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::X), forward);
 	AddMovementInput(FRotationMatrix(facing).GetUnitAxis(EAxis::Y), right);
 	_movedThisFrame = true;
+}
+
+void AWorldCharacter::rise()
+{
+	// On land the jump key jumps; in water, held, it swims straight up.
+	if (_swimming)
+	{
+		AddMovementInput(FVector::UpVector, 1.0f);
+		_movedThisFrame = true;
+	}
 }
 
 void AWorldCharacter::look(const FInputActionValue& value)
@@ -262,22 +284,23 @@ void AWorldCharacter::Tick(float deltaSeconds)
 		_camera->SetFieldOfView(settings->getFieldOfView());
 	}
 
-	// The worn body plays what the capsule is doing: in the air, standing, walking or running.
+	if (_onGround)
+	{
+		swimOrStand(deltaSeconds);
+	}
+
+	// The worn body plays what the capsule is doing: swimming, in the air, standing or running.
 	if (_metaHuman != nullptr)
 	{
-		const double speed = GetVelocity().Size2D();
-		Appearance::EMotion motion = Appearance::EMotion::Run;
-		if (GetCharacterMovement()->IsFalling())
+		const bool still = (GetVelocity().Size2D() < standingSpeedCm);
+		Appearance::EMotion motion = still ? Appearance::EMotion::Idle : Appearance::EMotion::Run;
+		if (_swimming)
+		{
+			motion = still ? Appearance::EMotion::SwimIdle : Appearance::EMotion::Swim;
+		}
+		else if (GetCharacterMovement()->IsFalling())
 		{
 			motion = Appearance::EMotion::Fall;
-		}
-		else if (speed < standingSpeedCm)
-		{
-			motion = Appearance::EMotion::Idle;
-		}
-		else if (speed < walkingSpeedCm)
-		{
-			motion = Appearance::EMotion::Walk;
 		}
 
 		Appearance::animate(*_metaHuman, motion);
@@ -293,6 +316,51 @@ void AWorldCharacter::Tick(float deltaSeconds)
 	}
 
 	_movedThisFrame = false;
+}
+
+void AWorldCharacter::swimOrStand(float deltaSeconds)
+{
+	// The ground under the capsule, or none past the island's edge, which is open sea.
+	const FVector here = GetActorLocation();
+	FCollisionQueryParams query;
+	query.AddIgnoredActor(this);
+
+	FHitResult hit;
+	const bool found = GetWorld()->LineTraceSingleByChannel(hit, here, here - FVector(0.0, 0.0, settleSearchCm), ECC_WorldStatic, query);
+	const bool deep = Water::tooDeep(found ? hit.ImpactPoint.Z : (Water::surfaceCm - settleSearchCm), _swimming);
+
+	UCharacterMovementComponent* movement = GetCharacterMovement();
+	if (deep != _swimming)
+	{
+		_swimming = deep;
+		_surfacing = deep;
+		movement->SetMovementMode(deep ? MOVE_Flying : MOVE_Falling);
+	}
+
+	if (!_swimming)
+	{
+		return;
+	}
+
+	// The capsule's middle is half its height above the feet, which float no higher than the water's swimmer line.
+	// Wading in from the beach floats the swimmer up to it once; after that it holds whatever depth it swims to, and that line is as high as it goes.
+	const double floating = Water::swimmerFeetCm + capsuleHalfHeightCm;
+	double height = FMath::Min(here.Z, floating);
+	if (_surfacing)
+	{
+		height = FMath::FInterpTo(here.Z, floating, static_cast<double>(deltaSeconds), static_cast<double>(floatRate));
+		_surfacing = (FMath::Abs(floating - height) > 2.0) && (movement->Velocity.Z >= 0.0);
+	}
+
+	if (height != here.Z)
+	{
+		SetActorLocation(FVector(here.X, here.Y, height));
+	}
+
+	if ((height >= floating) && (movement->Velocity.Z > 0.0))
+	{
+		movement->Velocity.Z = 0.0;
+	}
 }
 
 bool AWorldCharacter::settleOnGround()

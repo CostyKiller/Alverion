@@ -17,13 +17,14 @@ namespace Network
  */
 namespace Appearance
 {
-	/** What a body is doing, which picks the clip it plays. */
+	/** What a body is doing, which picks the clip it plays. Characters only run, on land, and swim in deep water. */
 	enum class EMotion : uint8
 	{
 		Idle,
-		Walk,
 		Run,
-		Fall
+		Fall,
+		SwimIdle,
+		Swim
 	};
 
 	/** Plays the clip for a motion on a MetaHuman's body, looping, and leaves it alone while the motion stays the same, so a loop keeps its phase. */

@@ -8,6 +8,7 @@
 #include "Core/GameSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "World/SceneSetup.h"
+#include "World/Water.h"
 
 namespace
 {
@@ -21,9 +22,6 @@ namespace
 
 	// How far above and below a reported height to look for the island.
 	constexpr double groundSearchCm = 20000.0;
-
-	// The server's speed below which another player walks rather than runs, in centimetres a second.
-	constexpr float strollingSpeedCm = 250.0f;
 }
 
 AProxyCharacter::AProxyCharacter()
@@ -52,6 +50,7 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 	_label->SetTextRenderColor(color.ToFColor(true));
 
 	_speed = spawn.runSpeed;
+	_swimSpeed = spawn.swimSpeed;
 	standAt(spawn.location, spawn.yaw);
 
 	// Players carry an appearance and wear it; a repeated spawn with the same bytes keeps the body already standing.
@@ -104,52 +103,62 @@ void AProxyCharacter::walkTo(const FVector& destination)
 void AProxyCharacter::standAt(const FVector& location, float yaw)
 {
 	_walking = false;
-	SetActorLocation(onGround(location));
+	SetActorLocation(settle(location));
 	SetActorRotation(FRotator(0.0f, yaw, 0.0f));
 }
 
-FVector AProxyCharacter::onGround(const FVector& location) const
+FVector AProxyCharacter::settle(const FVector& location)
 {
 	FHitResult hit;
 	FCollisionQueryParams query;
 	query.AddIgnoredActor(this);
 
+	// No island under a place is open sea.
 	const FVector above = location + FVector(0.0, 0.0, groundSearchCm);
 	const FVector below = location - FVector(0.0, 0.0, groundSearchCm);
-	if (GetWorld()->LineTraceSingleByChannel(hit, above, below, ECC_WorldStatic, query))
+	const bool found = GetWorld()->LineTraceSingleByChannel(hit, above, below, ECC_WorldStatic, query);
+	_swimming = Water::tooDeep(found ? hit.ImpactPoint.Z : (Water::surfaceCm - groundSearchCm), _swimming);
+
+	// The root is the feet. A swimmer keeps the depth the server reports, no lower than the seabed and no higher than the swimmer line.
+	if (_swimming)
 	{
-		return hit.ImpactPoint;
+		const double seabed = found ? hit.ImpactPoint.Z : (Water::surfaceCm - groundSearchCm);
+		return FVector(location.X, location.Y, FMath::Clamp(location.Z, seabed, Water::swimmerFeetCm));
 	}
 
-	return location;
+	return found ? hit.ImpactPoint : location;
 }
 
 void AProxyCharacter::Tick(float deltaSeconds)
 {
 	Super::Tick(deltaSeconds);
 
-	// A player's body runs while it heads for a destination, at a walk when the server's speed is a walking one, and stands otherwise.
+	// A player's body runs or swims while it heads for a destination, and stands or treads water otherwise.
 	if (_metaHuman != nullptr)
 	{
-		const Appearance::EMotion moving = (_speed < strollingSpeedCm) ? Appearance::EMotion::Walk : Appearance::EMotion::Run;
-		Appearance::animate(*_metaHuman, _walking ? moving : Appearance::EMotion::Idle);
+		const Appearance::EMotion moving = _swimming ? Appearance::EMotion::Swim : Appearance::EMotion::Run;
+		const Appearance::EMotion still = _swimming ? Appearance::EMotion::SwimIdle : Appearance::EMotion::Idle;
+		Appearance::animate(*_metaHuman, _walking ? moving : still);
 	}
 
 	if (_walking)
 	{
+		// A server too old to report a swim speed leaves it zero, and the run speed stands in.
+		const float speed = (_swimming && (_swimSpeed > 0.0f)) ? _swimSpeed : _speed;
 		const FVector here = GetActorLocation();
-		const FVector toGo = FVector(_destination.X - here.X, _destination.Y - here.Y, 0.0);
-		const double step = static_cast<double>(_speed * deltaSeconds);
+		const double step = static_cast<double>(speed * deltaSeconds);
 
-		if ((toGo.Size2D() <= step) || (_speed <= 0.0f))
+		// On land the ground carries the height; a swimmer heads for the destination's depth too, and tilts into a dive or a rise.
+		const FVector toGo = _swimming ? (FVector(_destination.X, _destination.Y, FMath::Min(_destination.Z, Water::swimmerFeetCm)) - here) : FVector(_destination.X - here.X, _destination.Y - here.Y, 0.0);
+		if ((toGo.Size() <= step) || (speed <= 0.0f))
 		{
 			standAt(_destination, GetActorRotation().Yaw);
 		}
 		else
 		{
-			const FVector direction = toGo.GetSafeNormal2D();
-			SetActorLocation(onGround(here + (direction * step)));
-			SetActorRotation(direction.Rotation());
+			const FVector direction = toGo.GetSafeNormal();
+			SetActorLocation(settle(here + (direction * step)));
+			SetActorRotation(_swimming ? direction.Rotation() : FRotator(0.0f, direction.Rotation().Yaw, 0.0f));
 		}
 	}
 

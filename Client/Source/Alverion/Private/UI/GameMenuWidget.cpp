@@ -93,14 +93,13 @@ TSharedRef<SWidget> UGameMenuWidget::RebuildWidget()
 		closeSlot->SetVerticalAlignment(VAlign_Top);
 		closeSlot->SetPadding(FMargin(screenMargin));
 
-		// Options, Characters and Exit Game stacked in the bottom right corner, where the inventory will not cover them.
+		// Options, Characters and Exit Game stacked in the middle of the screen.
 		USizeBox* panel = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
 		panel->SetWidthOverride(menuColumnWidth);
 
 		UOverlaySlot* panelSlot = root->AddChildToOverlay(panel);
-		panelSlot->SetHorizontalAlignment(HAlign_Right);
-		panelSlot->SetVerticalAlignment(VAlign_Bottom);
-		panelSlot->SetPadding(FMargin(screenMargin));
+		panelSlot->SetHorizontalAlignment(HAlign_Center);
+		panelSlot->SetVerticalAlignment(VAlign_Center);
 
 		UVerticalBox* column = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 		panel->AddChild(column);

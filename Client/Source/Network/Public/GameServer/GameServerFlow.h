@@ -23,6 +23,9 @@ enum class EGameServerStep : uint8
 	SelectSent,
 	Selected,
 	InWorld,
+
+	/** RequestRestart sent: world packets stop until the server answers. A refusal goes back to InWorld, consent ends at CharacterSelect. */
+	Restarting,
 	Failed
 };
 
@@ -32,6 +35,7 @@ DECLARE_DELEGATE_OneParam(FCharacterCreateRejected, ECreateRejectReason);
 DECLARE_DELEGATE(FCharacterCreated);
 DECLARE_DELEGATE(FCharacterDeleted);
 DECLARE_DELEGATE(FCharacterDeleteRejected);
+DECLARE_DELEGATE(FRestartRefused);
 
 /** The game server leg up to a chosen character. Its session must be opened with an FGameCipher, which this flow keys from KeyPacket. */
 class NETWORK_API FGameServerFlow
@@ -49,6 +53,9 @@ public:
 	/** Sends EnterWorld. Every packet after it goes to onWorldPacket. */
 	bool enterWorld();
 
+	/** Asks to leave the world for the character list, keeping the link. The step changes to CharacterSelect when the server agrees. */
+	bool returnToCharacterSelect();
+
 	void end();
 
 	EGameServerStep step() const;
@@ -64,6 +71,9 @@ public:
 	FCharacterCreated onCreated;
 	FCharacterDeleteRejected onDeleteRejected;
 	FCharacterDeleted onDeleted;
+
+	/** The server kept the character in the world, as it does in combat. */
+	FRestartRefused onRestartRefused;
 
 private:
 	void handlePacket(uint32 opcode, TArrayView<const uint8> body);

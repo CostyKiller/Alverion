@@ -70,7 +70,8 @@ void FWorldFlow::setLocalState(const FVector& location, float yaw, bool wantsToM
 
 void FWorldFlow::tick(float deltaSeconds)
 {
-	if ((_gameServer == nullptr) || !_hasLocalState || (deltaSeconds <= 0.0f))
+	// Nothing goes out while a restart is pending, since a server that agrees has already taken the character out of the world.
+	if ((_gameServer == nullptr) || !_hasLocalState || (deltaSeconds <= 0.0f) || (_gameServer->step() != EGameServerStep::InWorld))
 	{
 		return;
 	}

@@ -79,6 +79,9 @@ private:
 	// Takes the token the login server issued to the game server it named.
 	void enterGameServer();
 
+	// Listens to the game server link for the character list, the world entry and a lost connection.
+	void bindGameServer();
+
 	void setStatus(const FText& text);
 
 	// A second press cannot open a second session while one is in flight.

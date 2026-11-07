@@ -139,6 +139,21 @@ bool FGameServerFlow::enterWorld()
 	return true;
 }
 
+bool FGameServerFlow::returnToCharacterSelect()
+{
+	if ((_session == nullptr) || (_step != EGameServerStep::InWorld))
+	{
+		return false;
+	}
+
+	FWriteBuffer buffer;
+	GameServer::writeRequestRestart(buffer);
+	send(buffer);
+
+	setStep(EGameServerStep::Restarting);
+	return true;
+}
+
 void FGameServerFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 {
 	if (_step == EGameServerStep::InWorld)
@@ -151,6 +166,19 @@ void FGameServerFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 
 	switch (opcode)
 	{
+		case GameServer::Opcode::restartResponse:
+		{
+			// One when the server lets the character go, which CharSelectionInfo follows; zero when it keeps it in the world.
+			int32 result = 0;
+			buffer.readInt32(result);
+			if ((_step == EGameServerStep::Restarting) && (result == 0))
+			{
+				setStep(EGameServerStep::InWorld);
+				onRestartRefused.ExecuteIfBound();
+			}
+
+			return;
+		}
 		case GameServer::Opcode::versionCheck:
 		{
 			TArray<uint8> key;

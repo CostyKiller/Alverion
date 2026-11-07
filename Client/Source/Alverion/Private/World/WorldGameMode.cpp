@@ -104,9 +104,36 @@ void AWorldGameMode::EndPlay(const EEndPlayReason::Type reason)
 		flow.onMoved.Unbind();
 		flow.end();
 		link->gameServer().onFailed.Unbind();
+		link->gameServer().onStepChanged.Unbind();
+		link->gameServer().onRestartRefused.Unbind();
 	}
 
 	Super::EndPlay(reason);
+}
+
+void AWorldGameMode::returnToCharacterSelect()
+{
+	UServerConnectionSubsystem* link = connection();
+	if (link == nullptr)
+	{
+		return;
+	}
+
+	// The front end opens on the character list when the link already holds one, so arriving there is all that is left.
+	link->gameServer().onStepChanged.BindWeakLambda(this, [this](Network::EGameServerStep step)
+	{
+		if (step == Network::EGameServerStep::CharacterSelect)
+		{
+			UGameplayStatics::OpenLevel(this, FName(TEXT("/Game/Maps/L_Login")));
+		}
+	});
+
+	link->gameServer().onRestartRefused.BindWeakLambda(this, [this]()
+	{
+		UE_LOG(LogTemp, Display, TEXT("The server kept the character in the world, as it does in combat."));
+	});
+
+	link->gameServer().returnToCharacterSelect();
 }
 
 void AWorldGameMode::spawned(const Network::FCharacterSpawn& spawn)

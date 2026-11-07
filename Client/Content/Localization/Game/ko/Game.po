@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Game\n"
-"POT-Creation-Date: 2026-11-07 11:09\n"
-"PO-Revision-Date: 2026-11-07 11:09\n"
+"POT-Creation-Date: 2026-11-07 16:34\n"
+"PO-Revision-Date: 2026-11-07 16:34\n"
 "Language-Team: \n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -370,6 +370,20 @@ msgctxt "ST_Game,menu.back"
 msgid "Back"
 msgstr "뒤로"
 
+#. Key:	menu.characters
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.characters"
+msgid "Characters"
+msgstr "캐릭터"
+
+#. Key:	menu.characters_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.characters_confirm"
+msgid "Return to character selection?"
+msgstr "캐릭터 선택으로 돌아가시겠습니까?"
+
 #. Key:	menu.create
 #. SourceLocation:	Localization/StringTables/ST_Game.csv
 #: Localization/StringTables/ST_Game.csv
@@ -439,20 +453,6 @@ msgstr "설정"
 msgctxt "ST_Game,menu.options_title"
 msgid "Options"
 msgstr "설정"
-
-#. Key:	menu.quit_to_menu
-#. SourceLocation:	Localization/StringTables/ST_Game.csv
-#: Localization/StringTables/ST_Game.csv
-msgctxt "ST_Game,menu.quit_to_menu"
-msgid "Quit to Menu"
-msgstr "메뉴로 돌아가기"
-
-#. Key:	menu.resume
-#. SourceLocation:	Localization/StringTables/ST_Game.csv
-#: Localization/StringTables/ST_Game.csv
-msgctxt "ST_Game,menu.resume"
-msgid "Resume"
-msgstr "계속하기"
 
 #. Key:	menu.yes
 #. SourceLocation:	Localization/StringTables/ST_Game.csv
@@ -901,4 +901,11 @@ msgstr "{0}을(를) 준비하는 중입니다."
 msgctxt "ST_Game,worldentry.title"
 msgid "Entering the world"
 msgstr "월드에 진입하는 중"
+
+#. Key:	loading
+#. SourceLocation:	Source/Alverion/Private/Boot/LoadingScreen.cpp(114)
+#: Source/Alverion/Private/Boot/LoadingScreen.cpp(114)
+msgctxt "Alverion,loading"
+msgid "Loading..."
+msgstr ""
 

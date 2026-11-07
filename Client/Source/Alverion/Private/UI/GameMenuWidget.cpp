@@ -15,27 +15,30 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "UI/LocalizedText.h"
 #include "UI/OptionsWidget.h"
-#include "ServerConnectionSubsystem.h"
 #include "Sound/SoundBase.h"
 #include "UI/UIStyle.h"
 #include "UI/UISubsystem.h"
+#include "World/WorldGameMode.h"
 
 namespace
 {
 	// Widget name to string table key, matched by name so the tree needs no extra bindings.
 	const TMap<FName, FString> gameMenuTextKeys =
 	{
-		{ TEXT("resumeLabel"), TEXT("menu.resume") },
 		{ TEXT("optionsLabel"), TEXT("menu.options") },
-		{ TEXT("logoutLabel"), TEXT("menu.quit_to_menu") },
-		{ TEXT("quitLabel"), TEXT("menu.exit") }
+		{ TEXT("charactersLabel"), TEXT("menu.characters") },
+		{ TEXT("quitLabel"), TEXT("charselect.exit_game") }
 	};
 
-	// What WBP_GameMenu held, read out with the DumpWidget commandlet before the asset went away.
+	// The dim and the button style WBP_GameMenu held, read out with the DumpWidget commandlet before the asset went away.
 	constexpr FLinearColor menuBackdropColor = FLinearColor(0.01f, 0.01f, 0.015f, 0.72f);
-	constexpr float menuPanelWidth = 420.0f;
+	constexpr float menuColumnWidth = 320.0f;
 	constexpr float menuButtonRadius = 14.0f;
 	constexpr int32 menuFontSize = 28;
+
+	// The close square in the top right corner, and how far the corners keep from the screen's edge.
+	constexpr float closeButtonSize = 56.0f;
+	constexpr float screenMargin = 32.0f;
 
 	// One menu button. The label carries no colour on purpose, the asset left it default white.
 	UButton* addMenuButton(UWidgetTree& tree, UVerticalBox& column, const TCHAR* labelName)
@@ -71,19 +74,39 @@ TSharedRef<SWidget> UGameMenuWidget::RebuildWidget()
 		backdropSlot->SetHorizontalAlignment(HAlign_Fill);
 		backdropSlot->SetVerticalAlignment(VAlign_Fill);
 
+		// The close square in the top right corner.
+		USizeBox* closeBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+		closeBox->SetWidthOverride(closeButtonSize);
+		closeBox->SetHeightOverride(closeButtonSize);
+
+		closeButton = WidgetTree->ConstructWidget<UButton>(UButton::StaticClass());
+		closeButton->SetStyle(UIStyle::frontEndButtonStyle(menuButtonRadius));
+		UTextBlock* closeLabel = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(TEXT("closeLabel")));
+		closeLabel->SetFont(UIStyle::font(menuFontSize));
+		closeLabel->SetJustification(ETextJustify::Center);
+		closeLabel->SetText(FText::FromString(TEXT("X")));
+		closeButton->AddChild(closeLabel);
+		closeBox->AddChild(closeButton);
+
+		UOverlaySlot* closeSlot = root->AddChildToOverlay(closeBox);
+		closeSlot->SetHorizontalAlignment(HAlign_Right);
+		closeSlot->SetVerticalAlignment(VAlign_Top);
+		closeSlot->SetPadding(FMargin(screenMargin));
+
+		// Options, Characters and Exit Game stacked in the bottom right corner, where the inventory will not cover them.
 		USizeBox* panel = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
-		panel->SetWidthOverride(menuPanelWidth);
+		panel->SetWidthOverride(menuColumnWidth);
 
 		UOverlaySlot* panelSlot = root->AddChildToOverlay(panel);
-		panelSlot->SetHorizontalAlignment(HAlign_Center);
-		panelSlot->SetVerticalAlignment(VAlign_Center);
+		panelSlot->SetHorizontalAlignment(HAlign_Right);
+		panelSlot->SetVerticalAlignment(VAlign_Bottom);
+		panelSlot->SetPadding(FMargin(screenMargin));
 
 		UVerticalBox* column = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
 		panel->AddChild(column);
 
-		resumeButton = addMenuButton(*WidgetTree, *column, TEXT("resumeLabel"));
 		optionsButton = addMenuButton(*WidgetTree, *column, TEXT("optionsLabel"));
-		logoutButton = addMenuButton(*WidgetTree, *column, TEXT("logoutLabel"));
+		charactersButton = addMenuButton(*WidgetTree, *column, TEXT("charactersLabel"));
 		quitButton = addMenuButton(*WidgetTree, *column, TEXT("quitLabel"));
 
 		WidgetTree->RootWidget = root;
@@ -102,9 +125,9 @@ void UGameMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (resumeButton != nullptr)
+	if (closeButton != nullptr)
 	{
-		resumeButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleResumeClicked);
+		closeButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleCloseClicked);
 	}
 
 	if (optionsButton != nullptr)
@@ -112,9 +135,9 @@ void UGameMenuWidget::NativeConstruct()
 		optionsButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleOptionsClicked);
 	}
 
-	if (logoutButton != nullptr)
+	if (charactersButton != nullptr)
 	{
-		logoutButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleLogoutClicked);
+		charactersButton->OnClicked.AddDynamic(this, &UGameMenuWidget::handleCharactersClicked);
 	}
 
 	if (quitButton != nullptr)
@@ -127,9 +150,9 @@ void UGameMenuWidget::NativeConstruct()
 
 UWidget* UGameMenuWidget::NativeGetDesiredFocusTarget() const
 {
-	if (resumeButton != nullptr)
+	if (optionsButton != nullptr)
 	{
-		return resumeButton;
+		return optionsButton;
 	}
 
 	return Super::NativeGetDesiredFocusTarget();
@@ -148,7 +171,7 @@ void UGameMenuWidget::playClickSound() const
 	UGameplayStatics::PlaySound2D(this, clickSound, volume);
 }
 
-void UGameMenuWidget::handleResumeClicked()
+void UGameMenuWidget::handleCloseClicked()
 {
 	playClickSound();
 
@@ -177,19 +200,28 @@ void UGameMenuWidget::handleOptionsClicked()
 	subsystem->pushWidget(EUILayer::GameMenu, UOptionsWidget::StaticClass());
 }
 
-void UGameMenuWidget::handleLogoutClicked()
+void UGameMenuWidget::handleCharactersClicked()
 {
 	playClickSound();
 
-	// Dropping the link is the logout: the server takes the character out of the world when its connection closes.
 	UGameInstance* gameInstance = GetGameInstance();
-	UServerConnectionSubsystem* network = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UServerConnectionSubsystem>() : nullptr;
-	if (network != nullptr)
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	if (subsystem == nullptr)
 	{
-		network->disconnectAll();
+		return;
 	}
 
-	UGameplayStatics::OpenLevel(this, FName(TEXT("/Game/Maps/L_Login")));
+	// The link stays up: the server takes the character out of the world and sends the list again, so no second login is needed.
+	subsystem->askConfirm(LocalizedText::get(TEXT("menu.characters_confirm")), FOnConfirmAnswered::CreateWeakLambda(this, [this](bool confirmed)
+	{
+		UWorld* world = GetWorld();
+		AWorldGameMode* mode = (world != nullptr) ? world->GetAuthGameMode<AWorldGameMode>() : nullptr;
+		if (confirmed && (mode != nullptr))
+		{
+			DeactivateWidget();
+			mode->returnToCharacterSelect();
+		}
+	}));
 }
 
 void UGameMenuWidget::handleQuitClicked()

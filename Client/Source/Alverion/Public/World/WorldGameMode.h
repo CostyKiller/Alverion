@@ -20,6 +20,9 @@ class ALVERION_API AWorldGameMode : public AGameModeBase
 public:
 	AWorldGameMode();
 
+	/** Takes the character out of the world for the character list, keeping the link, and travels to it once the server agrees. */
+	void returnToCharacterSelect();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type reason) override;

@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Game\n"
-"POT-Creation-Date: 2026-11-07 11:09\n"
-"PO-Revision-Date: 2026-11-07 11:09\n"
+"POT-Creation-Date: 2026-11-07 16:34\n"
+"PO-Revision-Date: 2026-11-07 16:34\n"
 "Language-Team: \n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -370,6 +370,20 @@ msgctxt "ST_Game,menu.back"
 msgid "Back"
 msgstr "Indietro"
 
+#. Key:	menu.characters
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.characters"
+msgid "Characters"
+msgstr "Personaggi"
+
+#. Key:	menu.characters_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.characters_confirm"
+msgid "Return to character selection?"
+msgstr "Tornare alla selezione del personaggio?"
+
 #. Key:	menu.create
 #. SourceLocation:	Localization/StringTables/ST_Game.csv
 #: Localization/StringTables/ST_Game.csv
@@ -439,20 +453,6 @@ msgstr "Opzioni"
 msgctxt "ST_Game,menu.options_title"
 msgid "Options"
 msgstr "Opzioni"
-
-#. Key:	menu.quit_to_menu
-#. SourceLocation:	Localization/StringTables/ST_Game.csv
-#: Localization/StringTables/ST_Game.csv
-msgctxt "ST_Game,menu.quit_to_menu"
-msgid "Quit to Menu"
-msgstr "Torna al menu"
-
-#. Key:	menu.resume
-#. SourceLocation:	Localization/StringTables/ST_Game.csv
-#: Localization/StringTables/ST_Game.csv
-msgctxt "ST_Game,menu.resume"
-msgid "Resume"
-msgstr "Riprendi"
 
 #. Key:	menu.yes
 #. SourceLocation:	Localization/StringTables/ST_Game.csv
@@ -901,4 +901,11 @@ msgstr "Preparazione di {0}."
 msgctxt "ST_Game,worldentry.title"
 msgid "Entering the world"
 msgstr "Ingresso nel mondo"
+
+#. Key:	loading
+#. SourceLocation:	Source/Alverion/Private/Boot/LoadingScreen.cpp(114)
+#: Source/Alverion/Private/Boot/LoadingScreen.cpp(114)
+msgctxt "Alverion,loading"
+msgid "Loading..."
+msgstr ""
 

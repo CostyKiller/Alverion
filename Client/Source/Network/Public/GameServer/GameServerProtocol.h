@@ -202,6 +202,7 @@ namespace Opcode
 	inline constexpr uint32 charInfo = 0x31;
 	inline constexpr uint32 userInfo = 0x32;
 	inline constexpr uint32 stopMove = 0x47;
+	inline constexpr uint32 restartResponse = 0x71;
 	inline constexpr uint32 validateLocation = 0x79;
 
 	// Client to server.
@@ -214,6 +215,7 @@ namespace Opcode
 	inline constexpr uint8 characterSelect = 0x12;
 	inline constexpr uint8 authLogin = 0x2B;
 	inline constexpr uint8 appearing = 0x3A;
+	inline constexpr uint8 requestRestart = 0x57;
 	inline constexpr uint8 validatePosition = 0x59;
 
 	// Extended client packets: this byte, then a uint16 naming the packet.

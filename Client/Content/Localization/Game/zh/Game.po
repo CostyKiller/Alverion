@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Game\n"
-"POT-Creation-Date: 2026-11-07 11:09\n"
-"PO-Revision-Date: 2026-11-07 11:09\n"
+"POT-Creation-Date: 2026-11-07 16:34\n"
+"PO-Revision-Date: 2026-11-07 16:34\n"
 "Language-Team: \n"
 "Language: zh\n"
 "MIME-Version: 1.0\n"
@@ -370,6 +370,20 @@ msgctxt "ST_Game,menu.back"
 msgid "Back"
 msgstr "返回"
 
+#. Key:	menu.characters
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.characters"
+msgid "Characters"
+msgstr "角色"
+
+#. Key:	menu.characters_confirm
+#. SourceLocation:	Localization/StringTables/ST_Game.csv
+#: Localization/StringTables/ST_Game.csv
+msgctxt "ST_Game,menu.characters_confirm"
+msgid "Return to character selection?"
+msgstr "返回角色选择？"
+
 #. Key:	menu.create
 #. SourceLocation:	Localization/StringTables/ST_Game.csv
 #: Localization/StringTables/ST_Game.csv
@@ -439,20 +453,6 @@ msgstr "设置"
 msgctxt "ST_Game,menu.options_title"
 msgid "Options"
 msgstr "设置"
-
-#. Key:	menu.quit_to_menu
-#. SourceLocation:	Localization/StringTables/ST_Game.csv
-#: Localization/StringTables/ST_Game.csv
-msgctxt "ST_Game,menu.quit_to_menu"
-msgid "Quit to Menu"
-msgstr "返回主菜单"
-
-#. Key:	menu.resume
-#. SourceLocation:	Localization/StringTables/ST_Game.csv
-#: Localization/StringTables/ST_Game.csv
-msgctxt "ST_Game,menu.resume"
-msgid "Resume"
-msgstr "继续"
 
 #. Key:	menu.yes
 #. SourceLocation:	Localization/StringTables/ST_Game.csv
@@ -901,4 +901,11 @@ msgstr "正在准备 {0}。"
 msgctxt "ST_Game,worldentry.title"
 msgid "Entering the world"
 msgstr "正在进入世界"
+
+#. Key:	loading
+#. SourceLocation:	Source/Alverion/Private/Boot/LoadingScreen.cpp(114)
+#: Source/Alverion/Private/Boot/LoadingScreen.cpp(114)
+msgctxt "Alverion,loading"
+msgid "Loading..."
+msgstr ""
 

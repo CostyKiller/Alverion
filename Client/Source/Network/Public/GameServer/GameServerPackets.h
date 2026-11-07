@@ -20,4 +20,5 @@
 #include "GameServer/ClientPackets/ValidatePosition.h"
 #include "GameServer/ClientPackets/Appearing.h"
 #include "GameServer/ClientPackets/RequestGotoLobby.h"
+#include "GameServer/ClientPackets/RequestRestart.h"
 #include "GameServer/ClientPackets/Logout.h"

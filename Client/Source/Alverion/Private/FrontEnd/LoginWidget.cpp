@@ -315,6 +315,15 @@ void ULoginWidget::NativeConstruct()
 
 	LocalizedText::applyToTree(WidgetTree, loginTextKeys);
 
+	// Back from the world with the character list already held: straight to it, without the login form or a second automatic login.
+	UServerConnectionSubsystem* network = connectionOf(*this);
+	if ((network != nullptr) && (network->gameServer().step() == Network::EGameServerStep::CharacterSelect))
+	{
+		bindGameServer();
+		showCharacterSelect();
+		return;
+	}
+
 	applyCommandLineCredentials();
 }
 void ULoginWidget::NativeDestruct()
@@ -519,6 +528,22 @@ void ULoginWidget::enterGameServer()
 		return;
 	}
 
+	bindGameServer();
+	if (!network->startGameServer())
+	{
+		setStatus(LocalizedText::get(TEXT("login.could_not_connect")));
+		setBusy(false);
+	}
+}
+
+void ULoginWidget::bindGameServer()
+{
+	UServerConnectionSubsystem* network = connectionOf(*this);
+	if (network == nullptr)
+	{
+		return;
+	}
+
 	network->gameServer().onStepChanged.BindWeakLambda(this, [this](Network::EGameServerStep step)
 	{
 		if (step == Network::EGameServerStep::CharacterSelect)
@@ -545,12 +570,6 @@ void ULoginWidget::enterGameServer()
 		setStatus(LocalizedText::get(TEXT("login.could_not_connect")));
 		setBusy(false);
 	});
-
-	if (!network->startGameServer())
-	{
-		setStatus(LocalizedText::get(TEXT("login.could_not_connect")));
-		setBusy(false);
-	}
 }
 
 void ULoginWidget::showCharacterSelect()

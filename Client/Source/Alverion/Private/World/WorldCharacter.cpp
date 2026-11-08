@@ -16,6 +16,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "World/SceneSetup.h"
 #include "World/Water.h"
 #include "ServerConnectionSubsystem.h"
@@ -116,6 +117,14 @@ void AWorldCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	SceneSetup::paintPlaceholderBody(*_body, ownBodyColor);
+
+	// Underwater haze for whatever part of the view starts below the sea, so a camera at the waterline splits along it.
+	UMaterialInterface* underwater = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/Environment/Continent/PP_Underwater.PP_Underwater"));
+	if (underwater != nullptr)
+	{
+		_underwater = UMaterialInstanceDynamic::Create(underwater, this);
+		_camera->PostProcessSettings.AddBlendable(_underwater, 0.0f);
+	}
 
 	// Held in the air until the ground streams in, or it would fall through the sea before the first section loads.
 	GetCharacterMovement()->DisableMovement();
@@ -458,6 +467,20 @@ void AWorldCharacter::Tick(float deltaSeconds)
 	if ((settings != nullptr) && (_camera->FieldOfView != settings->getFieldOfView()))
 	{
 		_camera->SetFieldOfView(settings->getFieldOfView());
+	}
+
+	// The haze pass runs only with the camera near the water, since higher up no part of the view can start below it.
+	if (_underwater != nullptr)
+	{
+		const float cameraHeight = static_cast<float>(_camera->GetComponentLocation().Z - Water::surfaceCm);
+		_underwater->SetScalarParameterValue(TEXT("CameraHeight"), cameraHeight);
+		for (FWeightedBlendable& blendable : _camera->PostProcessSettings.WeightedBlendables.Array)
+		{
+			if (blendable.Object == _underwater)
+			{
+				blendable.Weight = (cameraHeight < 50.0f) ? 1.0f : 0.0f;
+			}
+		}
 	}
 
 	_arm->TargetArmLength = FMath::FInterpTo(_arm->TargetArmLength, _firstPerson ? 0.0f : _cameraDistanceCm, deltaSeconds, cameraZoomRate);

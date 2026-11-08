@@ -10,6 +10,7 @@ class APlayerController;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class UMaterialInstanceDynamic;
 class USceneCaptureComponent2D;
 class USpringArmComponent;
 class UStaticMeshComponent;
@@ -85,6 +86,10 @@ private:
 	/** Made on the first character sheet and kept, filming only while a sheet is open. */
 	UPROPERTY()
 	TObjectPtr<USceneCaptureComponent2D> _portraitCapture;
+
+	/** The underwater haze on the camera, told the camera's height above the sea every frame. */
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> _underwater;
 
 	/** Mouse look and wheel zoom only. The movement keys live in the rebindable context the input bootstrap builds from the action assets. */
 	UPROPERTY()

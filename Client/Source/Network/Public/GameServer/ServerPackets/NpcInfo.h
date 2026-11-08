@@ -21,6 +21,7 @@ inline bool readNpcInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 	int32 z = 0;
 	int32 heading = 0;
 	int32 runSpeed = 0;
+	int32 walkSpeed = 0;
 	int32 swimSpeed = 0;
 	double moveMultiplier = 1.0;
 
@@ -36,9 +37,7 @@ inline bool readNpcInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 	buffer.skip(12);
 
 	buffer.readInt32(runSpeed);
-
-	// Walk.
-	buffer.skip(4);
+	buffer.readInt32(walkSpeed);
 
 	buffer.readInt32(swimSpeed);
 
@@ -47,8 +46,14 @@ inline bool readNpcInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 
 	buffer.readDouble(moveMultiplier);
 
-	// Attack speed multiplier, collision radius and height, three equipment ids, five flags, the client name string id.
-	buffer.skip(24 + 12 + 5 + 4);
+	// Attack speed multiplier, collision radius and height, three equipment ids, and the flag that shows the name.
+	buffer.skip(24 + 12 + 1);
+
+	uint8 running = 0;
+	buffer.readUInt8(running);
+
+	// Combat, dead, summoned, and the client name string id.
+	buffer.skip(3 + 4);
 
 	buffer.readString(spawn.name);
 
@@ -64,7 +69,9 @@ inline bool readNpcInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 	spawn.kind = readCreatureKind(body);
 	spawn.location = toLocation(x, y, z);
 	spawn.yaw = headingToYaw(heading);
+	spawn.running = (running != 0);
 	spawn.runSpeed = static_cast<float>(toCentimetres(runSpeed) * moveMultiplier);
+	spawn.walkSpeed = static_cast<float>(toCentimetres(walkSpeed) * moveMultiplier);
 	spawn.swimSpeed = static_cast<float>(toCentimetres(swimSpeed) * moveMultiplier);
 
 	if (spawn.name.IsEmpty())

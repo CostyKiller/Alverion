@@ -127,6 +127,7 @@ void AWorldGameMode::BeginPlay()
 	flow.onSpawned.BindUObject(this, &AWorldGameMode::spawned);
 	flow.onDespawned.BindUObject(this, &AWorldGameMode::despawned);
 	flow.onMoved.BindUObject(this, &AWorldGameMode::moved);
+	flow.onMoveTypeChanged.BindUObject(this, &AWorldGameMode::moveTypeChanged);
 
 	// A lost link goes back to the login screen, which is what the front end shows for anything but a character list.
 	link->gameServer().onFailed.BindWeakLambda(this, [this](const FString& reason)
@@ -146,6 +147,7 @@ void AWorldGameMode::EndPlay(const EEndPlayReason::Type reason)
 		flow.onSpawned.Unbind();
 		flow.onDespawned.Unbind();
 		flow.onMoved.Unbind();
+		flow.onMoveTypeChanged.Unbind();
 		flow.end();
 		link->gameServer().onFailed.Unbind();
 		link->gameServer().onStepChanged.Unbind();
@@ -246,6 +248,15 @@ void AWorldGameMode::despawned(uint32 objectId)
 	if (_proxies.RemoveAndCopyValue(objectId, proxy) && (proxy != nullptr))
 	{
 		proxy->Destroy();
+	}
+}
+
+void AWorldGameMode::moveTypeChanged(uint32 objectId, bool running)
+{
+	TObjectPtr<AProxyCharacter>* proxy = _proxies.Find(objectId);
+	if ((proxy != nullptr) && (*proxy != nullptr))
+	{
+		(*proxy)->setRunning(running);
 	}
 }
 

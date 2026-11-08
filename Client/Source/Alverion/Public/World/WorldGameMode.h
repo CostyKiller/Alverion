@@ -40,6 +40,7 @@ private:
 	void spawned(const Network::FCharacterSpawn& spawn);
 	void despawned(uint32 objectId);
 	void moved(const Network::FObjectPlace& place, Network::EMoveKind kind);
+	void moveTypeChanged(uint32 objectId, bool running);
 	UServerConnectionSubsystem* connection() const;
 
 	UPROPERTY()

@@ -39,6 +39,9 @@ bool FMonsterAppearanceTest::RunTest(const FString& parameters)
 	spawn.attackable = true;
 	spawn.runSpeed = 160.0f;
 	proxy->setup(spawn);
+
+	// Bodies stand on the frame after they are asked for.
+	world->Tick(LEVELTICK_All, 1.0f / 60.0f);
 	TArray<AActor*> bodies;
 	proxy->GetAttachedActors(bodies);
 	if (!TestEqual(TEXT("A monster has one body"), bodies.Num(), 1))

@@ -48,6 +48,7 @@ namespace Appearance
 	/**
 	 * Stands the MetaHuman an appearance describes on a host whose feet are feetOffset from its root, facing the host's forward, and dresses it.
 	 * The body has no collision of its own, so it never blocks the host it rides on. The callback gets it once it stands, or null when the MetaHuman assets are missing.
+	 * Bodies stand one per frame of the host's world, never in this call, so a crowd arriving together fills in over a few frames instead of freezing one.
 	 * An authored body uses its assembled Blueprint and keeps its own materials and grooms.
 	 * The host owns it from then on and destroys it with itself, since an attached actor outlives its parent otherwise.
 	 */

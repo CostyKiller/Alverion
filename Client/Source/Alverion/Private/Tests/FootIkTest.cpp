@@ -56,6 +56,9 @@ bool FFootIkTest::RunTest(const FString& parameters)
 	spawn.appearance = Network::FAppearance().pack();
 	spawn.location = FVector(0.0, 0.0, 10.0);
 	proxy->setup(spawn);
+
+	// Bodies stand on the frame after they are asked for.
+	world->Tick(LEVELTICK_All, 1.0f / 60.0f);
 	TArray<AActor*> bodies;
 	proxy->GetAttachedActors(bodies);
 	if (!TestEqual(TEXT("The character has one body"), bodies.Num(), 1))

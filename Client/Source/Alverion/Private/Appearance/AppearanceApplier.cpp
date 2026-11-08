@@ -13,6 +13,7 @@
 #include "GroomComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/PackageName.h"
+#include "TimerManager.h"
 
 namespace
 {
@@ -514,6 +515,79 @@ namespace
 			whenReady(FindObject<UClass>(nullptr, *path));
 		}));
 	}
+
+	/** A body waiting for its frame: the world it stands in and the spawn that stands it. */
+	struct FQueuedBody
+	{
+		TWeakObjectPtr<UWorld> world;
+		TFunction<void()> stand;
+	};
+
+	/**
+	 * One body stands per frame.
+	 * A MetaHuman's construction and its two meshes cost about twenty milliseconds of game thread, and the server introduces a whole crowd in one burst, which stood at once froze the frame for a fifth of a second.
+	 */
+	TArray<FQueuedBody> queuedBodies;
+
+	bool hasQueuedBody(const TWeakObjectPtr<UWorld>& world)
+	{
+		for (const FQueuedBody& queued : queuedBodies)
+		{
+			if (queued.world == world)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void standQueuedBody(TWeakObjectPtr<UWorld> world);
+
+	/** A timer set for the next tick fires on the next frame even when it is set while timers are firing, so rescheduling from the callback paces one per frame. */
+	void scheduleQueuedBody(UWorld& world)
+	{
+		world.GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateStatic(&standQueuedBody, TWeakObjectPtr<UWorld>(&world)));
+	}
+
+	void standQueuedBody(TWeakObjectPtr<UWorld> world)
+	{
+		for (int32 index = 0; index < queuedBodies.Num(); index++)
+		{
+			if (queuedBodies[index].world == world)
+			{
+				const TFunction<void()> stand = MoveTemp(queuedBodies[index].stand);
+				queuedBodies.RemoveAt(index);
+				stand();
+				break;
+			}
+		}
+
+		if (world.IsValid() && hasQueuedBody(world))
+		{
+			scheduleQueuedBody(*world.Get());
+		}
+	}
+
+	void queueBody(UWorld& world, TFunction<void()> stand)
+	{
+		// A world that ended took its timer with it, so whatever it still had queued goes too.
+		for (int32 index = queuedBodies.Num() - 1; index >= 0; index--)
+		{
+			if (!queuedBodies[index].world.IsValid())
+			{
+				queuedBodies.RemoveAt(index);
+			}
+		}
+
+		const TWeakObjectPtr<UWorld> weakWorld(&world);
+		const bool idle = !hasQueuedBody(weakWorld);
+		queuedBodies.Add({ weakWorld, MoveTemp(stand) });
+		if (idle)
+		{
+			scheduleQueuedBody(world);
+		}
+	}
 }
 
 namespace Appearance
@@ -632,26 +706,45 @@ namespace Appearance
 				return;
 			}
 
-			FActorSpawnParameters parameters;
-			parameters.Owner = hostActor;
-			parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AActor* body = world->SpawnActor<AActor>(bodyClass, hostActor->GetActorTransform(), parameters);
-			if (body == nullptr)
+			const TWeakObjectPtr<UClass> weakClass(bodyClass);
+			queueBody(*world, [weakHost, weakClass, appearance, feetOffset, whenAttached, useAuthoredBody]()
 			{
-				whenAttached(nullptr);
-				return;
-			}
+				// The host can leave, and the class be collected, while the body waits for its frame.
+				AActor* queuedHost = weakHost.Get();
+				if (queuedHost == nullptr)
+				{
+					return;
+				}
 
-			body->SetActorEnableCollision(false);
-			body->AttachToActor(hostActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			body->SetActorRelativeLocation(feetOffset);
-			body->SetActorRelativeRotation(FRotator(0.0f, bodyYawOffset, 0.0f));
-			if (!useAuthoredBody)
-			{
-				apply(*body, appearance);
-			}
+				UClass* queuedClass = weakClass.Get();
+				UWorld* queuedWorld = queuedHost->GetWorld();
+				if ((queuedClass == nullptr) || (queuedWorld == nullptr))
+				{
+					whenAttached(nullptr);
+					return;
+				}
 
-			whenAttached(body);
+				FActorSpawnParameters parameters;
+				parameters.Owner = queuedHost;
+				parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				AActor* body = queuedWorld->SpawnActor<AActor>(queuedClass, queuedHost->GetActorTransform(), parameters);
+				if (body == nullptr)
+				{
+					whenAttached(nullptr);
+					return;
+				}
+
+				body->SetActorEnableCollision(false);
+				body->AttachToActor(queuedHost, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				body->SetActorRelativeLocation(feetOffset);
+				body->SetActorRelativeRotation(FRotator(0.0f, bodyYawOffset, 0.0f));
+				if (!useAuthoredBody)
+				{
+					apply(*body, appearance);
+				}
+
+				whenAttached(body);
+			});
 		});
 	}
 }

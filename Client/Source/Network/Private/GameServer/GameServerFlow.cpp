@@ -135,6 +135,11 @@ bool FGameServerFlow::enterWorld()
 	GameServer::writeEnterWorld(buffer);
 	send(buffer);
 
+	// Straight after EnterWorld, as the stock client does, so a server that kicks without it keeps the player.
+	FWriteBuffer hardware;
+	GameServer::writeRequestHardWareInfo(hardware);
+	send(hardware);
+
 	setStep(EGameServerStep::InWorld);
 	return true;
 }

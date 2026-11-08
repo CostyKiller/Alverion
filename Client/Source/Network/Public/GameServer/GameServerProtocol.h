@@ -272,6 +272,7 @@ namespace Opcode
 	// Extended client packets: this byte, then a uint16 naming the packet.
 	inline constexpr uint8 extended = 0xD0;
 	inline constexpr int16 requestGotoLobby = 0x36;
+	inline constexpr int16 requestHardWareInfo = 0x96;
 }
 }
 }

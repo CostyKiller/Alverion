@@ -189,6 +189,13 @@ struct NETWORK_API FUserInfo
 	int32 runSpeed = 0;
 };
 
+/** One StatusUpdate: some figures of one creature that changed, each as an attribute id and its new value. */
+struct NETWORK_API FStatusUpdate
+{
+	uint32 objectId = 0;
+	TArray<TPair<int32, int32>> attributes;
+};
+
 /** Somebody or something coming into view: a player from CharInfo, or a monster or townsperson from NpcInfo. */
 struct NETWORK_API FCharacterSpawn
 {
@@ -243,6 +250,7 @@ namespace Opcode
 	inline constexpr uint32 npcInfo = 0x0C;
 	inline constexpr uint32 characterCreateSuccess = 0x0F;
 	inline constexpr uint32 characterCreateFail = 0x10;
+	inline constexpr uint32 statusUpdate = 0x18;
 	inline constexpr uint32 characterDeleteSuccess = 0x1D;
 	inline constexpr uint32 characterDeleteFail = 0x1E;
 	inline constexpr uint32 teleportToLocation = 0x22;

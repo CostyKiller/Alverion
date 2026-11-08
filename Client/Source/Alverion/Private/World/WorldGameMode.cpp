@@ -10,6 +10,7 @@
 #include "UI/ArrivalCover.h"
 #include "UI/ChatWidget.h"
 #include "UI/RootLayout.h"
+#include "UI/StatusBarsWidget.h"
 #include "ServerConnectionSubsystem.h"
 #include "World/WorldCharacter.h"
 
@@ -67,6 +68,12 @@ void AWorldGameMode::BeginPlay()
 	if (chat != nullptr)
 	{
 		chat->AddToViewport(-1);
+	}
+
+	UStatusBarsWidget* statusBars = CreateWidget<UStatusBarsWidget>(world, UStatusBarsWidget::StaticClass());
+	if (statusBars != nullptr)
+	{
+		statusBars->AddToViewport(-1);
 	}
 
 	// Black for a second while the world draws, then a fade.

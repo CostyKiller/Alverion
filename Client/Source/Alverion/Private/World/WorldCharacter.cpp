@@ -508,11 +508,19 @@ void AWorldCharacter::swimOrStand(float deltaSeconds)
 	const bool deep = Water::tooDeep(found ? hit.ImpactPoint.Z : (Water::surfaceCm - settleSearchCm), _swimming);
 
 	UCharacterMovementComponent* movement = GetCharacterMovement();
+	// Wading out stands the body on the bottom at once. It floats at the swimmer line, a metre above it, and falling that far would play the jump.
 	if (deep != _swimming)
 	{
 		_swimming = deep;
 		_surfacing = deep;
-		movement->SetMovementMode(deep ? MOVE_Flying : MOVE_Falling);
+		if (deep)
+		{
+			movement->SetMovementMode(MOVE_Flying);
+		}
+		else if (!settleOnGround())
+		{
+			movement->SetMovementMode(MOVE_Falling);
+		}
 	}
 
 	if (!_swimming)
@@ -521,12 +529,13 @@ void AWorldCharacter::swimOrStand(float deltaSeconds)
 	}
 
 	// The capsule's middle is half its height above the feet, which float no higher than the water's swimmer line.
-	// Wading in from the beach floats the swimmer up to it once; after that it holds whatever depth it swims to, and that line is as high as it goes.
+	// Wading in from the beach puts the swimmer on it at once, since the swim clip holds the head lower than a standing body and rising slowly would dip it under first; dropping in from above glides down to it.
+	// After that it holds whatever depth it swims to, and that line is as high as it goes.
 	const double floating = Water::swimmerFeetCm + capsuleHalfHeightCm;
 	double height = FMath::Min(here.Z, floating);
 	if (_surfacing)
 	{
-		height = FMath::FInterpTo(here.Z, floating, static_cast<double>(deltaSeconds), static_cast<double>(floatRate));
+		height = (here.Z < floating) ? floating : FMath::FInterpTo(here.Z, floating, static_cast<double>(deltaSeconds), static_cast<double>(floatRate));
 		_surfacing = (FMath::Abs(floating - height) > 2.0) && (movement->Velocity.Z >= 0.0);
 	}
 

@@ -2,7 +2,7 @@
 
 #include "Appearance.h"
 #include "Appearance/AppearanceChoices.h"
-#include "Animation/AnimSingleNodeInstance.h"
+#include "Appearance/FootIkAnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
@@ -539,13 +539,25 @@ namespace Appearance
 			return;
 		}
 
-		const UAnimSingleNodeInstance* player = mesh->GetSingleNodeInstance();
-		if ((mesh->GetAnimationMode() == EAnimationMode::AnimationSingleNode) && (player != nullptr) && (player->GetAnimationAsset() == clip))
+		UFootIkAnimInstance* player = Cast<UFootIkAnimInstance>(mesh->GetAnimInstance());
+		if (player == nullptr)
 		{
-			return;
+			mesh->SetAnimInstanceClass(UFootIkAnimInstance::StaticClass());
+			player = Cast<UFootIkAnimInstance>(mesh->GetAnimInstance());
+			if (player == nullptr)
+			{
+				return;
+			}
 		}
 
-		mesh->PlayAnimation(clip, true);
+		// Standing feet find the ground. A running stride on a slope puts one foot far above the other, and bending to both folds the front leg, so running keeps the clip.
+		// So do falling and swimming, and the goblin's clips already meet the ground it tilts to.
+		player->grounded = (motion == EMotion::Idle);
+		if (player->GetAnimationAsset() != clip)
+		{
+			player->SetAnimationAsset(clip, true);
+			player->SetPlaying(true);
+		}
 	}
 
 	void apply(AActor& avatar, const Network::FAppearance& appearance)

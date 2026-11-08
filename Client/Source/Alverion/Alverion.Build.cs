@@ -7,6 +7,6 @@ public class Alverion : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "CommonUI", "CommonInput", "GameplayTags" });
-		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "Network", "ApplicationCore", "RHI", "HairStrandsCore", "MoviePlayer" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore", "Network", "ApplicationCore", "RHI", "HairStrandsCore", "MoviePlayer", "AnimationCore" });
 	}
 }

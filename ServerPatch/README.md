@@ -15,7 +15,7 @@ sees.
   appended when no listed character has a block, so stock characters produce stock packets.
 - Deleting a character deletes its block.
 
-Four upstream files change by 30 lines in total, and one class and one SQL file are added:
+Four upstream files change by 26 added lines in total, and one class and one SQL file are added:
 
 | File | Change |
 | --- | --- |
@@ -28,11 +28,19 @@ Four upstream files change by 30 lines in total, and one class and one SQL file 
 
 ## Applying it
 
-From the root of the L2J Mobius server project:
+The same patch applies to a standalone High Five server project and to the High Five folder of the
+L2J Mobius repository. From the root of a standalone project:
 
 ```
-git apply --check C:/Alverion/ServerPatch/alverion-appearance.patch
-git apply C:/Alverion/ServerPatch/alverion-appearance.patch
+git apply -p0 --check C:/Alverion/ServerPatch/alverion-appearance.patch
+git apply -p0 C:/Alverion/ServerPatch/alverion-appearance.patch
+```
+
+From the root of the L2J Mobius repository, which keeps every chronicle in one tree:
+
+```
+git apply -p0 --check --directory=L2J_Mobius_CT_2.6_HighFive C:/Alverion/ServerPatch/alverion-appearance.patch
+git apply -p0 --directory=L2J_Mobius_CT_2.6_HighFive C:/Alverion/ServerPatch/alverion-appearance.patch
 ```
 
 Then rebuild the server and run `dist/db_installer/sql/game/character_appearance.sql` against the
@@ -41,17 +49,24 @@ game database (the database installer picks it up with the other game tables).
 ## Running it without applying it
 
 The patched classes can be compiled on their own and put ahead of the stock ones, which is how it
-is tested here without touching the workspace:
+is tested here without touching the server. Copy the four upstream files into an empty folder,
+`<Folder>`, at their `java/...` paths and run `git apply -p0` on the patch there. Then compile from
+`<Folder>` and start the server with its classes first:
 
 ```
-javac -encoding UTF-8 -nowarn -proc:none -cp "<Server>/bin;<Server>/dist/libs/*" -d build/classes <the five .java files>
-java -cp "build/classes;<Server>/bin;<Server>/dist/libs/*" org.l2jmobius.gameserver.GameServer
+javac -encoding UTF-8 -nowarn -proc:none -cp "<Server>/bin;<Server>/dist/libs/*" -d classes <the five .java files>
+java -cp "<Folder>/classes;<Server>/bin;<Server>/dist/libs/*" org.l2jmobius.gameserver.GameServer
 ```
 
 The second command runs from `<Server>/dist/game`, with the JVM options in its `java.cfg`.
 
 ## Layout of this repository
 
-The first commit holds the four upstream files untouched; the second holds this extension. The
-patch file is the diff between them, so it can be regenerated with
-`git diff <first commit> HEAD -- java dist > alverion-appearance.patch`.
+No server files are kept here, only the patch, which carries the new class and the SQL file
+too. It is the one copy of the change and is edited directly. It adds no imports and names the
+new class in full instead, and its context lines are ones both kinds of High Five project share,
+so one patch fits either.
+
+## License
+
+MIT. The new class carries the MIT notice and names Mobius as its author.

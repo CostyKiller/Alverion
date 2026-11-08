@@ -280,8 +280,13 @@ namespace
 
 	void wearLoadedGroom(UGroomComponent& groom, UGroomAsset& groomAsset, UGroomBindingAsset& binding)
 	{
+		// Simulated strands trail to the ground behind a moving body, so the hair rides the head as bound instead.
+		const bool simulated = !groom.SimulationSettings.bOverrideSettings || groom.SimulationSettings.SolverSettings.bEnableSimulation;
+		groom.SimulationSettings.bOverrideSettings = true;
+		groom.SimulationSettings.SolverSettings.bEnableSimulation = false;
+
 		// Reassigning rebuilds the groom, and both are set in one call because two calls rebuild twice, the first time on the wrong head.
-		if ((groom.GroomAsset != &groomAsset) || (groom.BindingAsset != &binding))
+		if (simulated || (groom.GroomAsset != &groomAsset) || (groom.BindingAsset != &binding))
 		{
 			groom.SetGroomAsset(&groomAsset, &binding, true);
 		}

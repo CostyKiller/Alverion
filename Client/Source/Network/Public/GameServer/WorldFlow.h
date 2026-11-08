@@ -18,6 +18,7 @@ DECLARE_DELEGATE_OneParam(FCharacterDespawned, uint32);
 DECLARE_DELEGATE_TwoParams(FCharacterMoved, const FObjectPlace&, EMoveKind);
 DECLARE_DELEGATE_TwoParams(FLocalCorrected, const FObjectPlace&, bool);
 DECLARE_DELEGATE_OneParam(FChatReceived, const FChatMessage&);
+DECLARE_DELEGATE_OneParam(FNpcHtmlReceived, const FNpcHtml&);
 
 /**
  * The world, from EnterWorld on.
@@ -51,13 +52,31 @@ public:
 	/** A line of chat heard, this client's own included, since the server says it back to the speaker too. */
 	FChatReceived onChat;
 
+	/** A dialog page, whether it answers talking to a townsperson or a link in the dialog already open. */
+	FNpcHtmlReceived onNpcHtml;
+
 	/** Says a line on a channel. Empty lines are not sent, and nothing goes out outside the world. */
 	bool say(const FString& text, EChatChannel channel);
+
+	/**
+	 * Opens the dialog of a townsperson in one go.
+	 * The server selects an object on the first click and deals with it on the second, so this clicks once when something else is selected, and clicks again when the server confirms the selection.
+	 * The second click waits out the server's flood protection, which drops clicks that come too close together.
+	 * Nothing goes out outside the world, and a selection the server never confirms is given up on.
+	 */
+	bool talkTo(uint32 objectId);
+
+	/** Sends the command of a link or button in the dialog on screen. */
+	bool bypass(const FString& command);
+
+	/** Asks for the page a link in the dialog on screen names. */
+	bool link(const FString& file);
 
 private:
 	void handlePacket(uint32 opcode, TArrayView<const uint8> body);
 	void sendMove(const FVector& target);
 	void sendValidate();
+	void sendAction(uint32 objectId);
 
 	FGameServerFlow* _gameServer = nullptr;
 	uint32 _localObjectId = 0;
@@ -73,5 +92,14 @@ private:
 
 	float _sinceMoveSent = 0.0f;
 	float _sinceValidateSent = 0.0f;
+
+	/** What the server says this client has selected, from MyTargetSelected and TargetUnselected. Zero for nothing. */
+	uint32 _targetObjectId = 0;
+
+	/** The townsperson being talked to, until the second click goes out or the wait runs out. Zero when there is none. */
+	uint32 _talkObjectId = 0;
+	bool _talkSelected = false;
+	float _talkSeconds = 0.0f;
+	float _sinceActionSent = 0.0f;
 };
 }

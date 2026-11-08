@@ -21,6 +21,12 @@ namespace
 
 	// A correction smaller than this is the server repeating where this client already said it was.
 	constexpr double correctionToleranceCm = 150.0;
+
+	// The server drops a click that follows another within FloodProtectorPlayerActionInterval, one tick of a tenth of a second on High Five, so the second click of a talk keeps well clear of the first.
+	constexpr float actionGapSeconds = 0.35f;
+
+	// A selection the server has not confirmed by now is not coming.
+	constexpr float talkGiveUpSeconds = 2.0f;
 }
 
 FWorldFlow::~FWorldFlow()
@@ -37,6 +43,11 @@ bool FWorldFlow::begin(FGameServerFlow& gameServer)
 	_moving = false;
 	_sinceMoveSent = 0.0f;
 	_sinceValidateSent = 0.0f;
+	_targetObjectId = 0;
+	_talkObjectId = 0;
+	_talkSelected = false;
+	_talkSeconds = 0.0f;
+	_sinceActionSent = actionGapSeconds;
 
 	_gameServer->onWorldPacket = FPacketHandler::CreateRaw(this, &FWorldFlow::handlePacket);
 	return _gameServer->enterWorld();
@@ -74,6 +85,60 @@ bool FWorldFlow::say(const FString& text, EChatChannel channel)
 	return true;
 }
 
+bool FWorldFlow::talkTo(uint32 objectId)
+{
+	if ((_gameServer == nullptr) || (_gameServer->session() == nullptr) || (_gameServer->step() != EGameServerStep::InWorld) || (objectId == 0))
+	{
+		return false;
+	}
+
+	_talkObjectId = objectId;
+	_talkSeconds = 0.0f;
+
+	// An object that is selected already needs only the second click, which tick sends once the gap since the last click has passed.
+	_talkSelected = (_targetObjectId == objectId);
+	if (!_talkSelected)
+	{
+		sendAction(objectId);
+	}
+
+	return true;
+}
+
+bool FWorldFlow::bypass(const FString& command)
+{
+	if ((_gameServer == nullptr) || (_gameServer->session() == nullptr) || command.IsEmpty())
+	{
+		return false;
+	}
+
+	FWriteBuffer buffer;
+	if (!GameServer::writeRequestBypassToServer(buffer, command))
+	{
+		return false;
+	}
+
+	_gameServer->session()->send(buffer.bytes());
+	return true;
+}
+
+bool FWorldFlow::link(const FString& file)
+{
+	if ((_gameServer == nullptr) || (_gameServer->session() == nullptr) || file.IsEmpty())
+	{
+		return false;
+	}
+
+	FWriteBuffer buffer;
+	if (!GameServer::writeRequestLinkHtml(buffer, file))
+	{
+		return false;
+	}
+
+	_gameServer->session()->send(buffer.bytes());
+	return true;
+}
+
 void FWorldFlow::setLocalState(const FVector& location, float yaw, bool wantsToMove)
 {
 	_location = location;
@@ -90,7 +155,27 @@ void FWorldFlow::setLocalState(const FVector& location, float yaw, bool wantsToM
 void FWorldFlow::tick(float deltaSeconds)
 {
 	// Nothing goes out while a restart is pending, since a server that agrees has already taken the character out of the world.
-	if ((_gameServer == nullptr) || !_hasLocalState || (deltaSeconds <= 0.0f) || (_gameServer->step() != EGameServerStep::InWorld))
+	if ((_gameServer == nullptr) || (deltaSeconds <= 0.0f) || (_gameServer->step() != EGameServerStep::InWorld))
+	{
+		return;
+	}
+
+	_sinceActionSent += deltaSeconds;
+	if (_talkObjectId != 0)
+	{
+		_talkSeconds += deltaSeconds;
+		if (_talkSelected && (_sinceActionSent >= actionGapSeconds))
+		{
+			sendAction(_talkObjectId);
+			_talkObjectId = 0;
+		}
+		else if (_talkSeconds >= talkGiveUpSeconds)
+		{
+			_talkObjectId = 0;
+		}
+	}
+
+	if (!_hasLocalState)
 	{
 		return;
 	}
@@ -148,6 +233,14 @@ void FWorldFlow::sendValidate()
 	_sinceValidateSent = 0.0f;
 }
 
+void FWorldFlow::sendAction(uint32 objectId)
+{
+	FWriteBuffer buffer;
+	GameServer::writeAction(buffer, objectId, _location);
+	_gameServer->session()->send(buffer.bytes());
+	_sinceActionSent = 0.0f;
+}
+
 void FWorldFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 {
 	FReadBuffer buffer(body);
@@ -186,6 +279,37 @@ void FWorldFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 
 			return;
 		}
+		case GameServer::Opcode::npcHtmlMessage:
+		{
+			FNpcHtml message;
+			if (GameServer::readNpcHtmlMessage(buffer, message))
+			{
+				onNpcHtml.ExecuteIfBound(message);
+			}
+
+			return;
+		}
+		case GameServer::Opcode::myTargetSelected:
+		{
+			uint32 objectId = 0;
+			if (GameServer::readMyTargetSelected(buffer, objectId))
+			{
+				_targetObjectId = objectId;
+				_talkSelected = _talkSelected || (objectId == _talkObjectId);
+			}
+
+			return;
+		}
+		case GameServer::Opcode::targetUnselected:
+		{
+			uint32 objectId = 0;
+			if (GameServer::readTargetUnselected(buffer, objectId) && (objectId == _targetObjectId))
+			{
+				_targetObjectId = 0;
+			}
+
+			return;
+		}
 		case GameServer::Opcode::charInfo:
 		{
 			FCharacterSpawn spawn;
@@ -199,7 +323,7 @@ void FWorldFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 		case GameServer::Opcode::npcInfo:
 		{
 			FCharacterSpawn spawn;
-			if (GameServer::readNpcInfo(buffer, spawn))
+			if (GameServer::readNpcInfo(body, spawn))
 			{
 				onSpawned.ExecuteIfBound(spawn);
 			}

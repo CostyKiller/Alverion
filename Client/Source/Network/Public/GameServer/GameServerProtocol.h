@@ -196,6 +196,14 @@ struct NETWORK_API FStatusUpdate
 	TArray<TPair<int32, int32>> attributes;
 };
 
+/** What the creature kind trailer says a creature is, numbered as the server patch numbers it. */
+enum class ECreatureKind : uint8
+{
+	Normal = 0,
+	Summon = 1,
+	Trap = 2
+};
+
 /** Somebody or something coming into view: a player from CharInfo, or a monster or townsperson from NpcInfo. */
 struct NETWORK_API FCharacterSpawn
 {
@@ -213,12 +221,25 @@ struct NETWORK_API FCharacterSpawn
 	int32 npcId = 0;
 	bool attackable = false;
 
+	/** Summons and traps come in the same packet as townspeople, and only the creature kind patch tells them apart. */
+	ECreatureKind kind = ECreatureKind::Normal;
+
 	bool female = false;
 	int32 race = 0;
 	int32 hairStyle = 0;
 	int32 hairColor = 0;
 	int32 face = 0;
 	TArray<uint8> appearance;
+};
+
+/** One dialog page as NpcHtmlMessage carries it: the text is HTML of the kind the server's data files hold. */
+struct NETWORK_API FNpcHtml
+{
+	uint32 npcObjectId = 0;
+	FString html;
+
+	/** Zero for a townsperson's dialog; the server's own windows, such as the admin pages, name an item. */
+	int32 itemId = 0;
 };
 
 /** An object id and a place, which is all MoveToLocation, StopMove, ValidateLocation and TeleportToLocation carry. */
@@ -237,6 +258,9 @@ inline constexpr int32 protocolRevision = 273;
 /** The paperdoll slots CharSelectionInfo and CharInfo list, one int each. */
 inline constexpr int32 paperdollSlots = 26;
 
+/** Marks the creature kind trailer, as the bytes 'A' 'L' 'V' 'K'. */
+inline constexpr int32 creatureKindMagic = 0x4B564C41;
+
 /** Marks the appearance extension, as the bytes 'A' 'L' 'V' '1'. A server without the patch never sends it and ignores it when sent. */
 inline constexpr int32 appearanceMagic = 0x31564C41;
 
@@ -251,9 +275,11 @@ namespace Opcode
 	inline constexpr uint32 characterCreateSuccess = 0x0F;
 	inline constexpr uint32 characterCreateFail = 0x10;
 	inline constexpr uint32 statusUpdate = 0x18;
+	inline constexpr uint32 npcHtmlMessage = 0x19;
 	inline constexpr uint32 characterDeleteSuccess = 0x1D;
 	inline constexpr uint32 characterDeleteFail = 0x1E;
 	inline constexpr uint32 teleportToLocation = 0x22;
+	inline constexpr uint32 targetUnselected = 0x24;
 	inline constexpr uint32 versionCheck = 0x2E;
 	inline constexpr uint32 moveToLocation = 0x2F;
 	inline constexpr uint32 charInfo = 0x31;
@@ -262,6 +288,7 @@ namespace Opcode
 	inline constexpr uint32 creatureSay = 0x4A;
 	inline constexpr uint32 restartResponse = 0x71;
 	inline constexpr uint32 validateLocation = 0x79;
+	inline constexpr uint32 myTargetSelected = 0xB9;
 
 	// Client to server.
 	inline constexpr uint8 logout = 0x00;
@@ -271,6 +298,9 @@ namespace Opcode
 	inline constexpr uint8 moveBackwardToLocation = 0x0F;
 	inline constexpr uint8 enterWorld = 0x11;
 	inline constexpr uint8 characterSelect = 0x12;
+	inline constexpr uint8 action = 0x1F;
+	inline constexpr uint8 requestLinkHtml = 0x22;
+	inline constexpr uint8 requestBypassToServer = 0x23;
 	inline constexpr uint8 authLogin = 0x2B;
 	inline constexpr uint8 appearing = 0x3A;
 	inline constexpr uint8 say2 = 0x49;

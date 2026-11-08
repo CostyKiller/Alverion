@@ -17,6 +17,7 @@
 #include "GameServer/ClientPackets/CharacterDelete.h"
 #include "GameServer/ClientPackets/CharacterSelect.h"
 #include "GameServer/ClientPackets/EnterWorld.h"
+#include "GameServer/ClientPackets/RequestHardWareInfo.h"
 #include "GameServer/ClientPackets/MoveBackwardToLocation.h"
 #include "GameServer/ClientPackets/ValidatePosition.h"
 #include "GameServer/ClientPackets/Appearing.h"

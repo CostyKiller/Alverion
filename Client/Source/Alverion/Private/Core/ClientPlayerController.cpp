@@ -12,9 +12,12 @@
 #include "UI/ChatLineWidget.h"
 #include "UI/InventoryWidget.h"
 #include "UI/MapWidget.h"
+#include "UI/NpcDialogWidget.h"
 #include "InputAction.h"
 #include "Core/InputBootstrapSubsystem.h"
+#include "ServerConnectionSubsystem.h"
 #include "UI/UISubsystem.h"
+#include "World/WorldGameMode.h"
 #include "Widgets/CommonActivatableWidgetContainer.h"
 
 namespace
@@ -23,6 +26,65 @@ namespace
 	const TCHAR* const inventoryActionPath = TEXT("/Game/Input/Actions/IA_Inventory.IA_Inventory");
 	const TCHAR* const mapScreenActionPath = TEXT("/Game/Input/Actions/IA_Map.IA_Map");
 	const TCHAR* const chatActionPath = TEXT("/Game/Input/Actions/IA_Chat.IA_Chat");
+	const TCHAR* const interactActionPath = TEXT("/Game/Input/Actions/IA_Interact.IA_Interact");
+
+	// A dialog is closed once the character has walked a little past the range it was opened from, which is well inside the 250 units the server allows.
+	constexpr double dialogLeaveRangeCm = 70.0 * Network::worldUnitCm;
+}
+
+void AClientPlayerController::PlayerTick(float deltaSeconds)
+{
+	Super::PlayerTick(deltaSeconds);
+
+	if (_dialogObjectId == 0)
+	{
+		return;
+	}
+
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
+	UNpcDialogWidget* dialog = (layer != nullptr) ? Cast<UNpcDialogWidget>(layer->GetActiveWidget()) : nullptr;
+	if (dialog == nullptr)
+	{
+		// Closed some other way, so there is nothing left to watch.
+		_dialogObjectId = 0;
+		return;
+	}
+
+	UWorld* world = GetWorld();
+	AWorldGameMode* mode = (world != nullptr) ? world->GetAuthGameMode<AWorldGameMode>() : nullptr;
+	APawn* character = GetPawn();
+	double distance = 0.0;
+	if ((mode != nullptr) && (character != nullptr) && mode->distanceToCreature(_dialogObjectId, *character, distance) && (distance > dialogLeaveRangeCm))
+	{
+		_dialogObjectId = 0;
+		dialog->DeactivateWidget();
+	}
+}
+
+void AClientPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UGameInstance* gameInstance = GetGameInstance();
+	UServerConnectionSubsystem* connection = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UServerConnectionSubsystem>() : nullptr;
+	if (connection != nullptr)
+	{
+		connection->world().onNpcHtml.BindUObject(this, &AClientPlayerController::showNpcHtml);
+	}
+}
+
+void AClientPlayerController::EndPlay(const EEndPlayReason::Type reason)
+{
+	UGameInstance* gameInstance = GetGameInstance();
+	UServerConnectionSubsystem* connection = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UServerConnectionSubsystem>() : nullptr;
+	if ((connection != nullptr) && connection->world().onNpcHtml.IsBoundToObject(this))
+	{
+		connection->world().onNpcHtml.Unbind();
+	}
+
+	Super::EndPlay(reason);
 }
 
 void AClientPlayerController::SetupInputComponent()
@@ -82,6 +144,16 @@ void AClientPlayerController::SetupInputComponent()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the chat key does nothing."), chatActionPath);
+	}
+
+	UInputAction* interactAction = LoadObject<UInputAction>(nullptr, interactActionPath);
+	if (interactAction != nullptr)
+	{
+		enhancedInput->BindAction(interactAction, ETriggerEvent::Started, this, &AClientPlayerController::interact);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ClientPlayerController could not load %s, so the interact key does nothing."), interactActionPath);
 	}
 
 	// Alt+H for a clean screenshot: a fixed chord made here rather than a rebindable action asset, read as H with Alt held.
@@ -178,6 +250,57 @@ void AClientPlayerController::startChat()
 	openOverBareWorld(UChatLineWidget::StaticClass());
 }
 
+void AClientPlayerController::interact()
+{
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
+	UServerConnectionSubsystem* connection = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UServerConnectionSubsystem>() : nullptr;
+	UWorld* world = GetWorld();
+	AWorldGameMode* mode = (world != nullptr) ? world->GetAuthGameMode<AWorldGameMode>() : nullptr;
+	APawn* character = GetPawn();
+	if ((connection == nullptr) || (mode == nullptr) || (character == nullptr) || ((layer != nullptr) && (layer->GetActiveWidget() != nullptr)))
+	{
+		return;
+	}
+
+	const uint32 objectId = mode->townspersonInFront(*character);
+	if (objectId != 0)
+	{
+		connection->world().talkTo(objectId);
+	}
+}
+
+void AClientPlayerController::showNpcHtml(const Network::FNpcHtml& message)
+{
+	UGameInstance* gameInstance = GetGameInstance();
+	UUISubsystem* subsystem = (gameInstance != nullptr) ? gameInstance->GetSubsystem<UUISubsystem>() : nullptr;
+	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
+	if (layer == nullptr)
+	{
+		return;
+	}
+
+	// The page a link led to replaces the one on screen. A page that arrives over any other screen has nowhere to go.
+	UCommonActivatableWidget* open = layer->GetActiveWidget();
+	UNpcDialogWidget* dialog = Cast<UNpcDialogWidget>(open);
+	if ((dialog == nullptr) && (open == nullptr))
+	{
+		dialog = Cast<UNpcDialogWidget>(openScreen(UNpcDialogWidget::StaticClass()));
+
+		// The cursor works the dialog, and the mouse would turn the camera while it moved.
+		SetIgnoreLookInput(true);
+	}
+
+	if (dialog != nullptr)
+	{
+		dialog->showPage(message.html);
+
+		// Only a page from a creature is tied to where that creature stands. Zero, and an object this client has not been told of, are the server's own pages.
+		_dialogObjectId = message.npcObjectId;
+	}
+}
+
 void AClientPlayerController::openOverBareWorld(TSubclassOf<UCommonActivatableWidget> screenClass)
 {
 	UGameInstance* gameInstance = GetGameInstance();
@@ -191,7 +314,7 @@ void AClientPlayerController::openOverBareWorld(TSubclassOf<UCommonActivatableWi
 	openScreen(screenClass);
 }
 
-void AClientPlayerController::openScreen(TSubclassOf<UCommonActivatableWidget> screenClass)
+UCommonActivatableWidget* AClientPlayerController::openScreen(TSubclassOf<UCommonActivatableWidget> screenClass)
 {
 	// A screen opened over a hidden interface would take the keys while showing nothing.
 	if (_interfaceHidden)
@@ -204,7 +327,7 @@ void AClientPlayerController::openScreen(TSubclassOf<UCommonActivatableWidget> s
 	UCommonActivatableWidgetStack* layer = (subsystem != nullptr) ? subsystem->getLayer(EUILayer::GameMenu) : nullptr;
 	if (layer == nullptr)
 	{
-		return;
+		return nullptr;
 	}
 
 	// The layer is watched rather than the screen, because opening Options over the menu deactivates the menu without leaving it.
@@ -217,18 +340,20 @@ void AClientPlayerController::openScreen(TSubclassOf<UCommonActivatableWidget> s
 	UCommonActivatableWidget* screen = subsystem->pushWidget(EUILayer::GameMenu, screenClass);
 	if (screen == nullptr)
 	{
-		return;
+		return nullptr;
 	}
 
 	// The screen is read with a pointer, and game and UI together still lets its keys through to close it again.
 	SetShowMouseCursor(true);
 	SetInputMode(FInputModeGameAndUI().SetWidgetToFocus(screen->TakeWidget()));
+	return screen;
 }
 
 void AClientPlayerController::handleGameMenuLayerChanged(UCommonActivatableWidget* widget)
 {
 	if (widget == nullptr)
 	{
+		ResetIgnoreLookInput();
 		SetShowMouseCursor(false);
 		SetInputMode(FInputModeGameOnly());
 	}

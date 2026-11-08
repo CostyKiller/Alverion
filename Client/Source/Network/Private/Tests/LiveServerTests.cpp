@@ -150,7 +150,15 @@ bool FLiveServerRoundTripTest::RunTest(const FString& parameters)
 	}
 
 	int32 spawns = 0;
-	worldFlow.onSpawned.BindLambda([&spawns](const Network::FCharacterSpawn& spawn) { spawns++; });
+	TArray<Network::FCharacterSpawn> townspeople;
+	worldFlow.onSpawned.BindLambda([&spawns, &townspeople](const Network::FCharacterSpawn& spawn)
+	{
+		spawns++;
+		if (spawn.isNpc && !spawn.attackable && (spawn.kind == Network::ECreatureKind::Normal))
+		{
+			townspeople.Add(spawn);
+		}
+	});
 	TestTrue(TEXT("EnterWorld goes out"), worldFlow.begin(gameFlow));
 
 	pump([&]() { return false; }, 4.0);
@@ -169,6 +177,61 @@ bool FLiveServerRoundTripTest::RunTest(const FString& parameters)
 	pump([&]() { return heard == line; }, 5.0);
 	worldFlow.onChat.Unbind();
 	TestEqual(TEXT("The server says the chat line back"), heard, line);
+
+	// Talking to a townsperson: stand next to the nearest ones, which keyboard mode lets the client do by reporting where it is, and click.
+	// A townsperson with nothing to say, a guard for one, does not answer, so the nearest few are tried and one answer is enough.
+	const FVector start = gameFlow.selected().location;
+	townspeople.Sort([&start](const Network::FCharacterSpawn& left, const Network::FCharacterSpawn& right)
+	{
+		return FVector::Dist2D(left.location, start) < FVector::Dist2D(right.location, start);
+	});
+
+	TArray<Network::FNpcHtml> pages;
+	worldFlow.onNpcHtml.BindLambda([&pages](const Network::FNpcHtml& message) { pages.Add(message); });
+	TestTrue(FString::Printf(TEXT("A townsperson is in sight (%d)"), townspeople.Num()), townspeople.Num() > 0);
+
+	bool answered = false;
+	for (int32 index = 0; (index < FMath::Min(townspeople.Num(), 5)) && !answered; index++)
+	{
+		const Network::FCharacterSpawn& npc = townspeople[index];
+
+		// A body's length in front of the townsperson, on the side the character came from.
+		const FVector side = (start - npc.location).GetSafeNormal2D();
+		const FVector spot = npc.location + (side * 120.0);
+		worldFlow.setLocalState(spot, 0.0f, false);
+
+		Network::FWriteBuffer walk;
+		Network::GameServer::writeMoveToLocation(walk, spot + (side * -600.0), spot);
+		gameSession.send(walk.bytes());
+		pump([&]() { return false; }, 0.3);
+
+		Network::FWriteBuffer place;
+		Network::GameServer::writeValidatePosition(place, spot, 0.0f);
+		gameSession.send(place.bytes());
+		pump([&]() { return false; }, 0.3);
+
+		pages.Reset();
+		TestTrue(TEXT("The talk request goes out"), worldFlow.talkTo(npc.objectId));
+		answered = pump([&]() { return pages.ContainsByPredicate([&npc](const Network::FNpcHtml& page) { return page.npcObjectId == npc.objectId; }); }, 3.0);
+		if (!answered)
+		{
+			// A late answer from this one must not be taken for the next one's.
+			pump([&]() { return false; }, 1.0);
+			continue;
+		}
+
+		AddInfo(FString::Printf(TEXT("%s (%u) answered with %d characters of dialog."), *npc.name, npc.objectId, pages.Last().html.Len()));
+		TestTrue(TEXT("The dialog is a page"), pages.Last().html.Contains(TEXT("<")));
+
+		// The target is selected by now, so a second talk is one click, and the server answers it as well.
+		pages.Reset();
+		pump([&]() { return false; }, 0.5);
+		TestTrue(TEXT("The second talk request goes out"), worldFlow.talkTo(npc.objectId));
+		TestTrue(TEXT("A townsperson who is already selected answers the single click"), pump([&]() { return pages.ContainsByPredicate([&npc](const Network::FNpcHtml& page) { return page.npcObjectId == npc.objectId; }); }, 3.0));
+	}
+
+	TestTrue(TEXT("A townsperson answers the click with a dialog"), answered);
+	worldFlow.onNpcHtml.Unbind();
 
 	worldFlow.end();
 	gameFlow.end();

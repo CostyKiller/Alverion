@@ -50,6 +50,8 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 	_label->SetText(FText::FromString(spawn.name));
 	_label->SetTextRenderColor(color.ToFColor(true));
 
+	// Summons and traps come marked by the creature kind server patch.
+	_townsperson = spawn.isNpc && !spawn.attackable && (spawn.kind == Network::ECreatureKind::Normal);
 	_speed = spawn.runSpeed;
 	_swimSpeed = spawn.swimSpeed;
 	standAt(spawn.location, spawn.yaw);
@@ -99,6 +101,11 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 		proxy->_bodyRestRotation = body->GetRootComponent()->GetRelativeRotation().Quaternion();
 		proxy->_body->SetVisibility(false);
 	}, goblin ? TEXT("MH_Goblin") : TEXT(""));
+}
+
+bool AProxyCharacter::isTownsperson() const
+{
+	return _townsperson;
 }
 
 void AProxyCharacter::EndPlay(const EEndPlayReason::Type reason)

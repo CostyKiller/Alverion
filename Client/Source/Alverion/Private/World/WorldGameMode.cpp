@@ -18,6 +18,12 @@ namespace
 {
 	// Half the character's capsule, plus a little so it starts above the server's height rather than inside the ground.
 	constexpr double spawnLiftCm = 100.0;
+
+	// The server lets a townsperson be talked to within 250 of its units. The character has to be standing next to one, so this is a good deal nearer.
+	constexpr double talkRangeCm = 55.0 * Network::worldUnitCm;
+
+	// Sixty degrees either side of the way the character faces. The server asks for no direction at all, so this only keeps the pick to what is ahead.
+	constexpr double talkConeCosine = 0.5;
 }
 
 AWorldGameMode::AWorldGameMode()
@@ -172,6 +178,45 @@ void AWorldGameMode::returnToCharacterSelect()
 	});
 
 	link->gameServer().returnToCharacterSelect();
+}
+
+uint32 AWorldGameMode::townspersonInFront(const AActor& character) const
+{
+	const FVector origin = character.GetActorLocation();
+	const FVector forward = character.GetActorForwardVector().GetSafeNormal2D();
+
+	uint32 nearestObjectId = 0;
+	double nearestDistance = talkRangeCm;
+	for (const TPair<uint32, TObjectPtr<AProxyCharacter>>& proxy : _proxies)
+	{
+		if ((proxy.Value == nullptr) || !proxy.Value->isTownsperson())
+		{
+			continue;
+		}
+
+		// Flat distance, since the ground under the two is the client's own and the server has the last word on the height.
+		const FVector offset = proxy.Value->GetActorLocation() - origin;
+		const double distance = offset.Size2D();
+		if ((distance < nearestDistance) && (FVector::DotProduct(forward, offset.GetSafeNormal2D()) >= talkConeCosine))
+		{
+			nearestObjectId = proxy.Key;
+			nearestDistance = distance;
+		}
+	}
+
+	return nearestObjectId;
+}
+
+bool AWorldGameMode::distanceToCreature(uint32 objectId, const AActor& from, double& distanceCm) const
+{
+	const TObjectPtr<AProxyCharacter>* proxy = _proxies.Find(objectId);
+	if ((proxy == nullptr) || (*proxy == nullptr))
+	{
+		return false;
+	}
+
+	distanceCm = FVector::Dist2D((*proxy)->GetActorLocation(), from.GetActorLocation());
+	return true;
 }
 
 void AWorldGameMode::spawned(const Network::FCharacterSpawn& spawn)

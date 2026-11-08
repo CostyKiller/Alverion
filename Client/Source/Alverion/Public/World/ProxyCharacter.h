@@ -25,6 +25,9 @@ public:
 	void walkTo(const FVector& destination);
 	void standAt(const FVector& location, float yaw);
 
+	/** Whether this is a townsperson: a non-player that the server does not let the player attack and that is not a summon or a trap, and so one that can be talked to. */
+	bool isTownsperson() const;
+
 	virtual void Tick(float deltaSeconds) override;
 
 protected:
@@ -47,6 +50,7 @@ private:
 	/** The bytes the MetaHuman was dressed from, so a repeated spawn does not stand up a second body. */
 	TArray<uint8> _wornAppearance;
 	bool _wearsGoblin = false;
+	bool _townsperson = false;
 	FQuat _bodyRestRotation = FQuat::Identity;
 	FVector _groundNormal = FVector::UpVector;
 

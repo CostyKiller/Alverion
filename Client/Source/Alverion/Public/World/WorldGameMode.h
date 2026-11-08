@@ -23,6 +23,15 @@ public:
 	/** Takes the character out of the world for the character list, keeping the link, and travels to it once the server agrees. */
 	void returnToCharacterSelect();
 
+	/**
+	 * The townsperson the character is facing, for the interact key: the nearest one within talking range and in front.
+	 * Returns zero when there is none. Monsters and players are never picked.
+	 */
+	uint32 townspersonInFront(const AActor& character) const;
+
+	/** How far a creature the server has told this client about stands from the actor, flat, in centimetres. False when the creature is not one it knows. */
+	bool distanceToCreature(uint32 objectId, const AActor& from, double& distanceCm) const;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type reason) override;

@@ -53,14 +53,17 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 	_swimSpeed = spawn.swimSpeed;
 	standAt(spawn.location, spawn.yaw);
 
-	// Players carry an appearance and wear it; a repeated spawn with the same bytes keeps the body already standing.
+	// Players carry an appearance and wear it. Townspeople and monsters have no models of their own yet, so townspeople wear the default man and monsters the default woman.
+	// A repeated spawn with the same look keeps the body already standing.
 	Network::FAppearance appearance;
-	if (spawn.isNpc || (spawn.appearance == _wornAppearance) || !Network::FAppearance::unpack(spawn.appearance, appearance))
+	appearance.male = !spawn.attackable;
+	const TArray<uint8> look = spawn.isNpc ? appearance.pack() : spawn.appearance;
+	if ((look == _wornAppearance) || !Network::FAppearance::unpack(look, appearance))
 	{
 		return;
 	}
 
-	_wornAppearance = spawn.appearance;
+	_wornAppearance = look;
 	if (_metaHuman != nullptr)
 	{
 		_metaHuman->Destroy();

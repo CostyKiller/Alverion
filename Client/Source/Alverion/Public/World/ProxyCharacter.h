@@ -40,7 +40,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UTextRenderComponent> _label;
 
-	/** The MetaHuman a player wears, riding on this actor. Townspeople and monsters have no appearance and keep the placeholder. */
+	/** The MetaHuman this wears, riding on this actor: a player's own look, or the default look on townspeople and monsters. */
 	UPROPERTY()
 	TObjectPtr<AActor> _metaHuman;
 

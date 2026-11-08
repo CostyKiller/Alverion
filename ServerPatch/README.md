@@ -14,8 +14,10 @@ sees.
   padded to the longest, then that length and the count as shorts, then the magic. Nothing is
   appended when no listed character has a block, so stock characters produce stock packets.
 - Deleting a character deletes its block.
+- `Player.ini` turns `DisableCp` on, so all damage goes straight to HP: the client shows HP and MP only.
 
-Four upstream files change by 26 added lines in total, and one class and one SQL file are added:
+Four upstream Java files change by 26 added lines in total, `Player.ini` changes one value, and one
+class and one SQL file are added:
 
 | File | Change |
 | --- | --- |
@@ -23,6 +25,7 @@ Four upstream files change by 26 added lines in total, and one class and one SQL
 | `java/.../network/serverpackets/CharSelectionInfo.java` | trailer with one block per character |
 | `java/.../network/serverpackets/CharInfo.java` | trailer with the player's block |
 | `java/.../network/GameClient.java` | delete the block with the character |
+| `dist/game/config/Player.ini` | `DisableCp = True` |
 | `java/.../data/sql/CharacterAppearanceTable.java` | new: storage, cache, trailer writer |
 | `dist/db_installer/sql/game/character_appearance.sql` | new: the table |
 
@@ -58,8 +61,9 @@ game database (the database installer picks it up with the other game tables).
 
 The patched classes can be compiled on their own and put ahead of the stock ones, which is how it
 is tested here without touching the server. Copy the four upstream files into an empty folder,
-`<Folder>`, at their `java/...` paths and run `git apply -p0` on the patch there. Then compile from
-`<Folder>` and start the server with its classes first:
+`<Folder>`, at their `java/...` paths and run `git apply -p0 --exclude=dist/game/config/Player.ini`
+on the patch there; set `DisableCp = True` in the server's own `Player.ini` if CP should be off.
+Then compile from `<Folder>` and start the server with its classes first:
 
 ```
 javac -encoding UTF-8 -nowarn -proc:none -cp "<Server>/bin;<Server>/dist/libs/*" -d classes <the five .java files>

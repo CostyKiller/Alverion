@@ -10,6 +10,14 @@ index 0000000..16d29c4
 +  `data` VARBINARY(64) NOT NULL,
 +  PRIMARY KEY (`charId`)
 +) DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+diff --git dist/game/config/Player.ini dist/game/config/Player.ini
+--- dist/game/config/Player.ini
++++ dist/game/config/Player.ini
+@@ -54,3 +54,3 @@
+ # Default: False
+-DisableCp = False
++DisableCp = True
+ 
 diff --git java/org/l2jmobius/gameserver/data/sql/CharacterAppearanceTable.java java/org/l2jmobius/gameserver/data/sql/CharacterAppearanceTable.java
 new file mode 100644
 index 0000000..f87be59

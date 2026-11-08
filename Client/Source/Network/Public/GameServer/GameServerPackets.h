@@ -7,6 +7,7 @@
 #include "GameServer/ServerPackets/CharSelectionInfo.h"
 #include "GameServer/ServerPackets/CharSelected.h"
 #include "GameServer/ServerPackets/UserInfo.h"
+#include "GameServer/ServerPackets/StatusUpdate.h"
 #include "GameServer/ServerPackets/CharInfo.h"
 #include "GameServer/ServerPackets/NpcInfo.h"
 #include "GameServer/ServerPackets/ObjectPlace.h"

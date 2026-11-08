@@ -165,6 +165,17 @@ void FWorldFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 
 			return;
 		}
+		case GameServer::Opcode::statusUpdate:
+		{
+			// The server sends these for every creature in sight; only this client's own character has bars to keep.
+			FStatusUpdate update;
+			if (GameServer::readStatusUpdate(buffer, update) && (_localObjectId != 0) && (update.objectId == _localObjectId))
+			{
+				GameServer::applyStatusUpdate(update, _userInfo);
+			}
+
+			return;
+		}
 		case GameServer::Opcode::creatureSay:
 		{
 			FChatMessage message;

@@ -11,7 +11,7 @@ Unreal Engine 5 client for L2J Mobius.
 - Lists, creates and deletes characters, and enters the world.
 - The world is `L_Continent`, a World Partition map with Mesh Terrain. Start Island, its first land, sits under the server's human starting area so its spawns stand on something. Shape it in the editor's Mesh Terrain mode.
 - Runs in keyboard mode, where the server takes the client's position as true. Other players, townspeople and monsters walk where the server sends them.
-- Characters are the MetaHumans their stored appearance describes, in character select and creation and in the world. They idle, walk, run and fall.
+- Players are the MetaHumans their stored appearance describes, in character select and creation and in the world. Until they have models of their own, townspeople wear a default MetaHuman and monsters a goblin MetaHuman. They idle, walk, run and fall.
 
 ## Layout
 
@@ -24,17 +24,17 @@ Unreal Engine 5 client for L2J Mobius.
 
 The characters are MetaHumans, about 3 GB, so they are not in the repository. Download them here:
 
-https://drive.google.com/file/d/1DZWQk5yhEA7fCeuYtKLhv3QjR7KzBW7A/view?usp=sharing
+https://drive.google.com/file/d/1xUWfGzEfeOrGPYgAkrC8PJ7Jazq2AH8c/view?usp=sharing
 
-Extract the zip at the root of the repository, so that its folders land in `Client/Content/Characters/MetaHumans/` (`Grooms` and `Unpacked`). Git ignores that folder. Without it the game still runs, with coloured placeholder figures standing in for the characters.
+Extract the zip at the root of the repository, so that its folders land in `Client/Content/Characters/MetaHumans/` (`Goblin`, `Grooms` and `Unpacked`). Git ignores that folder. Without it the game still runs, with coloured placeholder figures standing in for the characters.
 
 MetaHumans are covered by the Unreal Engine EULA: share the download only with people who have accepted it.
 
 ## Animations
 
-The character animations are Quaternius's Universal Animation Library, packs 1 and 2, baked onto the MetaHuman skeleton. Download them here:
+The character animations are Quaternius's Universal Animation Library, packs 1 and 2, baked onto the MetaHuman skeleton, with the idle and the run baked again for the goblin's shorter legs. Download them here:
 
-https://drive.google.com/file/d/1_vLGT5tUYuHbd2LIAYOOLMSSs5ld1u2A/view?usp=sharing
+https://drive.google.com/file/d/1OoAfJC1oYUrg2F5ELrx0W54TfZtBvdbW/view?usp=sharing
 
 Extract the zip so that the clips land in `Client/Content/Characters/Animations/UAL/`. The packs are CC0, so no credit is required.
 

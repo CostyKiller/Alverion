@@ -46,10 +46,14 @@ private:
 
 	/** The bytes the MetaHuman was dressed from, so a repeated spawn does not stand up a second body. */
 	TArray<uint8> _wornAppearance;
+	bool _wearsGoblin = false;
+	FQuat _bodyRestRotation = FQuat::Identity;
+	FVector _groundNormal = FVector::UpVector;
 
 	FVector _destination = FVector::ZeroVector;
 	float _speed = 0.0f;
 	float _swimSpeed = 0.0f;
+	float _groundRetrySeconds = 0.0f;
 	bool _walking = false;
 	bool _swimming = false;
 };

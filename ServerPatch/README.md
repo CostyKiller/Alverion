@@ -29,18 +29,19 @@ Four upstream files change by 26 added lines in total, and one class and one SQL
 ## Applying it
 
 The same patch applies to a standalone High Five server project and to the High Five folder of the
-L2J Mobius repository. From the root of a standalone project:
+L2J Mobius repository; `<Patch>` below is the path to `alverion-appearance.patch`. From the root
+of a standalone project:
 
 ```
-git apply -p0 --check C:/Alverion/ServerPatch/alverion-appearance.patch
-git apply -p0 C:/Alverion/ServerPatch/alverion-appearance.patch
+git apply -p0 --check <Patch>
+git apply -p0 <Patch>
 ```
 
 From the root of the L2J Mobius repository, which keeps every chronicle in one tree:
 
 ```
-git apply -p0 --check --directory=L2J_Mobius_CT_2.6_HighFive C:/Alverion/ServerPatch/alverion-appearance.patch
-git apply -p0 --directory=L2J_Mobius_CT_2.6_HighFive C:/Alverion/ServerPatch/alverion-appearance.patch
+git apply -p0 --check --directory=L2J_Mobius_CT_2.6_HighFive <Patch>
+git apply -p0 --directory=L2J_Mobius_CT_2.6_HighFive <Patch>
 ```
 
 Then rebuild the server and run `dist/db_installer/sql/game/character_appearance.sql` against the

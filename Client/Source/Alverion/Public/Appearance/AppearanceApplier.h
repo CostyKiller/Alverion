@@ -24,7 +24,9 @@ namespace Appearance
 		Run,
 		Fall,
 		SwimIdle,
-		Swim
+		Swim,
+		GoblinIdle,
+		GoblinRun
 	};
 
 	/** Plays the clip for a motion on a MetaHuman's body, looping, and leaves it alone while the motion stays the same, so a loop keeps its phase. */
@@ -46,7 +48,8 @@ namespace Appearance
 	/**
 	 * Stands the MetaHuman an appearance describes on a host whose feet are feetOffset from its root, facing the host's forward, and dresses it.
 	 * The body has no collision of its own, so it never blocks the host it rides on. The callback gets it once it stands, or null when the MetaHuman assets are missing.
+	 * An authored body uses its assembled Blueprint and keeps its own materials and grooms.
 	 * The host owns it from then on and destroys it with itself, since an attached actor outlives its parent otherwise.
 	 */
-	ALVERION_API void attachTo(AActor& host, const Network::FAppearance& appearance, const FVector& feetOffset, TFunction<void(AActor*)> whenAttached);
+	ALVERION_API void attachTo(AActor& host, const Network::FAppearance& appearance, const FVector& feetOffset, TFunction<void(AActor*)> whenAttached, const FString& authoredBody = FString());
 }

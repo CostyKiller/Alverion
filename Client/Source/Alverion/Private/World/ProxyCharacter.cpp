@@ -22,6 +22,7 @@ namespace
 
 	// How far above and below a reported height to look for the island.
 	constexpr double groundSearchCm = 20000.0;
+	constexpr float groundRetryIntervalSeconds = 0.5f;
 }
 
 AProxyCharacter::AProxyCharacter()
@@ -53,36 +54,45 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 	_swimSpeed = spawn.swimSpeed;
 	standAt(spawn.location, spawn.yaw);
 
-	// Players carry an appearance and wear it. Townspeople and monsters have no models of their own yet, so townspeople wear the default man and monsters the default woman.
-	// A repeated spawn with the same look keeps the body already standing.
+	const bool goblin = spawn.isNpc && spawn.attackable;
 	Network::FAppearance appearance;
 	appearance.male = !spawn.attackable;
 	const TArray<uint8> look = spawn.isNpc ? appearance.pack() : spawn.appearance;
-	if ((look == _wornAppearance) || !Network::FAppearance::unpack(look, appearance))
+	if (((look == _wornAppearance) && (goblin == _wearsGoblin)) || !Network::FAppearance::unpack(look, appearance))
 	{
 		return;
 	}
 
 	_wornAppearance = look;
+	_wearsGoblin = goblin;
 	if (_metaHuman != nullptr)
 	{
 		_metaHuman->Destroy();
 		_metaHuman = nullptr;
+		_body->SetVisibility(true);
 	}
 
 	// The root is the feet, so the body stands on it; the placeholder hides once the body is there to take its place.
 	const TWeakObjectPtr<AProxyCharacter> weakThis(this);
-	Appearance::attachTo(*this, appearance, FVector::ZeroVector, [weakThis](AActor* body)
+	Appearance::attachTo(*this, appearance, FVector::ZeroVector, [weakThis, look, goblin](AActor* body)
 	{
 		AProxyCharacter* proxy = weakThis.Get();
-		if ((proxy == nullptr) || (body == nullptr))
+		if (body == nullptr)
 		{
 			return;
 		}
 
+		// A slower load can finish after the proxy has received another appearance.
+		if ((proxy == nullptr) || (proxy->_wearsGoblin != goblin) || (proxy->_wornAppearance != look) || (proxy->_metaHuman != nullptr))
+		{
+			body->Destroy();
+			return;
+		}
+
 		proxy->_metaHuman = body;
+		proxy->_bodyRestRotation = body->GetRootComponent()->GetRelativeRotation().Quaternion();
 		proxy->_body->SetVisibility(false);
-	});
+	}, goblin ? TEXT("MH_Goblin") : TEXT(""));
 }
 
 void AProxyCharacter::EndPlay(const EEndPlayReason::Type reason)
@@ -120,6 +130,8 @@ FVector AProxyCharacter::settle(const FVector& location)
 	const FVector above = location + FVector(0.0, 0.0, groundSearchCm);
 	const FVector below = location - FVector(0.0, 0.0, groundSearchCm);
 	const bool found = GetWorld()->LineTraceSingleByChannel(hit, above, below, ECC_WorldStatic, query);
+	_groundNormal = found ? FVector(hit.ImpactNormal) : FVector::UpVector;
+	_groundRetrySeconds = found ? 0.0f : groundRetryIntervalSeconds;
 	_swimming = Water::tooDeep(found ? hit.ImpactPoint.Z : (Water::surfaceCm - groundSearchCm), _swimming);
 
 	// The root is the feet. A swimmer keeps the depth the server reports, no lower than the seabed and no higher than the swimmer line.
@@ -136,12 +148,30 @@ void AProxyCharacter::Tick(float deltaSeconds)
 {
 	Super::Tick(deltaSeconds);
 
-	// A player's body runs or swims while it heads for a destination, and stands or treads water otherwise.
+	// Terrain collision can stream in after a stationary proxy has already been placed at sea level.
+	if (!_walking && (_groundRetrySeconds > 0.0f))
+	{
+		_groundRetrySeconds -= deltaSeconds;
+		if (_groundRetrySeconds <= 0.0f)
+		{
+			SetActorLocation(settle(GetActorLocation()));
+		}
+	}
+
+	// The short goblin uses floor contacts baked for its leg length on land.
 	if (_metaHuman != nullptr)
 	{
-		const Appearance::EMotion moving = _swimming ? Appearance::EMotion::Swim : Appearance::EMotion::Run;
-		const Appearance::EMotion still = _swimming ? Appearance::EMotion::SwimIdle : Appearance::EMotion::Idle;
-		Appearance::animate(*_metaHuman, _walking ? moving : still);
+		Appearance::EMotion motion = _walking ? Appearance::EMotion::Run : Appearance::EMotion::Idle;
+		if (_swimming)
+		{
+			motion = _walking ? Appearance::EMotion::Swim : Appearance::EMotion::SwimIdle;
+		}
+		else if (_wearsGoblin)
+		{
+			motion = _walking ? Appearance::EMotion::GoblinRun : Appearance::EMotion::GoblinIdle;
+		}
+
+		Appearance::animate(*_metaHuman, motion);
 	}
 
 	if (_walking)
@@ -162,6 +192,17 @@ void AProxyCharacter::Tick(float deltaSeconds)
 			const FVector direction = toGo.GetSafeNormal();
 			SetActorLocation(settle(here + (direction * step)));
 			SetActorRotation(_swimming ? direction.Rotation() : FRotator(0.0f, direction.Rotation().Yaw, 0.0f));
+		}
+	}
+
+	// The visual body follows the surface under its feet. The proxy and nameplate stay upright on land.
+	if (_wearsGoblin && (_metaHuman != nullptr))
+	{
+		const FVector up = _swimming ? GetActorUpVector() : _groundNormal;
+		if (!_metaHuman->GetActorUpVector().Equals(up, UE_KINDA_SMALL_NUMBER))
+		{
+			const FVector localUp = GetActorQuat().UnrotateVector(up);
+			_metaHuman->SetActorRelativeRotation(FQuat::FindBetweenNormals(FVector::UpVector, localUp) * _bodyRestRotation);
 		}
 	}
 

@@ -1,3 +1,1 @@
-*.java -text
-*.sql -text
 *.patch -text

@@ -486,6 +486,29 @@ namespace
 			}
 		}
 	}
+
+	void requestNamedBodyClass(const FString& characterName, TFunction<void(UClass*)> whenReady)
+	{
+		if (characterName.IsEmpty())
+		{
+			whenReady(nullptr);
+			return;
+		}
+
+		const FString path = bodyClassPath(characterName);
+		if (UClass* loaded = FindObject<UClass>(nullptr, *path))
+		{
+			whenReady(loaded);
+			return;
+		}
+
+		// Keyed by path so two screens asking for the same character share the one fetch.
+		pendingBodies.FindOrAdd(path) = UAssetManager::GetStreamableManager().RequestAsyncLoad(FSoftObjectPath(path), FStreamableDelegate::CreateLambda([path, whenReady]()
+		{
+			pendingBodies.Remove(path);
+			whenReady(FindObject<UClass>(nullptr, *path));
+		}));
+	}
 }
 
 namespace Appearance
@@ -499,7 +522,9 @@ namespace Appearance
 			TEXT("/Game/Characters/Animations/UAL/Jog_Fwd_Loop.Jog_Fwd_Loop"),
 			TEXT("/Game/Characters/Animations/UAL/Jump_Loop.Jump_Loop"),
 			TEXT("/Game/Characters/Animations/UAL/Swim_Idle_Loop.Swim_Idle_Loop"),
-			TEXT("/Game/Characters/Animations/UAL/Swim_Fwd_Loop.Swim_Fwd_Loop")
+			TEXT("/Game/Characters/Animations/UAL/Swim_Fwd_Loop.Swim_Fwd_Loop"),
+			TEXT("/Game/Characters/Animations/UAL/Goblin/Idle_Selection_Loop_Goblin.Idle_Selection_Loop_Goblin"),
+			TEXT("/Game/Characters/Animations/UAL/Goblin/Jog_Fwd_Loop_Goblin.Jog_Fwd_Loop_Goblin")
 		};
 
 		USkeletalMeshComponent* mesh = findMesh(body, TEXT("Body"));
@@ -558,35 +583,24 @@ namespace Appearance
 
 	void requestBodyClass(const Network::FAppearance& appearance, TFunction<void(UClass*)> whenReady)
 	{
-		const FString characterName = characterNameFor(appearance);
-		if (characterName.IsEmpty())
-		{
-			whenReady(nullptr);
-			return;
-		}
-
-		const FString path = bodyClassPath(characterName);
-		if (UClass* loaded = FindObject<UClass>(nullptr, *path))
-		{
-			whenReady(loaded);
-			return;
-		}
-
-		// Keyed by path so two screens asking for the same character share the one fetch.
-		pendingBodies.FindOrAdd(path) = UAssetManager::GetStreamableManager().RequestAsyncLoad(FSoftObjectPath(path), FStreamableDelegate::CreateLambda([path, whenReady]()
-		{
-			pendingBodies.Remove(path);
-			whenReady(FindObject<UClass>(nullptr, *path));
-		}));
+		requestNamedBodyClass(characterNameFor(appearance), MoveTemp(whenReady));
 	}
 
-	void attachTo(AActor& host, const Network::FAppearance& appearance, const FVector& feetOffset, TFunction<void(AActor*)> whenAttached)
+	void attachTo(AActor& host, const Network::FAppearance& appearance, const FVector& feetOffset, TFunction<void(AActor*)> whenAttached, const FString& authoredBody)
 	{
 		// A MetaHuman's mesh sits a quarter turn off its actor's yaw, the same offset the front end's spots carry.
 		static constexpr float bodyYawOffset = -90.0f;
 
 		const TWeakObjectPtr<AActor> weakHost(&host);
-		requestBodyClass(appearance, [weakHost, appearance, feetOffset, whenAttached](UClass* bodyClass)
+		const bool useAuthoredBody = !authoredBody.IsEmpty();
+		if (useAuthoredBody && !FPackageName::DoesPackageExist(characterPackage(authoredBody)))
+		{
+			whenAttached(nullptr);
+			return;
+		}
+
+		const FString characterName = useAuthoredBody ? authoredBody : characterNameFor(appearance);
+		requestNamedBodyClass(characterName, [weakHost, appearance, feetOffset, whenAttached, useAuthoredBody](UClass* bodyClass)
 		{
 			AActor* hostActor = weakHost.Get();
 			if (hostActor == nullptr)
@@ -615,7 +629,11 @@ namespace Appearance
 			body->AttachToActor(hostActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			body->SetActorRelativeLocation(feetOffset);
 			body->SetActorRelativeRotation(FRotator(0.0f, bodyYawOffset, 0.0f));
-			apply(*body, appearance);
+			if (!useAuthoredBody)
+			{
+				apply(*body, appearance);
+			}
+
 			whenAttached(body);
 		});
 	}

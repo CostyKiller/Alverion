@@ -26,6 +26,13 @@ Four upstream files change by 26 added lines in total, and one class and one SQL
 | `java/.../data/sql/CharacterAppearanceTable.java` | new: storage, cache, trailer writer |
 | `dist/db_installer/sql/game/character_appearance.sql` | new: the table |
 
+## Hardware information
+
+Nothing to patch. The client sends the stock `RequestHardWareInfo` right after `EnterWorld`, so
+`EnableHardwareInfo`, `KickMissingHWID` and `MaxPlayersPerHWID` in `Server.ini` work as they do
+with the stock client. Its first field, the one HWID bans and limits key on, is a hash of the
+machine id instead of a MAC address, so one machine always sends the same value.
+
 ## Applying it
 
 The same patch applies to a standalone High Five server project and to the High Five folder of the
@@ -67,7 +74,3 @@ No server files are kept here, only the patch, which carries the new class and t
 too. It is the one copy of the change and is edited directly. It adds no imports and names the
 new class in full instead, and its context lines are ones both kinds of High Five project share,
 so one patch fits either.
-
-## License
-
-MIT. The new class carries the MIT notice and names Mobius as its author.

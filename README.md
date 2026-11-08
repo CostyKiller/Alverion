@@ -9,6 +9,7 @@ Unreal Engine 5 client for L2J Mobius.
 - Logs in through the login server: Blowfish and RSA as the stock client does them.
 - Menus for login, server select, character select and creation, options and an in-game menu, in front of a small scene, `L_Login`.
 - Lists, creates and deletes characters, and enters the world.
+- Sends the machine description right after entering the world, so a server with `KickMissingHWID` on keeps the player. Where the stock client puts its MAC address it sends a hash of the machine id.
 - The world is `L_Continent`, a World Partition map with Mesh Terrain. Start Island, its first land, sits under the server's human starting area so its spawns stand on something. Shape it in the editor's Mesh Terrain mode.
 - Runs in keyboard mode, where the server takes the client's position as true. Other players, townspeople and monsters walk where the server sends them.
 - Players are the MetaHumans their stored appearance describes, in character select and creation and in the world. Until they have models of their own, townspeople wear a default MetaHuman and monsters a goblin MetaHuman. They idle, walk, run and fall.
@@ -71,4 +72,4 @@ UnrealEditor-Cmd Client/Alverion.uproject -ExecCmds="Automation RunTests Alverio
 
 ## Licence
 
-The client is MIT licensed, see `LICENSE`.
+The client is MIT licensed, see [LICENSE](LICENSE).

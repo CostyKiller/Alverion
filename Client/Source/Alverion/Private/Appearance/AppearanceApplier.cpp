@@ -2,9 +2,15 @@
 
 #include "Appearance.h"
 #include "Appearance/AppearanceChoices.h"
+#include "Animation/AnimSequence.h"
+#include "Animation/AnimationPoseData.h"
+#include "Animation/AttributesRuntime.h"
 #include "Appearance/FootIkAnimInstance.h"
+#include "BoneContainer.h"
+#include "BonePose.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/AssetManager.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/StreamableManager.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
@@ -12,11 +18,28 @@
 #include "GroomBindingAsset.h"
 #include "GroomComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/MemStack.h"
 #include "Misc/PackageName.h"
 #include "TimerManager.h"
 
 namespace
 {
+	// How many times a run clip is posed to measure it, which is every 1/256 of a second for a loop of a bit under a second.
+	constexpr int32 appearanceRunMeasureSamples = 240;
+
+	// A foot counts as planted when it is this close to its lowest height, in centimetres.
+	constexpr float appearancePlantedHeightCm = 2.0f;
+
+	// Slower than this is a clip that does not travel, whatever it measured.
+	constexpr float appearanceLeastClipSpeedCm = 20.0f;
+
+	// A body that has just started, stopped or jumped to a new place measures a speed that says nothing about its stride.
+	constexpr float appearanceLeastPlayRate = 0.5f;
+	constexpr float appearanceGreatestPlayRate = 1.5f;
+
+	// Another clip has to cut the foot slip to this share of the playing clip's, or the playing one stays.
+	constexpr double appearanceClipSwapSlipShare = 0.85;
+
 	struct FGroom
 	{
 		/** The kind folder the plugin files the groom under. */
@@ -592,7 +615,172 @@ namespace
 
 namespace Appearance
 {
-	void animate(AActor& body, EMotion motion)
+	float measureRunSpeed(const UAnimationAsset& clip, const USkeletalMesh& mesh)
+	{
+		const UAnimSequence* sequence = Cast<UAnimSequence>(&clip);
+		const float length = (sequence != nullptr) ? sequence->GetPlayLength() : 0.0f;
+		if (length <= 0.0f)
+		{
+			return 0.0f;
+		}
+
+		// A clip that carries its own motion says how fast it goes.
+		if (sequence->HasRootMotion())
+		{
+			return sequence->ExtractRootMotionFromRange(0.0, length, FAnimExtractContext(0.0, true)).GetTranslation().Size2D() / length;
+		}
+
+		// Otherwise the planted foot tells: it stands still on the ground while the body goes over it, so it slides back through the body's space at the body's speed.
+		// The clip is posed on this body's own bones, because legs of different lengths slide at different speeds.
+		const FReferenceSkeleton& skeleton = mesh.GetRefSkeleton();
+		TArray<FBoneIndexType> required;
+		for (int32 bone = 0; bone < skeleton.GetNum(); bone++)
+		{
+			required.Add(static_cast<FBoneIndexType>(bone));
+		}
+
+		FBoneContainer bones;
+		bones.InitializeTo(required, UE::Anim::FCurveFilterSettings(), mesh);
+
+		static const FName footNames[][2] = { { TEXT("foot_l"), TEXT("foot_r") }, { TEXT("ball_l"), TEXT("ball_r") } };
+		for (const FName (&feet)[2] : footNames)
+		{
+			FCompactPoseBoneIndex indices[2];
+			for (int32 side = 0; side < 2; side++)
+			{
+				const int32 meshIndex = skeleton.FindBoneIndex(feet[side]);
+				indices[side] = (meshIndex == INDEX_NONE) ? FCompactPoseBoneIndex(INDEX_NONE) : bones.MakeCompactPoseIndex(FMeshPoseBoneIndex(meshIndex));
+			}
+
+			if (!indices[0].IsValid() || !indices[1].IsValid())
+			{
+				continue;
+			}
+
+			// Where each foot is in the body's space at every sample.
+			TArray<FVector> places[2];
+			for (int32 sample = 0; sample < appearanceRunMeasureSamples; sample++)
+			{
+				// Poses live on the frame's stack, which wants a mark to give back to.
+				FMemMark mark(FMemStack::Get());
+				FCompactPose pose;
+				pose.SetBoneContainer(&bones);
+				FBlendedCurve curve;
+				curve.InitFrom(bones);
+				UE::Anim::FStackAttributeContainer attributes;
+				FAnimationPoseData poseData(pose, curve, attributes);
+				sequence->GetAnimationPose(poseData, FAnimExtractContext(static_cast<double>(length) * sample / appearanceRunMeasureSamples, false));
+
+				FCSPose<FCompactPose> componentPose;
+				componentPose.InitPose(pose);
+				for (int32 side = 0; side < 2; side++)
+				{
+					places[side].Add(componentPose.GetComponentSpaceTransform(indices[side]).GetLocation());
+				}
+			}
+
+			float total = 0.0f;
+			for (const TArray<FVector>& foot : places)
+			{
+				// A body faces +Y in its own space, so a planted foot slides toward -Y. A foot that swings low past the ground slides the other way and is not counted.
+				FBox travel(foot);
+				double slide = 0.0;
+				int32 steps = 0;
+				for (int32 sample = 0; sample + 1 < foot.Num(); sample++)
+				{
+					const double step = foot[sample + 1].Y - foot[sample].Y;
+					if ((step < 0.0) && (foot[sample].Z < travel.Min.Z + appearancePlantedHeightCm) && (foot[sample + 1].Z < travel.Min.Z + appearancePlantedHeightCm))
+					{
+						slide -= step;
+						steps++;
+					}
+				}
+
+				// Too few planted steps to say anything.
+				if (steps < 3)
+				{
+					return 0.0f;
+				}
+
+				total += static_cast<float>(slide / steps * appearanceRunMeasureSamples / length);
+			}
+
+			return total / 2.0f;
+		}
+
+		return 0.0f;
+	}
+
+	namespace
+	{
+		/** What a run clip measures on a body, once: the first body to use a clip pays for the measurement, and a clip that cannot be measured is said so a single time. */
+		float runClipSpeed(const UAnimationAsset& clip, const USkeletalMeshComponent& body)
+		{
+			static TMap<FObjectKey, TMap<FObjectKey, float>> measured;
+
+			const USkeletalMesh* mesh = body.GetSkeletalMeshAsset();
+			if (mesh == nullptr)
+			{
+				return 0.0f;
+			}
+
+			TMap<FObjectKey, float>& onBodies = measured.FindOrAdd(FObjectKey(&clip));
+			if (const float* known = onBodies.Find(FObjectKey(mesh)))
+			{
+				return *known;
+			}
+
+			const float speed = measureRunSpeed(clip, *mesh);
+			if (speed < appearanceLeastClipSpeedCm)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("The appearance applier could not measure the run clip %s on %s, so it plays at its own rate."), *clip.GetName(), *mesh->GetName());
+			}
+
+			onBodies.Add(FObjectKey(mesh), speed);
+			return speed;
+		}
+	}
+
+	EMotion pickMovingMotion(TConstArrayView<FMovingClip> clips, float speedCm, EMotion playing)
+	{
+		// Slip in ratio terms, so a clip twice too fast and one half as fast are equally bad: the body's speed against the one the clip covers at its clamped rate.
+		const auto slipOf = [speedCm](const FMovingClip& clip)
+		{
+			return (clip.speedCm >= appearanceLeastClipSpeedCm) ? static_cast<double>(FMath::Abs(FMath::Loge(FMath::Max(speedCm, 1.0f) / (clip.speedCm * playRate(speedCm, clip.speedCm))))) : MAX_dbl;
+		};
+
+		const FMovingClip* best = &clips.Last();
+		double bestSlip = MAX_dbl;
+		const FMovingClip* current = nullptr;
+		for (const FMovingClip& clip : clips)
+		{
+			const double slip = slipOf(clip);
+			if (slip < bestSlip)
+			{
+				best = &clip;
+				bestSlip = slip;
+			}
+
+			if (clip.motion == playing)
+			{
+				current = &clip;
+			}
+		}
+
+		if ((current != nullptr) && (slipOf(*current) <= bestSlip / appearanceClipSwapSlipShare))
+		{
+			return current->motion;
+		}
+
+		return best->motion;
+	}
+
+	float playRate(float speedCm, float clipSpeedCm)
+	{
+		return (clipSpeedCm >= appearanceLeastClipSpeedCm) ? FMath::Clamp(speedCm / clipSpeedCm, appearanceLeastPlayRate, appearanceGreatestPlayRate) : 1.0f;
+	}
+
+	void animate(AActor& body, EMotion motion, float speedCm)
 	{
 		// The Universal Animation Library clips, baked onto the MetaHuman skeleton with MetaHuman hands and shoulders.
 		static const TCHAR* const clips[] =
@@ -603,12 +791,61 @@ namespace Appearance
 			TEXT("/Game/Characters/Animations/UAL/Swim_Idle_Loop.Swim_Idle_Loop"),
 			TEXT("/Game/Characters/Animations/UAL/Swim_Fwd_Loop.Swim_Fwd_Loop"),
 			TEXT("/Game/Characters/Animations/UAL/Goblin/Idle_Selection_Loop_Goblin.Idle_Selection_Loop_Goblin"),
-			TEXT("/Game/Characters/Animations/UAL/Goblin/Jog_Fwd_Loop_Goblin.Jog_Fwd_Loop_Goblin")
+			TEXT("/Game/Characters/Animations/UAL/Goblin/Jog_Fwd_Loop_Goblin.Jog_Fwd_Loop_Goblin"),
+			TEXT("/Game/Characters/Animations/UAL/Walk_Loop.Walk_Loop")
+		};
+		static_assert(UE_ARRAY_COUNT(clips) == static_cast<uint8>(EMotion::Move), "Every motion before Move plays a clip of its own; Move and GoblinMove pick among them.");
+
+		// Looked up once rather than by every creature every frame. A weak pointer, since a clip in use is kept loaded by the body playing it.
+		static TWeakObjectPtr<UAnimationAsset> loaded[UE_ARRAY_COUNT(clips)];
+		auto clipOf = [](EMotion of) -> UAnimationAsset*
+		{
+			TWeakObjectPtr<UAnimationAsset>& slot = loaded[static_cast<uint8>(of)];
+			if (!slot.IsValid())
+			{
+				slot = LoadObject<UAnimationAsset>(nullptr, clips[static_cast<uint8>(of)]);
+			}
+
+			return slot.Get();
 		};
 
 		USkeletalMeshComponent* mesh = findMesh(body, TEXT("Body"));
-		UAnimationAsset* clip = LoadObject<UAnimationAsset>(nullptr, clips[static_cast<uint8>(motion)]);
-		if ((mesh == nullptr) || (clip == nullptr))
+		if (mesh == nullptr)
+		{
+			return;
+		}
+
+		// Moving over land has no clip of its own: the speed picks among the clips this body moves with, slowest first.
+		if ((motion == EMotion::Move) || (motion == EMotion::GoblinMove))
+		{
+			const UFootIkAnimInstance* playing = Cast<UFootIkAnimInstance>(mesh->GetAnimInstance());
+			EMotion playingMotion = motion;
+			static const EMotion humanClips[] = { EMotion::Walk, EMotion::Run };
+			static const EMotion goblinClips[] = { EMotion::GoblinRun };
+			TArray<FMovingClip, TInlineAllocator<2>> candidates;
+			for (const EMotion candidate : (motion == EMotion::Move) ? TConstArrayView<EMotion>(humanClips) : TConstArrayView<EMotion>(goblinClips))
+			{
+				const UAnimationAsset* candidateClip = clipOf(candidate);
+				if (candidateClip != nullptr)
+				{
+					candidates.Add({ candidate, runClipSpeed(*candidateClip, *mesh) });
+					if ((playing != nullptr) && (playing->GetAnimationAsset() == candidateClip))
+					{
+						playingMotion = candidate;
+					}
+				}
+			}
+
+			if (candidates.IsEmpty())
+			{
+				return;
+			}
+
+			motion = pickMovingMotion(candidates, speedCm, playingMotion);
+		}
+
+		UAnimationAsset* clip = clipOf(motion);
+		if (clip == nullptr)
 		{
 			return;
 		}
@@ -631,6 +868,14 @@ namespace Appearance
 		{
 			player->SetAnimationAsset(clip, true);
 			player->SetPlaying(true);
+		}
+
+		// The rate changes the pace and never the phase, so it is set on its own and the clip is not started over.
+		const bool onLand = (motion == EMotion::Run) || (motion == EMotion::GoblinRun) || (motion == EMotion::Walk);
+		const float rate = onLand ? playRate(speedCm, runClipSpeed(*clip, *mesh)) : 1.0f;
+		if (!FMath::IsNearlyEqual(player->GetPlayRate(), rate))
+		{
+			player->SetPlayRate(rate);
 		}
 	}
 

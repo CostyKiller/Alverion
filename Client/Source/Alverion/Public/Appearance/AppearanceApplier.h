@@ -3,7 +3,9 @@
 #include "CoreMinimal.h"
 
 class AActor;
+class UAnimationAsset;
 class UClass;
+class USkeletalMesh;
 
 namespace Network
 {
@@ -17,7 +19,7 @@ namespace Network
  */
 namespace Appearance
 {
-	/** What a body is doing, which picks the clip it plays. Characters only run, on land, and swim in deep water. */
+	/** What a body is doing, which picks the clip it plays. Characters walk or run on land, and swim in deep water. */
 	enum class EMotion : uint8
 	{
 		Idle,
@@ -26,11 +28,48 @@ namespace Appearance
 		SwimIdle,
 		Swim,
 		GoblinIdle,
-		GoblinRun
+		GoblinRun,
+		Walk,
+
+		/** Moving over land at the speed given to animate, which picks the clip that suits it best: a walk, or a run. */
+		Move,
+
+		/** The same for the goblin, which has only its run. A goblin walk clip would join it here. */
+		GoblinMove
 	};
 
-	/** Plays the clip for a motion on a MetaHuman's body, looping, and leaves it alone while the motion stays the same, so a loop keeps its phase. */
-	ALVERION_API void animate(AActor& body, EMotion motion);
+	/** A clip a body can move with, and how fast it travels on that body. */
+	struct FMovingClip
+	{
+		EMotion motion;
+		float speedCm;
+	};
+
+	/**
+	 * The clip a body moving at the speed should play: the one that leaves its feet the least slip once its rate is clamped, which is how far the speed the clip covers is from the body's, in ratio.
+	 * The clip already playing stays unless another cuts the slip by a clear margin, so a body at the crossover does not swap clips every frame.
+	 * A clip that could not be measured is not considered, and when none could be the last of them is the answer, which is listed as the fastest. The list must not be empty.
+	 */
+	ALVERION_API EMotion pickMovingMotion(TConstArrayView<FMovingClip> clips, float speedCm, EMotion playing);
+
+	/**
+	 * How fast a run clip travels on a body, in centimetres a second, or zero when that cannot be told.
+	 * A clip with root motion says so itself. Otherwise it is how fast a planted foot slides back through the body's space, found by posing the clip on the body's own bones over one loop.
+	 * The feet are foot_l and foot_r, or ball_l and ball_r when a skeleton has no foot bones.
+	 */
+	ALVERION_API float measureRunSpeed(const UAnimationAsset& clip, const USkeletalMesh& mesh);
+
+	/**
+	 * The rate a run clip plays at for a body that moves at the speed, as a ratio of the clip's own pace: the speed over the one the clip's feet cover, so the strides match the ground.
+	 * Kept within a range that stopping, starting and teleports cannot push into a crawl or a blur. A clip that could not be measured plays at its own rate, which is one.
+	 */
+	ALVERION_API float playRate(float speedCm, float clipSpeedCm);
+
+	/**
+	 * Plays the clip for a motion on a MetaHuman's body, looping, and leaves it alone while the motion stays the same, so a loop keeps its phase.
+	 * A run clip follows the speed the body moves at, which changes its rate and never restarts it.
+	 */
+	ALVERION_API void animate(AActor& body, EMotion motion, float speedCm);
 
 	/** Applies what it can and leaves the rest: a missing groom or eye material is logged and skipped, since a bald character beats no character. */
 	ALVERION_API void apply(AActor& avatar, const Network::FAppearance& appearance);

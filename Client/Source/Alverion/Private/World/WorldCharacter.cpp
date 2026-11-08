@@ -493,7 +493,8 @@ void AWorldCharacter::Tick(float deltaSeconds)
 	// The worn body plays what the capsule is doing: swimming, in the air, standing or running.
 	if (_metaHuman != nullptr)
 	{
-		const bool still = (GetVelocity().Size2D() < standingSpeedCm);
+		const float speed = static_cast<float>(GetVelocity().Size2D());
+		const bool still = (speed < standingSpeedCm);
 		Appearance::EMotion motion = still ? Appearance::EMotion::Idle : Appearance::EMotion::Run;
 		if (_swimming)
 		{
@@ -504,7 +505,7 @@ void AWorldCharacter::Tick(float deltaSeconds)
 			motion = Appearance::EMotion::Fall;
 		}
 
-		Appearance::animate(*_metaHuman, motion);
+		Appearance::animate(*_metaHuman, motion, speed);
 	}
 
 	// The server places a character by its feet, and the actor stands at the middle of its capsule.

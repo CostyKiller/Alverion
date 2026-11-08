@@ -28,6 +28,9 @@ public:
 	/** Whether this is a townsperson: a non-player that the server does not let the player attack and that is not a summon or a trap, and so one that can be talked to. */
 	bool isTownsperson() const;
 
+	/** Switches between the walk and the run, which move at different speeds and play different clips. */
+	void setRunning(bool running);
+
 	virtual void Tick(float deltaSeconds) override;
 
 protected:
@@ -56,8 +59,10 @@ private:
 
 	FVector _destination = FVector::ZeroVector;
 	float _speed = 0.0f;
+	float _walkSpeed = 0.0f;
 	float _swimSpeed = 0.0f;
 	float _groundRetrySeconds = 0.0f;
+	bool _running = true;
 	bool _walking = false;
 	bool _swimming = false;
 };

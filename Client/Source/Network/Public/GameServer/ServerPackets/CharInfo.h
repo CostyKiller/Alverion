@@ -17,6 +17,7 @@ inline bool readCharInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 	int32 objectId = 0;
 	int32 female = 0;
 	int32 runSpeed = 0;
+	int32 walkSpeed = 0;
 	int32 swimSpeed = 0;
 	double moveMultiplier = 1.0;
 	uint16 cubicCount = 0;
@@ -38,9 +39,7 @@ inline bool readCharInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 	buffer.skip((1 + (paperdollSlots * 2) + 7) * 4);
 
 	buffer.readInt32(runSpeed);
-
-	// Walk.
-	buffer.skip(4);
+	buffer.readInt32(walkSpeed);
 
 	buffer.readInt32(swimSpeed);
 
@@ -57,8 +56,13 @@ inline bool readCharInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 	buffer.readInt32(spawn.face);
 	buffer.readString(spawn.title);
 
-	// Clan, crest, alliance, alliance crest, then standing, running, combat, dead, invisible, mount and store as bytes.
-	buffer.skip((4 * 4) + 7);
+	// Clan, crest, alliance and alliance crest, then the standing byte, the running byte, and combat, dead, invisible, mount and store.
+	buffer.skip(4 * 4);
+	buffer.skip(1);
+
+	uint8 running = 0;
+	buffer.readUInt8(running);
+	buffer.skip(5);
 
 	buffer.readUInt16(cubicCount);
 	buffer.skip(cubicCount * 2);
@@ -77,7 +81,9 @@ inline bool readCharInfo(TArrayView<const uint8> body, FCharacterSpawn& spawn)
 	spawn.female = (female != 0);
 	spawn.location = toLocation(x, y, z);
 	spawn.yaw = headingToYaw(heading);
+	spawn.running = (running != 0);
 	spawn.runSpeed = static_cast<float>(toCentimetres(runSpeed) * moveMultiplier);
+	spawn.walkSpeed = static_cast<float>(toCentimetres(walkSpeed) * moveMultiplier);
 	spawn.swimSpeed = static_cast<float>(toCentimetres(swimSpeed) * moveMultiplier);
 
 	TArray<TArray<uint8>> blobs;

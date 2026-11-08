@@ -215,7 +215,11 @@ struct NETWORK_API FCharacterSpawn
 
 	/** Centimetres a second, already multiplied by the server's move multiplier. */
 	float runSpeed = 0.0f;
+	float walkSpeed = 0.0f;
 	float swimSpeed = 0.0f;
+
+	/** Whether it runs rather than walks. Players run until they walk, and townspeople and monsters walk until the server has them run. */
+	bool running = true;
 
 	bool isNpc = false;
 	int32 npcId = 0;
@@ -280,6 +284,7 @@ namespace Opcode
 	inline constexpr uint32 characterDeleteFail = 0x1E;
 	inline constexpr uint32 teleportToLocation = 0x22;
 	inline constexpr uint32 targetUnselected = 0x24;
+	inline constexpr uint32 changeMoveType = 0x28;
 	inline constexpr uint32 versionCheck = 0x2E;
 	inline constexpr uint32 moveToLocation = 0x2F;
 	inline constexpr uint32 charInfo = 0x31;

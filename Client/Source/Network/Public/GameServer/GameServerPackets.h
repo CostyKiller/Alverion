@@ -16,6 +16,7 @@
 #include "GameServer/ServerPackets/NpcHtmlMessage.h"
 #include "GameServer/ServerPackets/MyTargetSelected.h"
 #include "GameServer/ServerPackets/TargetUnselected.h"
+#include "GameServer/ServerPackets/ChangeMoveType.h"
 #include "GameServer/ClientPackets/ProtocolVersion.h"
 #include "GameServer/ClientPackets/AuthLogin.h"
 #include "GameServer/ClientPackets/CharacterCreate.h"

@@ -269,6 +269,17 @@ void FWorldFlow::handlePacket(uint32 opcode, TArrayView<const uint8> body)
 
 			return;
 		}
+		case GameServer::Opcode::changeMoveType:
+		{
+			uint32 objectId = 0;
+			bool running = true;
+			if (GameServer::readChangeMoveType(buffer, objectId, running) && (objectId != _localObjectId))
+			{
+				onMoveTypeChanged.ExecuteIfBound(objectId, running);
+			}
+
+			return;
+		}
 		case GameServer::Opcode::creatureSay:
 		{
 			FChatMessage message;

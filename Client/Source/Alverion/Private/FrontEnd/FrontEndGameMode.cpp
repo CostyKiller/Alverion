@@ -292,7 +292,7 @@ void AFrontEndGameMode::standAvatar(EAvatarSpot spot, UClass* bodyClass, const N
 		_avatarSpot = spot;
 		if (bodyClass != nullptr)
 		{
-			Appearance::animate(*_avatar, Appearance::EMotion::Idle);
+			Appearance::animate(*_avatar, Appearance::EMotion::Idle, 0.0f);
 		}
 	}
 

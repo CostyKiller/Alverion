@@ -19,6 +19,7 @@ DECLARE_DELEGATE_TwoParams(FCharacterMoved, const FObjectPlace&, EMoveKind);
 DECLARE_DELEGATE_TwoParams(FLocalCorrected, const FObjectPlace&, bool);
 DECLARE_DELEGATE_OneParam(FChatReceived, const FChatMessage&);
 DECLARE_DELEGATE_OneParam(FNpcHtmlReceived, const FNpcHtml&);
+DECLARE_DELEGATE_TwoParams(FMoveTypeChanged, uint32, bool);
 
 /**
  * The world, from EnterWorld on.
@@ -48,6 +49,9 @@ public:
 
 	/** The server moving this client's own character. True for a teleport, which snaps rather than blends. */
 	FLocalCorrected onCorrected;
+
+	/** Somebody started running or walking. This client's own character is not told of, since it chooses for itself. */
+	FMoveTypeChanged onMoveTypeChanged;
 
 	/** A line of chat heard, this client's own included, since the server says it back to the speaker too. */
 	FChatReceived onChat;

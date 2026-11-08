@@ -53,7 +53,9 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 	// Summons and traps come marked by the creature kind server patch.
 	_townsperson = spawn.isNpc && !spawn.attackable && (spawn.kind == Network::ECreatureKind::Normal);
 	_speed = spawn.runSpeed;
+	_walkSpeed = spawn.walkSpeed;
 	_swimSpeed = spawn.swimSpeed;
+	_running = spawn.running;
 	standAt(spawn.location, spawn.yaw);
 
 	const bool goblin = spawn.isNpc && spawn.attackable;
@@ -126,6 +128,11 @@ void AProxyCharacter::walkTo(const FVector& destination)
 	_walking = true;
 }
 
+void AProxyCharacter::setRunning(bool running)
+{
+	_running = running;
+}
+
 void AProxyCharacter::standAt(const FVector& location, float yaw)
 {
 	_walking = false;
@@ -171,26 +178,24 @@ void AProxyCharacter::Tick(float deltaSeconds)
 		}
 	}
 
+	// A server too old to report a swim speed leaves it zero, and the land speed stands in.
+	const float landSpeed = _running ? _speed : _walkSpeed;
+	const float speed = (_swimming && (_swimSpeed > 0.0f)) ? _swimSpeed : landSpeed;
+
 	// The short goblin uses floor contacts baked for its leg length on land.
 	if (_metaHuman != nullptr)
 	{
-		Appearance::EMotion motion = _walking ? Appearance::EMotion::Run : Appearance::EMotion::Idle;
+		Appearance::EMotion motion = _walking ? (_wearsGoblin ? Appearance::EMotion::GoblinMove : Appearance::EMotion::Move) : (_wearsGoblin ? Appearance::EMotion::GoblinIdle : Appearance::EMotion::Idle);
 		if (_swimming)
 		{
 			motion = _walking ? Appearance::EMotion::Swim : Appearance::EMotion::SwimIdle;
 		}
-		else if (_wearsGoblin)
-		{
-			motion = _walking ? Appearance::EMotion::GoblinRun : Appearance::EMotion::GoblinIdle;
-		}
 
-		Appearance::animate(*_metaHuman, motion);
+		Appearance::animate(*_metaHuman, motion, speed);
 	}
 
 	if (_walking)
 	{
-		// A server too old to report a swim speed leaves it zero, and the run speed stands in.
-		const float speed = (_swimming && (_swimSpeed > 0.0f)) ? _swimSpeed : _speed;
 		const FVector here = GetActorLocation();
 		const double step = static_cast<double>(speed * deltaSeconds);
 

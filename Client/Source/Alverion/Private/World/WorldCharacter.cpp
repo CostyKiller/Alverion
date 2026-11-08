@@ -146,13 +146,21 @@ void AWorldCharacter::EndPlay(const EEndPlayReason::Type reason)
 
 void AWorldCharacter::wear(const Network::FAppearance& appearance)
 {
+	// The stand-in hides while the MetaHuman loads and comes back only when the MetaHuman assets are missing, so it never shows first and changes into the body.
 	// The actor stands at the middle of its capsule, so the feet are half its height below.
+	_body->SetVisibility(false);
 	const TWeakObjectPtr<AWorldCharacter> weakThis(this);
 	Appearance::attachTo(*this, appearance, FVector(0.0, 0.0, -capsuleHalfHeightCm), [weakThis](AActor* body)
 	{
 		AWorldCharacter* character = weakThis.Get();
-		if ((character == nullptr) || (body == nullptr))
+		if (character == nullptr)
 		{
+			return;
+		}
+
+		if (body == nullptr)
+		{
+			character->_body->SetVisibility(true);
 			return;
 		}
 

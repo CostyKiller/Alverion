@@ -69,16 +69,22 @@ void AProxyCharacter::setup(const Network::FCharacterSpawn& spawn)
 	{
 		_metaHuman->Destroy();
 		_metaHuman = nullptr;
-		_body->SetVisibility(true);
 	}
 
-	// The root is the feet, so the body stands on it; the placeholder hides once the body is there to take its place.
+	// The root is the feet, so the body stands on it.
+	// The placeholder hides while the MetaHuman loads and comes back only when the MetaHuman assets are missing, so it never shows first and changes into the body.
+	_body->SetVisibility(false);
 	const TWeakObjectPtr<AProxyCharacter> weakThis(this);
 	Appearance::attachTo(*this, appearance, FVector::ZeroVector, [weakThis, look, goblin](AActor* body)
 	{
 		AProxyCharacter* proxy = weakThis.Get();
 		if (body == nullptr)
 		{
+			if ((proxy != nullptr) && (proxy->_metaHuman == nullptr))
+			{
+				proxy->_body->SetVisibility(true);
+			}
+
 			return;
 		}
 

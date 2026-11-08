@@ -181,6 +181,8 @@ void UCharacterSelectWidget::NativeOnActivated()
 
 	// Filled on activation rather than on construction.
 	// The list arrives from the game server after this class is known and before it is shown.
+	// Cleared first, so a screen shown again opens on the remembered character as a fresh one does.
+	_shownObjectId = 0;
 	refresh();
 
 	UGameInstance* gameInstance = GetGameInstance();
@@ -204,6 +206,8 @@ void UCharacterSelectWidget::refresh()
 		return;
 	}
 
+	// Nobody shown yet means the screen has just been arrived on, since activation clears it.
+	bool showRemembered = (_shownObjectId == 0);
 	_shownObjectId = 0;
 
 	UGameInstance* gameInstance = GetGameInstance();
@@ -217,7 +221,7 @@ void UCharacterSelectWidget::refresh()
 
 	// The one played or made last, which is what a player expects to be looking at on arrival.
 	// It survives a restart because it is kept in the settings beside the remembered server.
-	// Looked up every time rather than only on the first visit, so a character created while this screen was alive is the one it comes back to.
+	// Shown on arrival and after a creation, so a character created while this screen was alive is the one it comes back to; paging with the arrows keeps whoever was paged to.
 	// A character just created is remembered by name, since the server answers the creation before it sends the list holding its id.
 	UGameSettings* settings = UGameSettings::get();
 	UUISubsystem* createdUi = gameInstance->GetSubsystem<UUISubsystem>();
@@ -233,12 +237,13 @@ void UCharacterSelectWidget::refresh()
 		{
 			settings->rememberCharacter(created->objectId);
 			createdUi->createdName.Reset();
+			showRemembered = true;
 		}
 	}
 
 	const uint64 remembered = (settings != nullptr) ? settings->getRememberedCharacter() : 0;
 
-	if (remembered != 0)
+	if (showRemembered && (remembered != 0))
 	{
 		const int32 rememberedIndex = characters.IndexOfByPredicate([remembered](const Network::FCharacterListEntry& candidate)
 		{

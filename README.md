@@ -13,13 +13,14 @@ Unreal Engine 5 client for L2J Mobius.
 - The world is `L_Continent`, a World Partition map with Mesh Terrain. Start Island, its first land, sits under the server's human starting area so its spawns stand on something. Shape it in the editor's Mesh Terrain mode.
 - Runs in keyboard mode, where the server takes the client's position as true. Other players, townspeople and monsters walk where the server sends them.
 - Players are the MetaHumans their stored appearance describes, in character select and creation and in the world. Until they have models of their own, townspeople wear a default MetaHuman and monsters a goblin MetaHuman. They idle, walk, run and fall.
+- E talks to the townsperson in front, and their dialog opens with its links, buttons and entry fields working. Walking away closes it.
 
 ## Layout
 
 | Folder | What |
 | --- | --- |
 | `Client` | The Unreal Engine 5.8 project. `Network` speaks the server protocol, `Alverion` is the game. |
-| `ServerPatch` | A patch for `L2J_Mobius` that stores each character's appearance block. See its README. |
+| `ServerPatch` | Patches for `L2J_Mobius`: one stores each character's appearance block, the other marks summons and traps. See its README. |
 
 ## MetaHumans
 
@@ -41,7 +42,7 @@ Extract the zip so that the clips land in `Client/Content/Characters/Animations/
 
 ## Running it
 
-1. Run an L2J Mobius login server and game server, with the patch applied and `character_appearance.sql` imported.
+1. Run an L2J Mobius login server and game server, with both patches applied and `character_appearance.sql` imported.
 2. Download the MetaHumans and the animations, see above.
 3. Build `Client/Alverion.uproject` with Unreal Engine 5.8 and run it.
 4. Log in. A server with `AutoCreateAccounts` on makes the account the first time.
